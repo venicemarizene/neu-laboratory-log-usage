@@ -68,12 +68,12 @@ export default function RoomQrGeneratorPage() {
                   level="H"
                   includeMargin={true}
                   bgColor="#FFFFFF"
-                  fgColor="#1242A1"
+                  fgColor="#000000"
                 />
               </div>
               <Button 
                 onClick={() => downloadQR(room)}
-                className="w-full bg-[#57B9FF] hover:bg-[#57B9FF]/90 text-white border-none rounded-2xl font-bold h-11 transition-all flex items-center justify-center gap-2 shadow-sm"
+                className="w-full bg-[#1E3A8A] hover:bg-[#1E3A8A]/90 text-white border-none rounded-2xl font-bold h-11 transition-all flex items-center justify-center gap-2 shadow-sm"
               >
                 <Download className="h-4 w-4" />
                 Download PNG

@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useState, useEffect, useRef } from 'react';
@@ -269,7 +268,7 @@ export default function ProfessorDashboard() {
                       </SelectItem>
                     ))}
                   </SelectContent>
-                </PK-1Select>
+                </Select>
               </div>
 
               <div className="space-y-3">

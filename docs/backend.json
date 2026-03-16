@@ -1,0 +1,230 @@
+{
+  "entities": {
+    "UserProfile": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "UserProfile",
+      "type": "object",
+      "description": "Represents a user of the NEU LabTrack application, including professors and administrators. This entity stores core profile information and access-related flags.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the UserProfile entity. This typically corresponds to the Firebase Authentication UID."
+        },
+        "name": {
+          "type": "string",
+          "description": "The full name of the user as provided by their institutional account."
+        },
+        "email": {
+          "type": "string",
+          "description": "The institutional email address of the user (must be from the @neu.edu.ph domain).",
+          "format": "email"
+        },
+        "role": {
+          "type": "string",
+          "description": "The assigned role of the user within the application, determining their access level and dashboard. Can be 'Professor' or 'Admin'.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "qrString": {
+          "type": "string",
+          "description": "A unique string specifically generated for professors, used to create their identification QR code for scanning during lab usage logging."
+        },
+        "isBlocked": {
+          "type": "boolean",
+          "description": "A boolean flag indicating whether the user's access to the application, particularly lab usage logging, has been revoked by an administrator."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp recording when this user profile was initially created in the system.",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp recording the last time this user profile's information was updated.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "email",
+        "role",
+        "qrString",
+        "isBlocked",
+        "createdAt"
+      ]
+    },
+    "Room": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Room",
+      "type": "object",
+      "description": "Represents a physical computer laboratory room available for booking and usage within the NEU campus. Rooms are named from M101 to M111.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Room entity."
+        },
+        "name": {
+          "type": "string",
+          "description": "The official designation or name of the laboratory room (e.g., 'M101', 'M102', ..., 'M111')."
+        },
+        "description": {
+          "type": "string",
+          "description": "A brief description of the room, typically confirming its nature as a 'Computer Laboratory'."
+        },
+        "qrCodeIdentifier": {
+          "type": "string",
+          "description": "A unique string or identifier associated with this room, used by the system to generate or retrieve its specific QR code for scanning by professors."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp recording when this room record was initially created in the system.",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp recording the last time this room's information was updated.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "description",
+        "qrCodeIdentifier",
+        "createdAt"
+      ]
+    },
+    "RoomLog": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "RoomLog",
+      "type": "object",
+      "description": "Records individual usage sessions of a laboratory room by a professor, tracking start and end times, and session status.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the RoomLog entity."
+        },
+        "professorId": {
+          "type": "string",
+          "description": "Reference to the unique identifier of the UserProfile (professor) who initiated this room usage session. (Relationship: UserProfile 1:N RoomLog)"
+        },
+        "roomId": {
+          "type": "string",
+          "description": "Reference to the unique identifier of the Room entity that was used in this session. (Relationship: Room 1:N RoomLog)"
+        },
+        "startTime": {
+          "type": "string",
+          "description": "Timestamp indicating the precise moment when the room usage session began.",
+          "format": "date-time"
+        },
+        "endTime": {
+          "type": "string",
+          "description": "Timestamp indicating the precise moment when the room usage session ended. This field will be null if the session is still active.",
+          "format": "date-time"
+        },
+        "status": {
+          "type": "string",
+          "description": "The current state of the room usage session. Can be 'Active' (currently in use), 'Completed' (session has ended), or 'Cancelled' (session was prematurely terminated).",
+          "items": {
+            "type": "string"
+          }
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp recording when this room log entry was initially created in the system.",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp recording the last time this room log entry's information was updated (e.g., when 'endTime' or 'status' changed).",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "professorId",
+        "roomId",
+        "startTime",
+        "status",
+        "createdAt"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/user_profiles/{userId}",
+        "definition": {
+          "entityName": "UserProfile",
+          "schema": {
+            "$ref": "#/backend/entities/UserProfile"
+          },
+          "description": "Stores individual user profiles including name, email, role, QR string, and blocked status. The `userId` corresponds to the Firebase Authentication UID. Includes the 'role' field for application logic, but 'Admin' role authorization in security rules will use the existence of a document in the `/admin_roles` collection. Access is path-based for the owner, and full for administrators.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique Firebase Authentication UID of the user."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/rooms/{roomId}",
+        "definition": {
+          "entityName": "Room",
+          "schema": {
+            "$ref": "#/backend/entities/Room"
+          },
+          "description": "Contains details for each physical computer laboratory room (M101-M111). All users have read access to list rooms, but only administrators have write access. No denormalized authorization fields are required as access is global read, admin write.",
+          "params": [
+            {
+              "name": "roomId",
+              "description": "The unique identifier for the laboratory room."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/room_logs/{logId}",
+        "definition": {
+          "entityName": "RoomLog",
+          "schema": {
+            "$ref": "#/backend/entities/RoomLog"
+          },
+          "description": "Records individual lab usage sessions. Each document includes denormalized 'professorId' for professor-specific access, 'professorName' (from UserProfile) for admin filtering, and 'roomName' (from Room) for admin filtering. This flat structure enables efficient global querying for administrators and secure, self-contained access for professors. Supports QAPs by allowing distinct read/write patterns based on ownership and role without hierarchical dependencies.",
+          "params": [
+            {
+              "name": "logId",
+              "description": "The unique identifier for the room usage log entry."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/admin_roles/{adminUid}",
+        "definition": {
+          "entityName": "AdminRole",
+          "schema": {
+            "$ref": "#/backend/entities/UserProfile"
+          },
+          "description": "A dedicated collection for explicit, existence-based administrator role checking in Firebase Security Rules. An empty document exists here for each user with the 'Admin' role, where `adminUid` is their Firebase Auth UID. This provides Authorization Independence by avoiding 'get()' calls for role verification, making admin checks atomic and highly performant. This collection is not intended for direct application data storage, but purely for security rule enforcement.",
+          "params": [
+            {
+              "name": "adminUid",
+              "description": "The unique Firebase Authentication UID of an administrator."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "The recommended Firestore structure for the NEU LabTrack application prioritizes secure, scalable, and debuggable authorization rules by strictly adhering to the core design principles and mandates. \n\n**Authorization Independence (CRITICAL) and Denormalization Strategy:**\n\n1.  **Role-Based Access:** Instead of inferring roles by querying a user's `UserProfile` document in security rules (which would be a `get()` operation), a dedicated collection `/admin_roles/{adminUid}` is introduced. For an admin, an empty document exists at `/admin_roles/$(request.auth.uid)`. Security rules will perform an `exists()` check on this path. This makes admin authorization atomic, independent of the `UserProfile` document's content, and highly performant. The `role` field in the `UserProfile` document will still be maintained for application-level data display and filtering but is not the primary source for security rule enforcement. This perfectly satisfies the Authorization Independence mandate by removing `get()` calls for role checks.\n2.  **RoomLog Ownership:** The `RoomLog` collection explicitly includes `professorId` within each document. This denormalized field ensures that a professor's access to their own log entries (read, create, update status/endTime) can be verified directly against `request.auth.uid` without requiring any `get()` operations on parent or related documents. This also ensures atomic operations for log creation and updates.\n3.  **Admin Dashboard Filtering:** For the admin dashboard's requirement to filter `RoomLogs` by Professor Name and Room Name, `professorName` (from `UserProfile`) and `roomName` (from `Room`) are denormalized directly into the `RoomLog` documents. This avoids expensive client-side joins or complex, insecure rule logic, enabling efficient and secure queries for administrators. This is a direct application of Strategy A for authorization context denormalization to support QAPs.\n\n**QAPs (Rules are not Filters) Support:**\n\n1.  **`/user_profiles/{userId}`:** Professors can only read/update their *own* profile (path-based ownership). Admins, identified by the existence of `/admin_roles/$(request.auth.uid)`, have `list` and full read/write access to all profiles (with specific immutable fields protected). This segregation ensures professors cannot query other professors' profiles, while admins can, satisfying QAPs for different access levels.\n2.  **`/rooms/{roomId}`:** All users (professors and unauthenticated users) have read/list access to the rooms, enabling them to browse available labs. Only administrators (checked via `/admin_roles`) have write access. This clear segregation ensures that `list` operations for rooms are efficient and securely global for read-only purposes.\n3.  **`/room_logs/{logId}`:** This is a flat collection. Professors can create, read, and update *only their own* `RoomLog` entries, enforced by `request.auth.uid == resource.data.professorId`. Administrators, identified by `/admin_roles`, have unrestricted `list` and read access to *all* `RoomLog` entries. This structure allows the admin dashboard to perform global queries and filtering (e.g., by date range, professor name, room name, which are denormalized fields) efficiently without security rule filtering, fulfilling the QAP principle.\n\n**Structural Segregation & Access Modeling:**\n\n*   **`UserProfile`** and **`Room`** collections serve distinct data types with homogeneous security needs within their scope. All `UserProfile` documents have similar read/write patterns (owner vs. admin). All `Room` documents are globally readable, admin-editable.\n*   **`RoomLog`** is a flat collection with denormalized `professorId`, `professorName`, and `roomName` to support direct querying and clear access patterns for both professors (their own logs) and admins (all logs).\n*   **`/admin_roles/{adminUid}`** is a dedicated collection to simplify and secure admin role checks using existence-based validation, aligning with the DBAC principle and preventing `get()` operations in rules for authorization."
+  }
+}

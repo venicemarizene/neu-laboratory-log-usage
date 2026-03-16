@@ -30,8 +30,6 @@ import { useToast } from '@/hooks/use-toast';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Html5Qrcode } from 'html5-qrcode';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
-import { errorEmitter } from '@/firebase/error-emitter';
-import { FirestorePermissionError, type SecurityRuleContext } from '@/firebase/errors';
 import { setDocumentNonBlocking, updateDocumentNonBlocking } from '@/firebase/non-blocking-updates';
 
 /**
@@ -148,24 +146,14 @@ export default function ProfessorDashboard() {
   }, [user, db]);
 
   const handleSignOut = async () => {
-    if (user && db) {
-      const q = query(
-        collection(db, 'room_logs'),
-        where('professorId', '==', user.uid),
-        where('status', '==', 'Active'),
-        limit(10)
-      );
-      
-      getDocs(q).then((querySnapshot) => {
-        querySnapshot.docs.forEach(snapshot => {
-          const updateData = {
-            status: 'Completed',
-            endTime: new Date().toISOString(),
-            updatedAt: new Date().toISOString()
-          };
-          updateDocumentNonBlocking(snapshot.ref, updateData);
-        });
-      });
+    if (user && db && activeSession) {
+      const logRef = doc(db, 'room_logs', activeSession.id);
+      const updateData = {
+        status: 'Completed',
+        endTime: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+      updateDocumentNonBlocking(logRef, updateData);
     }
     await auth.signOut();
     router.push('/login');
@@ -196,19 +184,27 @@ export default function ProfessorDashboard() {
     setIsLogging(false);
   };
 
-  const handleEndSession = () => {
+  const handleEndSession = async () => {
     if (!activeSession || !db) return;
+    
     const logRef = doc(db, 'room_logs', activeSession.id);
     const updateData = {
       status: 'Completed',
       endTime: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     };
+    
+    // Finalize the log in the background
     updateDocumentNonBlocking(logRef, updateData);
+    
+    // Automatic logout and redirect as requested
     setActiveSession(null);
+    await auth.signOut();
+    router.push('/login');
+
     toast({
-      title: "Session Ended",
-      description: `You have successfully logged out of ${activeSession.roomId}.`,
+      title: "Session Completed",
+      description: `You have been automatically logged out after finishing your session in ${activeSession.roomId}.`,
     });
   };
 
@@ -273,7 +269,7 @@ export default function ProfessorDashboard() {
                       </SelectItem>
                     ))}
                   </SelectContent>
-                </Select>
+                </PK-1Select>
               </div>
 
               <div className="space-y-3">

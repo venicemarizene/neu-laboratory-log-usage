@@ -1,17 +1,22 @@
 
 "use client"
 
-import { ReactNode } from 'react';
+import { ReactNode, useEffect } from 'react';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { AdminSidebar } from '@/components/layout/AdminSidebar';
-import { useUser, useAuth } from '@/firebase';
+import { useUser } from '@/firebase';
 import { useRouter } from 'next/navigation';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 
 export default function AdminDashboardLayout({ children }: { children: ReactNode }) {
   const { user, isUserLoading } = useUser();
-  const auth = useAuth();
   const router = useRouter();
+
+  useEffect(() => {
+    if (!isUserLoading && !user) {
+      router.push('/login');
+    }
+  }, [user, isUserLoading, router]);
 
   if (isUserLoading) {
     return (
@@ -25,7 +30,6 @@ export default function AdminDashboardLayout({ children }: { children: ReactNode
   }
 
   if (!user) {
-    router.push('/login');
     return null;
   }
 

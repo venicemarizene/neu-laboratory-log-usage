@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Monitor, ShieldCheck, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth, useFirestore } from '@/firebase';
 import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
@@ -21,15 +21,11 @@ const ADMIN_EMAILS = [
 
 export default function LoginPage() {
   const router = useRouter();
-  const auth = authInstance();
-  const db = firestoreInstance();
+  const auth = useAuth();
+  const db = useFirestore();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<'Professor' | 'Admin'>('Professor');
-
-  // Helper to get instances safely
-  function authInstance() { try { return useAuth(); } catch { return null; } }
-  function firestoreInstance() { try { return useFirestore(); } catch { return null; } }
 
   const handleSignIn = async () => {
     if (!auth || !db) return;
@@ -110,7 +106,7 @@ export default function LoginPage() {
           <Monitor className="text-white h-10 w-10" />
         </div>
         <h1 className="text-4xl font-bold tracking-tight text-slate-900">NEU LabTrack</h1>
-        <p className="text-slate-500 max-w-xs font-medium">
+        <p className="text-slate-500 max-w-sm font-medium">
           Log in with your institutional account to access laboratories.
         </p>
       </div>
@@ -187,7 +183,7 @@ export default function LoginPage() {
       </Card>
       
       <p className="mt-8 text-slate-400 text-xs font-medium">
-        &copy; {new Date().getFullYear()} Northern Christian College. All rights reserved.
+        &copy; 2026 New Era University. All rights reserved.
       </p>
     </div>
   );

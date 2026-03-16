@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useState, useEffect } from 'react';
@@ -22,7 +23,7 @@ import {
 import { useUser, useAuth, useFirestore } from '@/firebase';
 import { useRouter } from 'next/navigation';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { doc, setDoc } from 'firebase/firestore';
+import { doc, setDoc, query, where, collection, getDocs, updateDoc } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Html5QrcodeScanner } from 'html5-qrcode';
@@ -90,6 +91,27 @@ export default function ProfessorDashboard() {
   const [isScannerOpen, setIsScannerOpen] = useState(false);
 
   const handleSignOut = async () => {
+    if (user && db) {
+      // End all active sessions for this professor before signing out
+      try {
+        const q = query(
+          collection(db, 'room_logs'),
+          where('professorId', '==', user.uid),
+          where('status', '==', 'Active')
+        );
+        const querySnapshot = await getDocs(q);
+        const updates = querySnapshot.docs.map(doc => 
+          updateDoc(doc.ref, {
+            status: 'Completed',
+            endTime: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+          })
+        );
+        await Promise.all(updates);
+      } catch (e) {
+        console.error("Error closing sessions on sign out", e);
+      }
+    }
     await auth.signOut();
     router.push('/login');
   };
@@ -98,10 +120,28 @@ export default function ProfessorDashboard() {
     if (!user || !db) return;
     setIsLogging(true);
 
-    const logId = crypto.randomUUID();
-    const logRef = doc(db, 'room_logs', logId);
-
     try {
+      // Prevent duplicate active sessions for the same room to avoid clutter
+      const q = query(
+        collection(db, 'room_logs'),
+        where('professorId', '==', user.uid),
+        where('roomId', '==', roomId),
+        where('status', '==', 'Active')
+      );
+      const existing = await getDocs(q);
+      
+      if (!existing.empty) {
+        toast({
+          title: 'Session Already Active',
+          description: `You already have an active session in ${roomId}.`,
+        });
+        setIsLogging(false);
+        return;
+      }
+
+      const logId = crypto.randomUUID();
+      const logRef = doc(db, 'room_logs', logId);
+
       await setDoc(logRef, {
         id: logId,
         professorId: user.uid,

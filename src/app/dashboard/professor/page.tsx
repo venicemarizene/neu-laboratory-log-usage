@@ -1,7 +1,7 @@
 
 "use client"
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -10,8 +10,7 @@ import {
   LogOut,
   QrCode,
   ArrowRight,
-  CheckCircle2,
-  X
+  CheckCircle2
 } from 'lucide-react';
 import { LAB_ROOMS } from '@/lib/constants';
 import { 
@@ -28,6 +27,56 @@ import { doc, setDoc } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Html5QrcodeScanner } from 'html5-qrcode';
+
+/**
+ * Sub-component to handle QR scanning to ensure the DOM element 'qr-reader' 
+ * exists before initialization.
+ */
+function ScannerView({ onScan }: { onScan: (roomId: string) => void }) {
+  const { toast } = useToast();
+
+  useEffect(() => {
+    const scanner = new Html5QrcodeScanner(
+      "qr-reader",
+      { fps: 10, qrbox: { width: 250, height: 250 } },
+      /* verbose= */ false
+    );
+
+    scanner.render(
+      (decodedText) => {
+        // Expect decodedText to be the Room ID like "M101"
+        const foundRoom = LAB_ROOMS.find(r => r === decodedText);
+        if (foundRoom) {
+          scanner.clear().then(() => {
+            onScan(foundRoom);
+          }).catch(e => console.warn("Failed to clear scanner", e));
+        } else {
+          toast({
+            variant: 'destructive',
+            title: 'Invalid QR Code',
+            description: 'This QR code is not recognized as a laboratory room.',
+          });
+        }
+      },
+      () => {
+        // Quietly handle scan errors (e.g. no QR in frame)
+      }
+    );
+
+    return () => {
+      scanner.clear().catch(e => console.warn("Scanner cleanup failed", e));
+    };
+  }, [onScan, toast]);
+
+  return (
+    <div className="p-6">
+      <div id="qr-reader" className="w-full rounded-2xl overflow-hidden border-none bg-slate-50"></div>
+      <p className="text-center text-xs text-slate-400 mt-4 font-bold">
+        Point your camera at the laboratory's identification QR code.
+      </p>
+    </div>
+  );
+}
 
 export default function ProfessorDashboard() {
   const { user, isUserLoading } = useUser();
@@ -78,47 +127,6 @@ export default function ProfessorDashboard() {
       setIsLogging(false);
     }
   };
-
-  // QR Scanner Logic
-  useEffect(() => {
-    let scanner: Html5QrcodeScanner | null = null;
-
-    if (isScannerOpen) {
-      scanner = new Html5QrcodeScanner(
-        "qr-reader",
-        { fps: 10, qrbox: { width: 250, height: 250 } },
-        /* verbose= */ false
-      );
-
-      scanner.render(
-        (decodedText) => {
-          // Success callback
-          // Expect decodedText to be the Room ID like "M101"
-          const foundRoom = LAB_ROOMS.find(r => r === decodedText);
-          if (foundRoom) {
-            scanner?.clear();
-            setIsScannerOpen(false);
-            handleLogEntry(foundRoom);
-          } else {
-            toast({
-              variant: 'destructive',
-              title: 'Invalid QR Code',
-              description: 'This QR code is not recognized as a laboratory room.',
-            });
-          }
-        },
-        (error) => {
-          // Error callback - usually just standard scanning chatter
-        }
-      );
-    }
-
-    return () => {
-      if (scanner) {
-        scanner.clear().catch(e => console.warn("Failed to clear scanner", e));
-      }
-    };
-  }, [isScannerOpen]);
 
   // Extract first name for personalized greeting
   const fullName = user?.displayName || 'Professor';
@@ -244,12 +252,13 @@ export default function ProfessorDashboard() {
           <DialogHeader className="p-6 bg-white border-b border-slate-50">
             <DialogTitle className="text-xl font-black text-slate-900">Scan Room QR Code</DialogTitle>
           </DialogHeader>
-          <div className="p-6">
-            <div id="qr-reader" className="w-full rounded-2xl overflow-hidden border-none bg-slate-50"></div>
-            <p className="text-center text-xs text-slate-400 mt-4 font-bold">
-              Point your camera at the laboratory's identification QR code.
-            </p>
-          </div>
+          
+          {isScannerOpen && (
+            <ScannerView onScan={(roomId) => {
+              setIsScannerOpen(false);
+              handleLogEntry(roomId);
+            }} />
+          )}
         </DialogContent>
       </Dialog>
 

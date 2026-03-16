@@ -60,14 +60,14 @@ export function AdminSidebar() {
                   asChild 
                   isActive={isActive}
                   className={cn(
-                    "h-12 rounded-none font-bold transition-all px-6 border-l-[6px]",
+                    "h-12 rounded-none font-bold transition-all px-6 border-l-4",
                     isActive 
-                      ? "bg-white text-primary border-white shadow-lg" 
+                      ? "bg-white/10 text-white border-white" 
                       : "text-white/60 hover:bg-white/5 hover:text-white border-transparent"
                   )}
                 >
                   <Link href={item.href}>
-                    <item.icon className={cn("h-5 w-5 mr-3", isActive ? "text-primary" : "text-white/60")} />
+                    <item.icon className={cn("h-5 w-5 mr-3", isActive ? "text-white" : "text-white/60")} />
                     {item.name}
                   </Link>
                 </SidebarMenuButton>

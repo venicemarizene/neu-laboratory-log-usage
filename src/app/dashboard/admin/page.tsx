@@ -6,8 +6,6 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { 
   Users, 
-  DoorOpen, 
-  Ban, 
   Search,
   Calendar as CalendarIcon,
   Waves,
@@ -45,7 +43,7 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar as CalendarUI } from '@/components/ui/calendar';
 import { DateRange } from 'react-day-picker';
-import { format, startOfDay, endOfDay, subDays, subWeeks, subMonths } from 'date-fns';
+import { format, startOfDay, endOfDay, subWeeks, subMonths } from 'date-fns';
 
 export default function AdminDashboard() {
   const [mounted, setMounted] = useState(false);
@@ -178,7 +176,7 @@ export default function AdminDashboard() {
 
         <Card className="border-none shadow-sm bg-white rounded-[32px] overflow-hidden relative">
           <div className="absolute top-6 right-6 opacity-20 text-destructive">
-            <Ban size={24} />
+            <Waves size={24} />
           </div>
           <CardHeader className="pb-2">
             <CardTitle className="text-xs font-black uppercase tracking-widest text-slate-400">

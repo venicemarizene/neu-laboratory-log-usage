@@ -24,11 +24,13 @@ import {
 import { useUser, useAuth, useFirestore } from '@/firebase';
 import { useRouter } from 'next/navigation';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { doc, setDoc, query, where, collection, getDocs, updateDoc } from 'firebase/firestore';
+import { doc, setDoc, query, where, collection, getDocs, updateDoc, writeBatch } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Html5Qrcode } from 'html5-qrcode';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
+import { errorEmitter } from '@/firebase/error-emitter';
+import { FirestorePermissionError } from '@/firebase/errors';
 
 /**
  * Sub-component to handle QR scanning using the stable Html5Qrcode API.
@@ -55,14 +57,18 @@ function ScannerView({ onScan }: { onScan: (roomId: string) => void }) {
             // Success: check if it's a valid laboratory room
             const foundRoom = LAB_ROOMS.find(r => r === decodedText);
             if (foundRoom) {
+              // Stop scanner first to release camera resources
               html5QrCode.stop().then(() => {
                 onScan(foundRoom);
-              }).catch(err => console.warn("Stop failed", err));
+              }).catch(err => {
+                console.warn("Scanner stop failed", err);
+                onScan(foundRoom); // Continue anyway
+              });
             } else {
               toast({
                 variant: 'destructive',
                 title: 'Invalid QR Code',
-                description: `Room "${decodedText}" is not recognized in our registry.`,
+                description: `Room identifier "${decodedText}" is not recognized.`,
               });
             }
           },
@@ -78,7 +84,7 @@ function ScannerView({ onScan }: { onScan: (roomId: string) => void }) {
     };
 
     // Small delay to ensure the DOM element "qr-reader" is fully painted in the Dialog
-    const timer = setTimeout(startScanner, 300);
+    const timer = setTimeout(startScanner, 400);
 
     return () => {
       clearTimeout(timer);
@@ -92,7 +98,7 @@ function ScannerView({ onScan }: { onScan: (roomId: string) => void }) {
     <div className="p-6 space-y-4">
       <div 
         id="qr-reader" 
-        className="w-full aspect-square rounded-2xl overflow-hidden border-none bg-slate-50 shadow-inner"
+        className="w-full aspect-square rounded-2xl overflow-hidden border-none bg-slate-100 shadow-inner"
       />
       
       {hasCameraPermission === false && (
@@ -124,6 +130,7 @@ export default function ProfessorDashboard() {
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [isScannerOpen, setIsScannerOpen] = useState(false);
 
+  // Automatic Session Management: Close active sessions on sign out
   const handleSignOut = async () => {
     if (user && db) {
       try {
@@ -133,16 +140,20 @@ export default function ProfessorDashboard() {
           where('status', '==', 'Active')
         );
         const querySnapshot = await getDocs(q);
-        const updates = querySnapshot.docs.map(doc => 
-          updateDoc(doc.ref, {
-            status: 'Completed',
-            endTime: new Date().toISOString(),
-            updatedAt: new Date().toISOString()
-          })
-        );
-        await Promise.all(updates);
+        
+        if (!querySnapshot.empty) {
+          const batch = writeBatch(db);
+          querySnapshot.docs.forEach(doc => {
+            batch.update(doc.ref, {
+              status: 'Completed',
+              endTime: new Date().toISOString(),
+              updatedAt: new Date().toISOString()
+            });
+          });
+          await batch.commit();
+        }
       } catch (e) {
-        console.error("Error closing sessions on sign out", e);
+        console.error("Session cleanup failed during sign out", e);
       }
     }
     await auth.signOut();
@@ -153,48 +164,42 @@ export default function ProfessorDashboard() {
     if (!user || !db) return;
     setIsLogging(true);
 
-    try {
-      const q = query(
-        collection(db, 'room_logs'),
-        where('professorId', '==', user.uid),
-        where('roomId', '==', roomId),
-        where('status', '==', 'Active')
-      );
-      const existing = await getDocs(q);
-      
-      if (!existing.empty) {
-        toast({
-          title: 'Session Already Active',
-          description: `You already have an active session in ${roomId}.`,
-        });
+    const logId = crypto.randomUUID();
+    const logRef = doc(db, 'room_logs', logId);
+    const now = new Date().toISOString();
+
+    const logData = {
+      id: logId,
+      professorId: user.uid,
+      roomId: roomId,
+      startTime: now,
+      status: 'Active',
+      createdAt: now,
+      updatedAt: now,
+    };
+
+    // Non-blocking Firestore write
+    setDoc(logRef, logData)
+      .then(() => {
+        setStatusMessage(`Session verified. Successfully entered ${roomId}!`);
         setIsLogging(false);
-        return;
-      }
-
-      const logId = crypto.randomUUID();
-      const logRef = doc(db, 'room_logs', logId);
-
-      await setDoc(logRef, {
-        id: logId,
-        professorId: user.uid,
-        roomId: roomId,
-        startTime: new Date().toISOString(),
-        status: 'Active',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        setTimeout(() => setStatusMessage(null), 5000);
+      })
+      .catch(async (error) => {
+        setIsLogging(false);
+        const permissionError = new FirestorePermissionError({
+          path: logRef.path,
+          operation: 'create',
+          requestResourceData: logData,
+        });
+        errorEmitter.emit('permission-error', permissionError);
+        
+        toast({
+          variant: 'destructive',
+          title: 'Logging Error',
+          description: 'Failed to record usage. Please ensure you have institutional access.',
+        });
       });
-
-      setStatusMessage(`Session verified. Successfully entered ${roomId}!`);
-      setTimeout(() => setStatusMessage(null), 5000);
-    } catch (error: any) {
-      toast({
-        variant: 'destructive',
-        title: 'Logging Error',
-        description: 'Failed to record usage. Please check your connection.',
-      });
-    } finally {
-      setIsLogging(false);
-    }
   };
 
   const fullName = user?.displayName || 'Professor';

@@ -9,7 +9,7 @@ import {
   DoorOpen, 
   Ban, 
   Search,
-  Calendar,
+  Calendar as CalendarIcon,
   Waves,
   ChevronDown
 } from 'lucide-react';
@@ -33,7 +33,7 @@ import {
 } from '@/components/ui/table';
 import { Input } from '@/components/ui/input';
 import { useCollection, useFirestore, useMemoFirebase } from '@/firebase';
-import { collection, query, orderBy, limit } from 'firebase/firestore';
+import { collection, query, orderBy, limit, where } from 'firebase/firestore';
 import { LAB_ROOMS } from '@/lib/constants';
 import { cn } from '@/lib/utils';
 import {
@@ -42,18 +42,46 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar as CalendarUI } from '@/components/ui/calendar';
+import { DateRange } from 'react-day-picker';
+import { format, startOfDay, endOfDay, subDays, subWeeks, subMonths } from 'date-fns';
 
 export default function AdminDashboard() {
   const [mounted, setMounted] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterLabel, setFilterLabel] = useState('All Logs');
+  const [dateRange, setDateRange] = useState<DateRange | undefined>();
   const db = useFirestore();
 
-  // Fetch real-time logs with proper memoization
+  // Fetch real-time logs with proper memoization and filtering
   const logsQuery = useMemoFirebase(() => {
     if (!db) return null;
-    return query(collection(db, 'room_logs'), orderBy('createdAt', 'desc'), limit(50));
-  }, [db]);
+    let q = query(collection(db, 'room_logs'), orderBy('createdAt', 'desc'));
+
+    const now = new Date();
+    if (filterLabel === 'Daily Logs') {
+      const start = startOfDay(now).toISOString();
+      q = query(collection(db, 'room_logs'), where('createdAt', '>=', start), orderBy('createdAt', 'desc'));
+    } else if (filterLabel === 'Weekly Logs') {
+      const start = subWeeks(now, 1).toISOString();
+      q = query(collection(db, 'room_logs'), where('createdAt', '>=', start), orderBy('createdAt', 'desc'));
+    } else if (filterLabel === 'Monthly Logs') {
+      const start = subMonths(now, 1).toISOString();
+      q = query(collection(db, 'room_logs'), where('createdAt', '>=', start), orderBy('createdAt', 'desc'));
+    } else if (filterLabel === 'Custom Range' && dateRange?.from) {
+      const start = startOfDay(dateRange.from).toISOString();
+      if (dateRange.to) {
+        const end = endOfDay(dateRange.to).toISOString();
+        q = query(collection(db, 'room_logs'), where('createdAt', '>=', start), where('createdAt', '<=', end), orderBy('createdAt', 'desc'));
+      } else {
+        q = query(collection(db, 'room_logs'), where('createdAt', '>=', start), orderBy('createdAt', 'desc'));
+      }
+    }
+
+    return query(q, limit(100));
+  }, [db, filterLabel, dateRange]);
+  
   const { data: logs, isLoading: isLogsLoading } = useCollection(logsQuery as any);
 
   // Fetch users for blocked count with proper memoization
@@ -124,12 +152,12 @@ export default function AdminDashboard() {
           </div>
           <CardHeader className="pb-2">
             <CardTitle className="text-xs font-black uppercase tracking-widest text-white/60">
-              Active Logs Today
+              Active Logs Filtered
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-5xl font-black mb-1">{activeLogsCount}</div>
-            <p className="text-[10px] font-bold text-white/60">New sessions since 00:00</p>
+            <p className="text-[10px] font-bold text-white/60">Current viewing window</p>
           </CardContent>
         </Card>
 
@@ -211,7 +239,7 @@ export default function AdminDashboard() {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
               <Input 
                 placeholder="Search faculty or lab..." 
-                className="pl-9 h-11 w-64 rounded-xl bg-white border-slate-200 text-xs font-bold shadow-sm focus-visible:ring-primary focus-visible:border-primary"
+                className="pl-9 h-11 w-64 rounded-xl bg-white border-slate-300 text-xs font-bold shadow-sm focus-visible:ring-primary"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -219,17 +247,43 @@ export default function AdminDashboard() {
             
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <div className="bg-white border border-slate-200 text-slate-900 h-11 px-4 rounded-xl flex items-center gap-2 font-bold cursor-pointer hover:bg-slate-50 transition-colors shadow-sm">
-                  <Calendar size={14} className="text-slate-400" />
-                  <span className="text-xs">{filterLabel}</span>
+                <div className="bg-white border border-slate-300 text-slate-900 h-11 px-4 rounded-xl flex items-center gap-2 font-bold cursor-pointer hover:bg-slate-50 transition-colors shadow-sm">
+                  <CalendarIcon size={14} className="text-slate-400" />
+                  <span className="text-xs">
+                    {filterLabel === 'Custom Range' && dateRange?.from
+                      ? `${format(dateRange.from, 'LLL dd')} - ${dateRange.to ? format(dateRange.to, 'LLL dd') : ''}`
+                      : filterLabel}
+                  </span>
                   <ChevronDown size={14} className="text-slate-400 ml-1" />
                 </div>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48 rounded-xl border-none shadow-2xl p-2">
-                <DropdownMenuItem onClick={() => setFilterLabel('Daily Logs')} className="rounded-lg font-bold text-xs h-10">Daily</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setFilterLabel('Weekly Logs')} className="rounded-lg font-bold text-xs h-10">Weekly</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setFilterLabel('Monthly Logs')} className="rounded-lg font-bold text-xs h-10">Monthly</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setFilterLabel('Custom Range')} className="rounded-lg font-bold text-xs h-10">Custom</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => { setFilterLabel('Daily Logs'); setDateRange(undefined); }} className="rounded-lg font-bold text-xs h-10">Daily</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => { setFilterLabel('Weekly Logs'); setDateRange(undefined); }} className="rounded-lg font-bold text-xs h-10">Weekly</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => { setFilterLabel('Monthly Logs'); setDateRange(undefined); }} className="rounded-lg font-bold text-xs h-10">Monthly</DropdownMenuItem>
+                
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="rounded-lg font-bold text-xs h-10">
+                      Custom Range
+                    </DropdownMenuItem>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0 border-none shadow-2xl" align="end">
+                    <CalendarUI
+                      initialFocus
+                      mode="range"
+                      defaultMonth={dateRange?.from}
+                      selected={dateRange}
+                      onSelect={(range) => {
+                        setDateRange(range);
+                        if (range?.from) setFilterLabel('Custom Range');
+                      }}
+                      numberOfMonths={1}
+                    />
+                  </PopoverContent>
+                </Popover>
+                
+                <DropdownMenuItem onClick={() => { setFilterLabel('All Logs'); setDateRange(undefined); }} className="rounded-lg font-bold text-xs h-10 border-t mt-1">Reset All</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
@@ -238,12 +292,12 @@ export default function AdminDashboard() {
           <Table>
             <TableHeader className="bg-slate-50/50">
               <TableRow className="border-none hover:bg-transparent">
-                <TableHead className="px-8 h-12 text-[10px] font-black uppercase tracking-widest text-slate-700">Professor</TableHead>
-                <TableHead className="h-12 text-[10px] font-black uppercase tracking-widest text-slate-700 text-center">Laboratory</TableHead>
-                <TableHead className="h-12 text-[10px] font-black uppercase tracking-widest text-slate-700 text-center">Time In</TableHead>
-                <TableHead className="h-12 text-[10px] font-black uppercase tracking-widest text-slate-700 text-center">Time Out</TableHead>
-                <TableHead className="h-12 text-[10px] font-black uppercase tracking-widest text-slate-700 text-center">Duration</TableHead>
-                <TableHead className="px-8 h-12 text-[10px] font-black uppercase tracking-widest text-slate-700 text-right">Status</TableHead>
+                <TableHead className="px-8 h-12 text-[10px] font-black uppercase tracking-widest text-slate-900">Professor</TableHead>
+                <TableHead className="h-12 text-[10px] font-black uppercase tracking-widest text-slate-900 text-center">Laboratory</TableHead>
+                <TableHead className="h-12 text-[10px] font-black uppercase tracking-widest text-slate-900 text-center">Time In</TableHead>
+                <TableHead className="h-12 text-[10px] font-black uppercase tracking-widest text-slate-900 text-center">Time Out</TableHead>
+                <TableHead className="h-12 text-[10px] font-black uppercase tracking-widest text-slate-900 text-center">Duration</TableHead>
+                <TableHead className="px-8 h-12 text-[10px] font-black uppercase tracking-widest text-slate-900 text-right">Status</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>

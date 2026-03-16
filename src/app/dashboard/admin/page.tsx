@@ -14,7 +14,8 @@ import {
   Clock, 
   Filter,
   Download,
-  Calendar
+  Calendar,
+  Monitor
 } from 'lucide-react';
 import { MOCK_ROOM_LOGS, MOCK_USERS } from '@/lib/placeholder-data';
 import { generateLabUsageSummary, type GenerateLabUsageSummaryOutput } from '@/ai/flows/generate-lab-usage-summary';
@@ -197,7 +198,7 @@ export default function AdminDashboard() {
                   <Users className="mr-2 h-4 w-4" /> Manage Professors
                 </Button>
                 <Button variant="outline" className="justify-start">
-                  <Microscope className="mr-2 h-4 w-4" /> Room Settings
+                  <Monitor className="mr-2 h-4 w-4" /> Room Settings
                 </Button>
               </CardContent>
             </Card>

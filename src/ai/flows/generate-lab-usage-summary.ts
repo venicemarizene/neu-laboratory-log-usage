@@ -50,9 +50,10 @@ Analyze the following laboratory usage data for the {{timePeriod}} period.
 {{#if endDate}} The period ends on {{endDate}}. {{/if}}
 
 Here are the raw room log entries in JSON format:
-` + '```json
+
+\`\`\`json
 {{{logEntries}}}
-```' + `
+\`\`\`
 
 Based on this data, provide:
 1.  A concise natural language summary of the overall laboratory usage patterns.

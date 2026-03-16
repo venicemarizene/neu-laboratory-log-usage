@@ -98,10 +98,13 @@ export default function AdminDashboard() {
     usage: logs?.filter(l => l.roomId === room).length || 0
   }));
 
-  const filteredLogs = logs?.filter(log => 
-    log.professorId?.toLowerCase().includes(searchTerm.toLowerCase()) || 
-    log.roomId?.toLowerCase().includes(searchTerm.toLowerCase())
-  ) || [];
+  const filteredLogs = logs?.filter(log => {
+    const searchLower = searchTerm.toLowerCase();
+    return (
+      log.professorId?.toLowerCase().includes(searchLower) || 
+      log.roomId?.toLowerCase().includes(searchLower)
+    );
+  }) || [];
 
   const formatTime = (dateString: string | null) => {
     if (!dateString) return "—";
@@ -234,7 +237,7 @@ export default function AdminDashboard() {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
               <Input 
                 placeholder="Search faculty or lab..." 
-                className="pl-9 h-11 w-64 rounded-xl bg-white border-slate-300 text-xs font-bold shadow-sm focus-visible:ring-primary"
+                className="pl-9 h-11 w-64 rounded-xl bg-white border-slate-200 text-xs font-bold shadow-sm focus-visible:ring-primary"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -242,11 +245,11 @@ export default function AdminDashboard() {
             
             <Popover open={isFilterOpen} onOpenChange={setIsFilterOpen}>
               <PopoverTrigger asChild>
-                <div className="bg-white border border-slate-300 text-slate-900 h-11 px-4 rounded-xl flex items-center gap-2 font-bold cursor-pointer hover:bg-slate-50 transition-colors shadow-sm">
+                <div className="bg-white border border-slate-200 text-slate-900 h-11 px-4 rounded-xl flex items-center gap-2 font-bold cursor-pointer hover:bg-slate-50 transition-colors shadow-sm">
                   <CalendarIcon size={14} className="text-slate-400" />
                   <span className="text-xs">
                     {filterLabel === 'Custom Range' && dateRange?.from
-                      ? `${format(dateRange.from, 'LLL dd')} - ${dateRange.to ? format(dateRange.to, 'LLL dd') : ''}`
+                      ? `${format(dateRange.from, 'LLL dd, yyyy')}${dateRange.to ? ` - ${format(dateRange.to, 'LLL dd, yyyy')}` : ''}`
                       : filterLabel}
                   </span>
                   <ChevronDown size={14} className="text-slate-400 ml-1" />
@@ -291,7 +294,7 @@ export default function AdminDashboard() {
                       initialFocus
                       className="rounded-none border-none"
                     />
-                    <div className="p-4 flex justify-end gap-2 border-t border-slate-50">
+                    <div className="p-4 flex justify-end gap-2 border-t border-slate-50 bg-slate-50/50">
                        <Button 
                          variant="ghost" 
                          size="sm" 
@@ -364,7 +367,7 @@ export default function AdminDashboard() {
               {filteredLogs.length === 0 && (
                 <TableRow>
                   <TableCell colSpan={6} className="h-32 text-center text-slate-300 font-bold italic">
-                    No activity logs found.
+                    No activity logs found for this criteria.
                   </TableCell>
                 </TableRow>
               )}

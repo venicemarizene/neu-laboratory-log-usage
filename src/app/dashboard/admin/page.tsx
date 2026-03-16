@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { 
@@ -79,6 +79,21 @@ export default function AdminDashboard() {
 
   const db = useFirestore();
 
+  const usersQuery = useMemoFirebase(() => {
+    if (!db) return null;
+    return collection(db, 'user_profiles');
+  }, [db]);
+  const { data: users } = useCollection(usersQuery as any);
+
+  // Create a lookup map for names to handle legacy logs or missing fields
+  const userNameMap = useMemo(() => {
+    const map: Record<string, string> = {};
+    users?.forEach(u => {
+      if (u.id) map[u.id] = u.name || u.email;
+    });
+    return map;
+  }, [users]);
+
   const logsQuery = useMemoFirebase(() => {
     if (!db) return null;
     let q = query(collection(db, 'room_logs'), orderBy('createdAt', 'desc'));
@@ -107,12 +122,6 @@ export default function AdminDashboard() {
   
   const { data: logs } = useCollection(logsQuery as any);
 
-  const usersQuery = useMemoFirebase(() => {
-    if (!db) return null;
-    return collection(db, 'user_profiles');
-  }, [db]);
-  const { data: users } = useCollection(usersQuery as any);
-
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -130,7 +139,8 @@ export default function AdminDashboard() {
 
   const filteredLogs = logs?.filter(log => {
     const searchLower = searchTerm.toLowerCase();
-    const profName = (log.professorName || log.professorId || '').toLowerCase();
+    const profNameFromMap = userNameMap[log.professorId] || '';
+    const profName = (log.professorName || profNameFromMap || log.professorId || '').toLowerCase();
     return (
       profName.includes(searchLower) || 
       log.roomId?.toLowerCase().includes(searchLower)
@@ -440,7 +450,9 @@ export default function AdminDashboard() {
                 <TableRow key={log.id} className="border-slate-50 hover:bg-slate-50/30 transition-colors h-16">
                   <TableCell className="px-8">
                     <div className="flex flex-col">
-                      <span className="font-bold text-sm text-slate-800">{log.professorName || log.professorId}</span>
+                      <span className="font-bold text-sm text-slate-800">
+                        {log.professorName || userNameMap[log.professorId] || log.professorId}
+                      </span>
                     </div>
                   </TableCell>
                   <TableCell className="text-center">

@@ -15,16 +15,6 @@ service cloud.firestore {
      * - /rooms/{roomId}: Laboratory room definitions, globally readable but admin-modifiable.
      * - /room_logs/{logId}: Usage logs secured via denormalized ownership (professorId).
      * - /admin_roles/{adminUid}: A system collection used for high-performance admin verification.
-     * 
-     * KEY SECURITY DECISIONS:
-     * 1. Authorization Independence: Admin status is verified by the existence of a document in 
-     *    /admin_roles, avoiding costly get() calls on user profiles during rule evaluation.
-     * 2. Denormalization for Performance: Room logs contain a 'professorId' field to allow 
-     *    direct ownership checks without parent-document lookups.
-     * 3. Public Room Listing: Room information (M101-M111) is publicly readable to allow 
-     *    authenticated and unauthenticated users to view lab availability.
-     * 4. Relational Integrity: On creation, documents are required to have internal IDs 
-     *    matching their paths (e.g., UserProfile.id == userId).
      */
 
     // --- Helper Functions ---
@@ -42,6 +32,17 @@ service cloud.firestore {
       return isSignedIn() && exists(/databases/$(database)/documents/admin_roles/$(request.auth.uid));
     }
 
+    /** 
+     * Checks if the authenticated user is one of the hardcoded bootstrap administrators.
+     * This allows these specific users to register themselves in the admin_roles collection.
+     */
+    function isBootstrapAdmin() {
+      return isSignedIn() && (
+        request.auth.token.email == 'venicemarizene.linga@neu.edu.ph' || 
+        request.auth.token.email == 'jcesperanza@neu.edu.ph'
+      );
+    }
+
     /** Checks if the user's UID matches the provided ID. */
     function isOwner(userId) {
       return isSignedIn() && request.auth.uid == userId;
@@ -56,10 +57,6 @@ service cloud.firestore {
 
     /**
      * @description Rules for user profile data. Users manage their own; admins manage all.
-     * @path /user_profiles/{userId}
-     * @allow get (owner or admin), create (self-registration), update (owner or admin).
-     * @deny delete (non-admins), update (modifying the profile ID).
-     * @principle Path-based ownership and relational integrity validation.
      */
     match /user_profiles/{userId} {
       allow get, list: if isOwner(userId) || isAdmin();
@@ -70,10 +67,6 @@ service cloud.firestore {
 
     /**
      * @description Lab room definitions. Read-only for most; writable by admins.
-     * @path /rooms/{roomId}
-     * @allow get, list (public), create/update/delete (admins).
-     * @deny write (professors or unauthenticated users).
-     * @principle Public read-access with restricted administrative writes.
      */
     match /rooms/{roomId} {
       allow get, list: if true;
@@ -83,18 +76,9 @@ service cloud.firestore {
 
     /**
      * @description Usage logs for laboratory sessions.
-     * @path /room_logs/{logId}
-     * @allow create (signed-in user setting self as professor), update (owner or admin), list (owner or admin).
-     * @deny create (setting another user as professor), delete (non-admins).
-     *  NOTE: List rule requires queries to filter by professorId for non-admins, but this cannot be enforced directly in rules
-     *  without potentially complex `get` or `list` checks that could affect performance. The `request.query.limit` check
-     *  is a basic safeguard, but backend queries must correctly apply the `professorId` filter.
-     * @principle Denormalized ownership verification for scalable query authorization.
      */
     match /room_logs/{logId} {
       allow get: if isAdmin() || (isSignedIn() && resource.data.professorId == request.auth.uid);
-      // For list, non-admins should only see their own logs. Backend queries must enforce filtering by professorId.
-      // The rules here provide a basic limit check and rely on isAdmin for full access.
       allow list: if isAdmin() || (isSignedIn() && request.query.limit <= 100); 
       allow create: if isSignedIn() && request.resource.data.professorId == request.auth.uid;
       allow update: if (isAdmin() || isDocOwner('professorId')) && resource != null && request.resource.data.professorId == resource.data.professorId;
@@ -103,15 +87,14 @@ service cloud.firestore {
 
     /**
      * @description System-level collection for role-based access control.
-     * @path /admin_roles/{adminUid}
-     * @allow get (any signed-in user for status check), list (admins).
-     * @deny create, update, delete (all users via API; managed via backend/console).
-     * @principle Authorization Independence via existence-based role checking.
+     * Allows bootstrapping via hardcoded emails.
      */
     match /admin_roles/{adminUid} {
       allow get: if isSignedIn();
       allow list: if isAdmin();
-      allow create, update, delete: if false; 
+      // Allow bootstrap admins to create their own record if it matches their UID
+      allow create: if isBootstrapAdmin() && request.auth.uid == adminUid;
+      allow update, delete: if isAdmin() && resource != null;
     }
   }
 }

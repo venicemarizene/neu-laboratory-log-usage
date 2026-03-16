@@ -1,22 +1,30 @@
 "use client"
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { LogOut, LayoutDashboard, Users, History, Settings, Microscope } from 'lucide-react';
+import { usePathname, useRouter } from 'next/navigation';
+import { LogOut, LayoutDashboard, Users, History, Monitor } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { useAuth } from '@/firebase';
 
 export function Navbar() {
   const pathname = usePathname();
+  const router = useRouter();
+  const auth = useAuth();
   const isAdmin = pathname.includes('/admin');
   const isProfessor = pathname.includes('/professor');
+
+  const handleSignOut = async () => {
+    await auth.signOut();
+    router.push('/login');
+  };
 
   return (
     <nav className="border-b bg-white sticky top-0 z-50">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <div className="bg-primary p-1.5 rounded-lg">
-            <Microscope className="text-white h-6 w-6" />
+            <Monitor className="text-white h-6 w-6" />
           </div>
           <span className="font-headline font-bold text-xl tracking-tight text-primary">NEU LabTrack</span>
         </div>
@@ -37,7 +45,12 @@ export function Navbar() {
             </div>
           )}
 
-          <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-destructive transition-colors">
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={handleSignOut}
+            className="text-muted-foreground hover:text-destructive transition-colors"
+          >
             <LogOut className="mr-2 h-4 w-4" />
             Sign Out
           </Button>

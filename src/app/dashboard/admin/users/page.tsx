@@ -2,7 +2,7 @@
 "use client"
 
 import { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { 
@@ -16,11 +16,9 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { 
   Search, 
-  UserPlus, 
   ShieldAlert, 
   ShieldCheck, 
-  MoreVertical,
-  QrCode
+  MoreVertical
 } from 'lucide-react';
 import { useCollection, useFirestore, useMemoFirebase } from '@/firebase';
 import { collection, doc, updateDoc } from 'firebase/firestore';
@@ -48,8 +46,7 @@ export default function UserManagementPage() {
 
   const filteredUsers = users?.filter(user => 
     user.name?.toLowerCase().includes(searchTerm.toLowerCase()) || 
-    user.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.qrString?.toLowerCase().includes(searchTerm.toLowerCase())
+    user.email?.toLowerCase().includes(searchTerm.toLowerCase())
   ) || [];
 
   const toggleBlockStatus = async (uid: string, currentStatus: boolean) => {
@@ -68,10 +65,6 @@ export default function UserManagementPage() {
             Institutional account management and laboratory access control
           </p>
         </div>
-        <Button className="bg-primary hover:bg-primary/90 rounded-2xl h-11 px-6 font-bold shadow-lg shadow-primary/20">
-          <UserPlus className="mr-2 h-4 w-4" />
-          Invite Professor
-        </Button>
       </header>
 
       <Card className="border-none shadow-sm bg-white rounded-[32px] overflow-hidden">
@@ -81,7 +74,7 @@ export default function UserManagementPage() {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-300" />
               <Input 
                 placeholder="Search faculty by name or email..." 
-                className="pl-10 h-11 rounded-2xl bg-slate-50 border-none text-sm font-bold placeholder:text-slate-300"
+                className="pl-10 h-11 rounded-2xl bg-slate-50 border-none text-sm font-bold placeholder:text-slate-300 focus-visible:ring-0 focus-visible:ring-offset-0"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -93,7 +86,6 @@ export default function UserManagementPage() {
             <TableHeader className="bg-slate-50/50">
               <TableRow className="border-none hover:bg-transparent">
                 <TableHead className="px-8 h-12 text-[10px] font-black uppercase tracking-widest text-slate-400">Professor</TableHead>
-                <TableHead className="h-12 text-[10px] font-black uppercase tracking-widest text-slate-400">QR ID</TableHead>
                 <TableHead className="h-12 text-[10px] font-black uppercase tracking-widest text-slate-400">Role</TableHead>
                 <TableHead className="h-12 text-[10px] font-black uppercase tracking-widest text-slate-400">Status</TableHead>
                 <TableHead className="px-8 h-12 text-[10px] font-black uppercase tracking-widest text-slate-400 text-right">Actions</TableHead>
@@ -107,11 +99,6 @@ export default function UserManagementPage() {
                       <span className="font-bold text-slate-700">{user.name}</span>
                       <span className="text-[11px] text-slate-400 font-medium">{user.email}</span>
                     </div>
-                  </TableCell>
-                  <TableCell>
-                    <code className="bg-slate-100 px-3 py-1 rounded-full text-[10px] font-black text-slate-400 border border-slate-200">
-                      {user.qrString || 'NOT_ASSIGNED'}
-                    </code>
                   </TableCell>
                   <TableCell>
                     <Badge variant="outline" className="rounded-full bg-slate-50 border-none text-[9px] font-black uppercase tracking-widest px-3 py-0.5 text-slate-400">
@@ -147,9 +134,6 @@ export default function UserManagementPage() {
                             <><ShieldAlert className="mr-3 h-4 w-4 text-destructive" /> Revoke Access</>
                           )}
                         </DropdownMenuItem>
-                        <DropdownMenuItem className="rounded-xl h-10 font-bold text-sm cursor-pointer">
-                          <QrCode className="mr-3 h-4 w-4 text-slate-400" /> Regenerate QR
-                        </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>
@@ -157,7 +141,7 @@ export default function UserManagementPage() {
               ))}
               {!isLoading && filteredUsers.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={5} className="h-32 text-center text-slate-300 font-bold italic">
+                  <TableCell colSpan={4} className="h-32 text-center text-slate-300 font-bold italic">
                     No faculty records found.
                   </TableCell>
                 </TableRow>

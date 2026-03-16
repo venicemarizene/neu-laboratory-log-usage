@@ -8,7 +8,9 @@ import {
   Users, 
   LogOut, 
   Monitor,
-  ShieldCheck
+  ShieldCheck,
+  QrCode,
+  History
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { 
@@ -35,6 +37,8 @@ export function AdminSidebar() {
   const navItems = [
     { name: 'Dashboard', href: '/dashboard/admin', icon: LayoutDashboard },
     { name: 'Professor Directory', href: '/dashboard/admin/users', icon: Users },
+    { name: 'Room Logs', href: '/dashboard/admin/logs', icon: History },
+    { name: 'Lab QR Registry', href: '/dashboard/admin/rooms', icon: QrCode },
   ];
 
   return (
@@ -60,12 +64,12 @@ export function AdminSidebar() {
                   className={cn(
                     "h-12 rounded-xl font-bold transition-all px-4",
                     isActive 
-                      ? "bg-white/10 text-white hover:bg-white/20 hover:text-white" 
+                      ? "bg-white text-primary hover:bg-white hover:text-primary shadow-lg shadow-white/10" 
                       : "text-white/60 hover:bg-white/5 hover:text-white"
                   )}
                 >
                   <Link href={item.href}>
-                    <item.icon className={cn("h-5 w-5 mr-3", isActive ? "text-white" : "text-white/60")} />
+                    <item.icon className={cn("h-5 w-5 mr-3", isActive ? "text-primary" : "text-white/60")} />
                     {item.name}
                   </Link>
                 </SidebarMenuButton>

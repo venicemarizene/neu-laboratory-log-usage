@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useState, useEffect } from 'react';
@@ -49,7 +48,6 @@ export default function AdminDashboard() {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const db = useFirestore();
 
-  // Fetch real-time logs with proper memoization and filtering
   const logsQuery = useMemoFirebase(() => {
     if (!db) return null;
     let q = query(collection(db, 'room_logs'), orderBy('createdAt', 'desc'));
@@ -79,7 +77,6 @@ export default function AdminDashboard() {
   
   const { data: logs } = useCollection(logsQuery as any);
 
-  // Fetch users for blocked count
   const usersQuery = useMemoFirebase(() => {
     if (!db) return null;
     return collection(db, 'user_profiles');
@@ -92,12 +89,10 @@ export default function AdminDashboard() {
 
   if (!mounted) return null;
 
-  // Process data for charts and stats
   const activeLogsCount = logs?.filter(l => l.status === 'Active').length || 0;
   const uniqueFacultyCount = new Set(logs?.map(l => l.professorId)).size || 0;
   const blockedCount = users?.filter(u => u.isBlocked).length || 0;
 
-  // Lab distribution data
   const labDistributionData = LAB_ROOMS.map(room => ({
     name: room,
     usage: logs?.filter(l => l.roomId === room).length || 0
@@ -147,7 +142,6 @@ export default function AdminDashboard() {
         </p>
       </header>
 
-      {/* Stats Section */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card className="border-none shadow-xl bg-primary text-white rounded-[32px] overflow-hidden relative">
           <div className="absolute top-6 right-6 opacity-20">
@@ -195,7 +189,6 @@ export default function AdminDashboard() {
         </Card>
       </div>
 
-      {/* Chart Section */}
       <Card className="border-none shadow-sm bg-white rounded-[32px] p-8">
         <div className="mb-8">
           <h2 className="text-lg font-black text-slate-900">Computer Laboratory Distribution</h2>
@@ -230,7 +223,6 @@ export default function AdminDashboard() {
         </div>
       </Card>
 
-      {/* Activity Logs Table */}
       <Card className="border-none shadow-sm bg-white rounded-[32px] overflow-hidden">
         <CardHeader className="p-8 border-b border-slate-50 flex flex-row items-center justify-between">
           <div>
@@ -260,7 +252,7 @@ export default function AdminDashboard() {
                   <ChevronDown size={14} className="text-slate-400 ml-1" />
                 </div>
               </PopoverTrigger>
-              <PopoverContent align="end" className="w-auto p-0 border-none shadow-2xl rounded-2xl overflow-hidden flex flex-col md:flex-row">
+              <PopoverContent align="end" className="w-auto p-0 border-none shadow-2xl rounded-2xl overflow-hidden flex flex-col md:flex-row bg-white">
                 <div className="p-2 border-r border-slate-50 min-w-[160px] bg-white">
                   <div className="space-y-1">
                     {['Daily Logs', 'Weekly Logs', 'Monthly Logs', 'All Logs'].map((option) => (
@@ -291,15 +283,15 @@ export default function AdminDashboard() {
                   </div>
                 </div>
                 {filterLabel === 'Custom Range' && (
-                  <div className="p-2 bg-slate-50/50">
+                  <div className="p-0 bg-white border-l border-slate-50">
                     <CalendarUI
                       mode="range"
                       selected={dateRange}
                       onSelect={(range) => setDateRange(range)}
                       initialFocus
-                      className="rounded-xl border-none bg-transparent"
+                      className="rounded-none border-none"
                     />
-                    <div className="p-2 flex justify-end gap-2">
+                    <div className="p-4 flex justify-end gap-2 border-t border-slate-50">
                        <Button 
                          variant="ghost" 
                          size="sm" 

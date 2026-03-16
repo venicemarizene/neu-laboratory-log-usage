@@ -9,8 +9,7 @@ import {
   LogOut, 
   Monitor,
   ShieldCheck,
-  QrCode,
-  History
+  QrCode
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { 
@@ -37,7 +36,6 @@ export function AdminSidebar() {
   const navItems = [
     { name: 'Dashboard', href: '/dashboard/admin', icon: LayoutDashboard },
     { name: 'Professor Directory', href: '/dashboard/admin/users', icon: Users },
-    { name: 'Room Logs', href: '/dashboard/admin/logs', icon: History },
     { name: 'Lab QR Registry', href: '/dashboard/admin/rooms', icon: QrCode },
   ];
 
@@ -52,7 +50,7 @@ export function AdminSidebar() {
         </div>
       </SidebarHeader>
 
-      <SidebarContent className="px-4 py-4">
+      <SidebarContent className="px-0 py-4">
         <SidebarMenu className="gap-2">
           {navItems.map((item) => {
             const isActive = pathname === item.href;
@@ -62,14 +60,14 @@ export function AdminSidebar() {
                   asChild 
                   isActive={isActive}
                   className={cn(
-                    "h-12 rounded-xl font-bold transition-all px-4",
+                    "h-12 rounded-none font-bold transition-all px-6 border-l-[6px] border-transparent",
                     isActive 
-                      ? "bg-white text-primary hover:bg-white hover:text-primary shadow-lg shadow-white/10" 
+                      ? "bg-white/10 text-white border-white shadow-lg" 
                       : "text-white/60 hover:bg-white/5 hover:text-white"
                   )}
                 >
                   <Link href={item.href}>
-                    <item.icon className={cn("h-5 w-5 mr-3", isActive ? "text-primary" : "text-white/60")} />
+                    <item.icon className={cn("h-5 w-5 mr-3", isActive ? "text-white" : "text-white/60")} />
                     {item.name}
                   </Link>
                 </SidebarMenuButton>

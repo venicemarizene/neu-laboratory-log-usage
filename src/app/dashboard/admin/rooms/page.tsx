@@ -6,11 +6,10 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { LAB_ROOMS } from '@/lib/constants';
 import { QRCodeSVG } from 'qrcode.react';
-import { Download, Monitor, QrCode } from 'lucide-react';
+import { Download, Monitor } from 'lucide-react';
 
 export default function RoomQrGeneratorPage() {
   const [selectedRoom, setSelectedRoom] = useState<string | null>(null);
-  const qrRef = useRef<SVGSVGElement>(null);
 
   const downloadQR = (roomName: string) => {
     const svg = document.getElementById(`qr-${roomName}`);
@@ -76,7 +75,7 @@ export default function RoomQrGeneratorPage() {
               </div>
               <Button 
                 onClick={() => downloadQR(room)}
-                className="w-full bg-slate-50 hover:bg-slate-100 text-slate-600 border-none rounded-2xl font-bold h-11 transition-all flex items-center justify-center gap-2"
+                className="w-full bg-slate-800 hover:bg-slate-900 text-white border-none rounded-2xl font-bold h-11 transition-all flex items-center justify-center gap-2 shadow-sm"
               >
                 <Download className="h-4 w-4" />
                 Download PNG

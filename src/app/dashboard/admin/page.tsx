@@ -10,7 +10,8 @@ import {
   Ban, 
   Search,
   Calendar,
-  Waves
+  Waves,
+  ChevronDown
 } from 'lucide-react';
 import { 
   BarChart, 
@@ -35,10 +36,17 @@ import { useCollection, useFirestore, useMemoFirebase } from '@/firebase';
 import { collection, query, orderBy, limit } from 'firebase/firestore';
 import { LAB_ROOMS } from '@/lib/constants';
 import { cn } from '@/lib/utils';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 export default function AdminDashboard() {
   const [mounted, setMounted] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [filterLabel, setFilterLabel] = useState('All Logs');
   const db = useFirestore();
 
   // Fetch real-time logs with proper memoization
@@ -77,17 +85,26 @@ export default function AdminDashboard() {
     log.roomId?.toLowerCase().includes(searchTerm.toLowerCase())
   ) || [];
 
-  const formatDateTime = (dateString: string) => {
-    if (!dateString) return "N/A";
-    return new Date(dateString).toLocaleString('en-US', {
-      month: 'numeric',
-      day: 'numeric',
-      year: 'numeric',
+  const formatTime = (dateString: string | null) => {
+    if (!dateString) return "—";
+    return new Date(dateString).toLocaleTimeString('en-US', {
       hour: 'numeric',
       minute: '2-digit',
-      second: '2-digit',
       hour12: true
     });
+  };
+
+  const calculateDuration = (start: string, end: string | null) => {
+    if (!end) return "Active";
+    const startTime = new Date(start).getTime();
+    const endTime = new Date(end).getTime();
+    const diffMs = endTime - startTime;
+    const diffMins = Math.floor(diffMs / 60000);
+    
+    if (diffMins < 60) return `${diffMins}m`;
+    const hours = Math.floor(diffMins / 60);
+    const remainingMins = diffMins % 60;
+    return `${hours}h ${remainingMins}m`;
   };
 
   return (
@@ -193,39 +210,63 @@ export default function AdminDashboard() {
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
               <Input 
-                placeholder="Search..." 
-                className="pl-9 h-9 w-48 rounded-xl bg-slate-50 border-none text-xs font-bold"
+                placeholder="Search faculty or lab..." 
+                className="pl-9 h-11 w-64 rounded-xl bg-white border-slate-200 text-xs font-bold shadow-sm focus-visible:ring-primary focus-visible:border-primary"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
-            <Badge variant="secondary" className="bg-slate-50 text-slate-900 h-9 px-4 rounded-xl border-none flex gap-2 font-bold cursor-pointer hover:bg-slate-100">
-              <Calendar size={14} className="text-slate-400" />
-              All Logs
-            </Badge>
+            
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <div className="bg-white border border-slate-200 text-slate-900 h-11 px-4 rounded-xl flex items-center gap-2 font-bold cursor-pointer hover:bg-slate-50 transition-colors shadow-sm">
+                  <Calendar size={14} className="text-slate-400" />
+                  <span className="text-xs">{filterLabel}</span>
+                  <ChevronDown size={14} className="text-slate-400 ml-1" />
+                </div>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48 rounded-xl border-none shadow-2xl p-2">
+                <DropdownMenuItem onClick={() => setFilterLabel('Daily Logs')} className="rounded-lg font-bold text-xs h-10">Daily</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setFilterLabel('Weekly Logs')} className="rounded-lg font-bold text-xs h-10">Weekly</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setFilterLabel('Monthly Logs')} className="rounded-lg font-bold text-xs h-10">Monthly</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setFilterLabel('Custom Range')} className="rounded-lg font-bold text-xs h-10">Custom</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </CardHeader>
         <CardContent className="p-0">
           <Table>
             <TableHeader className="bg-slate-50/50">
               <TableRow className="border-none hover:bg-transparent">
-                <TableHead className="px-8 h-12 text-[10px] font-black uppercase tracking-widest text-slate-400">Faculty</TableHead>
-                <TableHead className="h-12 text-[10px] font-black uppercase tracking-widest text-slate-400 text-center">Laboratory</TableHead>
-                <TableHead className="h-12 text-[10px] font-black uppercase tracking-widest text-slate-400 text-center">Timestamp</TableHead>
-                <TableHead className="px-8 h-12 text-[10px] font-black uppercase tracking-widest text-slate-400 text-right">Status</TableHead>
+                <TableHead className="px-8 h-12 text-[10px] font-black uppercase tracking-widest text-slate-700">Professor</TableHead>
+                <TableHead className="h-12 text-[10px] font-black uppercase tracking-widest text-slate-700 text-center">Laboratory</TableHead>
+                <TableHead className="h-12 text-[10px] font-black uppercase tracking-widest text-slate-700 text-center">Time In</TableHead>
+                <TableHead className="h-12 text-[10px] font-black uppercase tracking-widest text-slate-700 text-center">Time Out</TableHead>
+                <TableHead className="h-12 text-[10px] font-black uppercase tracking-widest text-slate-700 text-center">Duration</TableHead>
+                <TableHead className="px-8 h-12 text-[10px] font-black uppercase tracking-widest text-slate-700 text-right">Status</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {filteredLogs.map((log) => (
                 <TableRow key={log.id} className="border-slate-50 hover:bg-slate-50/30 transition-colors h-16">
-                  <TableCell className="px-8 font-bold text-sm text-slate-700">{log.professorId}</TableCell>
+                  <TableCell className="px-8">
+                    <div className="flex flex-col">
+                      <span className="font-bold text-sm text-slate-800">{log.professorId}</span>
+                    </div>
+                  </TableCell>
                   <TableCell className="text-center">
-                    <Badge variant="outline" className="rounded-full bg-slate-50 border-slate-200 text-slate-400 px-3 py-0.5 text-[9px] font-black">
+                    <Badge variant="outline" className="rounded-full bg-slate-50 border-slate-200 text-slate-600 px-3 py-0.5 text-[9px] font-black uppercase">
                       {log.roomId}
                     </Badge>
                   </TableCell>
+                  <TableCell className="text-center text-[10px] font-bold text-slate-500">
+                    {formatTime(log.startTime)}
+                  </TableCell>
+                  <TableCell className="text-center text-[10px] font-bold text-slate-500">
+                    {formatTime(log.endTime)}
+                  </TableCell>
                   <TableCell className="text-center text-[10px] font-bold text-slate-400">
-                    {formatDateTime(log.startTime)}
+                    {calculateDuration(log.startTime, log.endTime)}
                   </TableCell>
                   <TableCell className="px-8 text-right">
                     <Badge 
@@ -241,7 +282,7 @@ export default function AdminDashboard() {
               ))}
               {filteredLogs.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={4} className="h-32 text-center text-slate-300 font-bold italic">
+                  <TableCell colSpan={6} className="h-32 text-center text-slate-300 font-bold italic">
                     No activity logs found.
                   </TableCell>
                 </TableRow>

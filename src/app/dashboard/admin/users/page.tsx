@@ -74,7 +74,7 @@ export default function UserManagementPage() {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-300" />
               <Input 
                 placeholder="Search faculty by name or email..." 
-                className="pl-10 h-11 rounded-2xl bg-slate-50 border-none text-sm font-bold placeholder:text-slate-300 focus-visible:ring-0 focus-visible:ring-offset-0"
+                className="pl-10 h-11 rounded-xl bg-white border-slate-200 text-sm font-bold placeholder:text-slate-300 shadow-sm focus-visible:ring-primary"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -85,10 +85,10 @@ export default function UserManagementPage() {
           <Table>
             <TableHeader className="bg-slate-50/50">
               <TableRow className="border-none hover:bg-transparent">
-                <TableHead className="px-8 h-12 text-[10px] font-black uppercase tracking-widest text-slate-400">Professor</TableHead>
-                <TableHead className="h-12 text-[10px] font-black uppercase tracking-widest text-slate-400">Role</TableHead>
-                <TableHead className="h-12 text-[10px] font-black uppercase tracking-widest text-slate-400">Status</TableHead>
-                <TableHead className="px-8 h-12 text-[10px] font-black uppercase tracking-widest text-slate-400 text-right">Actions</TableHead>
+                <TableHead className="px-8 h-12 text-[10px] font-black uppercase tracking-widest text-slate-700">Professor</TableHead>
+                <TableHead className="h-12 text-[10px] font-black uppercase tracking-widest text-slate-700">Role</TableHead>
+                <TableHead className="h-12 text-[10px] font-black uppercase tracking-widest text-slate-700">Status</TableHead>
+                <TableHead className="px-8 h-12 text-[10px] font-black uppercase tracking-widest text-slate-700 text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -96,7 +96,7 @@ export default function UserManagementPage() {
                 <TableRow key={user.id} className="border-slate-50 hover:bg-slate-50/30 transition-colors h-20">
                   <TableCell className="px-8">
                     <div className="flex flex-col">
-                      <span className="font-bold text-slate-700">{user.name}</span>
+                      <span className="font-bold text-slate-800">{user.name}</span>
                       <span className="text-[11px] text-slate-400 font-medium">{user.email}</span>
                     </div>
                   </TableCell>

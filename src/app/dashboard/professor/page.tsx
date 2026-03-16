@@ -1,7 +1,7 @@
 
 "use client"
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -10,7 +10,8 @@ import {
   LogOut,
   QrCode,
   ArrowRight,
-  CheckCircle2
+  CheckCircle2,
+  AlertCircle
 } from 'lucide-react';
 import { LAB_ROOMS } from '@/lib/constants';
 import { 
@@ -26,53 +27,86 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { doc, setDoc, query, where, collection, getDocs, updateDoc } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Html5QrcodeScanner } from 'html5-qrcode';
+import { Html5Qrcode } from 'html5-qrcode';
+import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 
 /**
- * Sub-component to handle QR scanning to ensure the DOM element 'qr-reader' 
- * exists before initialization.
+ * Sub-component to handle QR scanning using the stable Html5Qrcode API.
  */
 function ScannerView({ onScan }: { onScan: (roomId: string) => void }) {
   const { toast } = useToast();
+  const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
+  const scannerRef = useRef<Html5Qrcode | null>(null);
 
   useEffect(() => {
-    const scanner = new Html5QrcodeScanner(
-      "qr-reader",
-      { fps: 10, qrbox: { width: 250, height: 250 } },
-      /* verbose= */ false
-    );
+    // Initialize scanner on the specific element ID
+    const html5QrCode = new Html5Qrcode("qr-reader");
+    scannerRef.current = html5QrCode;
 
-    scanner.render(
-      (decodedText) => {
-        // Expect decodedText to be the Room ID like "M101"
-        const foundRoom = LAB_ROOMS.find(r => r === decodedText);
-        if (foundRoom) {
-          scanner.clear().then(() => {
-            onScan(foundRoom);
-          }).catch(e => console.warn("Failed to clear scanner", e));
-        } else {
-          toast({
-            variant: 'destructive',
-            title: 'Invalid QR Code',
-            description: 'This QR code is not recognized as a laboratory room.',
-          });
-        }
-      },
-      () => {
-        // Quietly handle scan errors (e.g. no QR in frame)
+    const startScanner = async () => {
+      try {
+        await html5QrCode.start(
+          { facingMode: "environment" },
+          {
+            fps: 10,
+            qrbox: { width: 250, height: 250 },
+          },
+          (decodedText) => {
+            // Success: check if it's a valid laboratory room
+            const foundRoom = LAB_ROOMS.find(r => r === decodedText);
+            if (foundRoom) {
+              html5QrCode.stop().then(() => {
+                onScan(foundRoom);
+              }).catch(err => console.warn("Stop failed", err));
+            } else {
+              toast({
+                variant: 'destructive',
+                title: 'Invalid QR Code',
+                description: `Room "${decodedText}" is not recognized in our registry.`,
+              });
+            }
+          },
+          () => {
+            // Scan failed or no QR in frame - handled silently
+          }
+        );
+        setHasCameraPermission(true);
+      } catch (err) {
+        console.error("Scanner start error:", err);
+        setHasCameraPermission(false);
       }
-    );
+    };
+
+    // Small delay to ensure the DOM element "qr-reader" is fully painted in the Dialog
+    const timer = setTimeout(startScanner, 300);
 
     return () => {
-      scanner.clear().catch(e => console.warn("Scanner cleanup failed", e));
+      clearTimeout(timer);
+      if (scannerRef.current?.isScanning) {
+        scannerRef.current.stop().catch(err => console.warn("Cleanup stop failed", err));
+      }
     };
   }, [onScan, toast]);
 
   return (
-    <div className="p-6">
-      <div id="qr-reader" className="w-full rounded-2xl overflow-hidden border-none bg-slate-50"></div>
-      <p className="text-center text-xs text-slate-400 mt-4 font-bold">
-        Point your camera at the laboratory's identification QR code.
+    <div className="p-6 space-y-4">
+      <div 
+        id="qr-reader" 
+        className="w-full aspect-square rounded-2xl overflow-hidden border-none bg-slate-50 shadow-inner"
+      />
+      
+      {hasCameraPermission === false && (
+        <Alert variant="destructive" className="rounded-xl border-none bg-red-50 text-red-600">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle className="font-black text-xs uppercase tracking-widest">Camera Access Required</AlertTitle>
+          <AlertDescription className="text-[11px] font-bold">
+            Please allow camera access in your browser settings to scan laboratory QR codes.
+          </AlertDescription>
+        </Alert>
+      )}
+
+      <p className="text-center text-[10px] text-slate-400 font-black uppercase tracking-widest">
+        Position the QR code within the frame
       </p>
     </div>
   );
@@ -92,7 +126,6 @@ export default function ProfessorDashboard() {
 
   const handleSignOut = async () => {
     if (user && db) {
-      // End all active sessions for this professor before signing out
       try {
         const q = query(
           collection(db, 'room_logs'),
@@ -121,7 +154,6 @@ export default function ProfessorDashboard() {
     setIsLogging(true);
 
     try {
-      // Prevent duplicate active sessions for the same room to avoid clutter
       const q = query(
         collection(db, 'room_logs'),
         where('professorId', '==', user.uid),
@@ -152,22 +184,19 @@ export default function ProfessorDashboard() {
         updatedAt: new Date().toISOString(),
       });
 
-      setStatusMessage(`Session verified. Thank you for using room ${roomId}!`);
-      
-      // Auto-clear success message after 5 seconds
+      setStatusMessage(`Session verified. Successfully entered ${roomId}!`);
       setTimeout(() => setStatusMessage(null), 5000);
     } catch (error: any) {
       toast({
         variant: 'destructive',
         title: 'Logging Error',
-        description: 'Failed to log room usage. Please try again.',
+        description: 'Failed to record usage. Please check your connection.',
       });
     } finally {
       setIsLogging(false);
     }
   };
 
-  // Extract first name for personalized greeting
   const fullName = user?.displayName || 'Professor';
   const firstName = fullName.split(' ')[0];
   const initial = firstName.charAt(0).toUpperCase();
@@ -185,7 +214,6 @@ export default function ProfessorDashboard() {
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] flex flex-col font-body antialiased">
-      {/* Branding Header (Minimal) */}
       <div className="w-full flex justify-center py-8">
         <div className="flex items-center gap-2">
           <div className="bg-primary p-2 rounded-xl shadow-lg shadow-primary/20">
@@ -195,23 +223,19 @@ export default function ProfessorDashboard() {
         </div>
       </div>
 
-      {/* Main Content Area */}
       <main className="flex-1 flex flex-col items-center justify-center p-6 space-y-6 -mt-12">
-        {/* Success Alert */}
         {statusMessage && (
-          <div className="w-full max-w-md bg-green-50 border border-green-100 text-green-700 px-4 py-3 rounded-xl flex items-center gap-3 animate-in fade-in shadow-sm">
+          <div className="w-full max-w-md bg-green-50 border border-green-100 text-green-700 px-4 py-3 rounded-xl flex items-center gap-3 animate-in slide-in-from-top-4 shadow-sm">
             <CheckCircle2 className="h-5 w-5 text-green-500 shrink-0" />
             <span className="font-bold text-sm">{statusMessage}</span>
           </div>
         )}
 
-        {/* Welcome Section */}
         <div className="text-center space-y-2">
           <h1 className="text-3xl font-black text-slate-900 tracking-tight">Welcome back, {firstName}!</h1>
-          <p className="text-base text-slate-400 font-bold">Which room would you like to use?</p>
+          <p className="text-base text-slate-400 font-bold">Which room are you using today?</p>
         </div>
 
-        {/* Central Selection Card */}
         <Card className="w-full max-w-[360px] border-none shadow-2xl rounded-[32px] overflow-hidden bg-white">
           <CardContent className="p-8 space-y-6">
             <div className="space-y-3">
@@ -254,7 +278,6 @@ export default function ProfessorDashboard() {
           </CardContent>
         </Card>
 
-        {/* User Profile & Sign Out Footer */}
         <div className="w-full max-w-[360px] bg-white rounded-3xl p-4 shadow-sm flex items-center justify-between border border-slate-50">
           <div className="flex items-center gap-3">
             <Avatar className="h-10 w-10 bg-primary/10 rounded-2xl border-none">
@@ -280,11 +303,10 @@ export default function ProfessorDashboard() {
         </div>
       </main>
       
-      {/* QR Scanner Dialog */}
       <Dialog open={isScannerOpen} onOpenChange={setIsScannerOpen}>
-        <DialogContent className="sm:max-w-md p-0 overflow-hidden rounded-[32px] border-none">
+        <DialogContent className="sm:max-w-md p-0 overflow-hidden rounded-[32px] border-none bg-white">
           <DialogHeader className="p-6 bg-white border-b border-slate-50">
-            <DialogTitle className="text-xl font-black text-slate-900">Scan Room QR Code</DialogTitle>
+            <DialogTitle className="text-xl font-black text-slate-900 tracking-tight">Scan Room QR Code</DialogTitle>
           </DialogHeader>
           
           {isScannerOpen && (

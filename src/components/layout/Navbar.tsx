@@ -1,8 +1,9 @@
+
 "use client"
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { LogOut, LayoutDashboard, Users, History, Monitor } from 'lucide-react';
+import { LogOut, LayoutDashboard, Users, QrCode, Monitor } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/firebase';
@@ -34,14 +35,13 @@ export function Navbar() {
             <div className="hidden md:flex items-center gap-1 mr-4">
               <NavLink href="/dashboard/admin" icon={<LayoutDashboard size={18} />} active={pathname === '/dashboard/admin'}>Overview</NavLink>
               <NavLink href="/dashboard/admin/users" icon={<Users size={18} />} active={pathname === '/dashboard/admin/users'}>Users</NavLink>
-              <NavLink href="/dashboard/admin/logs" icon={<History size={18} />} active={pathname === '/dashboard/admin/logs'}>Room Logs</NavLink>
+              <NavLink href="/dashboard/admin/rooms" icon={<QrCode size={18} />} active={pathname === '/dashboard/admin/rooms'}>Lab QR Registry</NavLink>
             </div>
           )}
           
           {isProfessor && (
             <div className="hidden md:flex items-center gap-1 mr-4">
               <NavLink href="/dashboard/professor" icon={<LayoutDashboard size={18} />} active={pathname === '/dashboard/professor'}>Dashboard</NavLink>
-              <NavLink href="/dashboard/professor/history" icon={<History size={18} />} active={pathname === '/dashboard/professor/history'}>My Sessions</NavLink>
             </div>
           )}
 

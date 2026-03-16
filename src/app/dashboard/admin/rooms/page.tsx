@@ -75,7 +75,7 @@ export default function RoomQrGeneratorPage() {
               </div>
               <Button 
                 onClick={() => downloadQR(room)}
-                className="w-full bg-slate-800 hover:bg-slate-900 text-white border-none rounded-2xl font-bold h-11 transition-all flex items-center justify-center gap-2 shadow-sm"
+                className="w-full bg-slate-900 hover:bg-slate-950 text-white border-none rounded-2xl font-bold h-11 transition-all flex items-center justify-center gap-2 shadow-sm"
               >
                 <Download className="h-4 w-4" />
                 Download PNG

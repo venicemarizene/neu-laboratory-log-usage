@@ -11,7 +11,8 @@ import {
   QrCode,
   ArrowRight,
   CheckCircle2,
-  AlertCircle
+  AlertCircle,
+  Clock
 } from 'lucide-react';
 import { LAB_ROOMS } from '@/lib/constants';
 import { 
@@ -34,7 +35,7 @@ import { FirestorePermissionError, type SecurityRuleContext } from '@/firebase/e
 import { setDocumentNonBlocking, updateDocumentNonBlocking } from '@/firebase/non-blocking-updates';
 
 /**
- * Sub-component to handle QR scanning using the stable Html5Qrcode API.
+ * Sub-component to handle QR scanning with strict border containment.
  */
 function ScannerView({ onScan }: { onScan: (roomId: string) => void }) {
   const { toast } = useToast();
@@ -91,10 +92,13 @@ function ScannerView({ onScan }: { onScan: (roomId: string) => void }) {
 
   return (
     <div className="p-6 space-y-4">
-      <div 
-        id="qr-reader" 
-        className="w-full aspect-square rounded-2xl overflow-hidden border-none bg-slate-100 shadow-inner"
-      />
+      {/* Scanner Container with strict overflow-hidden to stay in border */}
+      <div className="relative w-full aspect-square rounded-[2rem] overflow-hidden bg-slate-100 border-4 border-slate-50 shadow-inner flex items-center justify-center">
+        <div 
+          id="qr-reader" 
+          className="w-full h-full [&_video]:object-cover [&_video]:w-full [&_video]:h-full"
+        />
+      </div>
       
       {hasCameraPermission === false && (
         <Alert variant="destructive" className="rounded-xl border-none bg-red-50 text-red-600">
@@ -122,8 +126,26 @@ export default function ProfessorDashboard() {
   
   const [selectedRoom, setSelectedRoom] = useState<string>("M103");
   const [isLogging, setIsLogging] = useState(false);
-  const [statusMessage, setStatusMessage] = useState<string | null>(null);
+  const [activeSession, setActiveSession] = useState<{id: string, roomId: string} | null>(null);
   const [isScannerOpen, setIsScannerOpen] = useState(false);
+
+  // Check for active sessions on load
+  useEffect(() => {
+    if (user && db) {
+      const q = query(
+        collection(db, 'room_logs'),
+        where('professorId', '==', user.uid),
+        where('status', '==', 'Active'),
+        limit(1)
+      );
+      getDocs(q).then((snapshot) => {
+        if (!snapshot.empty) {
+          const doc = snapshot.docs[0];
+          setActiveSession({ id: doc.id, roomId: doc.data().roomId });
+        }
+      });
+    }
+  }, [user, db]);
 
   const handleSignOut = async () => {
     if (user && db) {
@@ -143,12 +165,6 @@ export default function ProfessorDashboard() {
           };
           updateDocumentNonBlocking(snapshot.ref, updateData);
         });
-      }).catch(async (serverError) => {
-        const permissionError = new FirestorePermissionError({
-          path: 'room_logs',
-          operation: 'list',
-        } satisfies SecurityRuleContext);
-        errorEmitter.emit('permission-error', permissionError);
       });
     }
     await auth.signOut();
@@ -175,10 +191,25 @@ export default function ProfessorDashboard() {
 
     setDocumentNonBlocking(logRef, logData, { merge: true });
     
-    // Optimistically show success
-    setStatusMessage(`Session verified. Successfully entered ${roomId}!`);
+    // Set active session contextually
+    setActiveSession({ id: logId, roomId: roomId });
     setIsLogging(false);
-    setTimeout(() => setStatusMessage(null), 5000);
+  };
+
+  const handleEndSession = () => {
+    if (!activeSession || !db) return;
+    const logRef = doc(db, 'room_logs', activeSession.id);
+    const updateData = {
+      status: 'Completed',
+      endTime: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    updateDocumentNonBlocking(logRef, updateData);
+    setActiveSession(null);
+    toast({
+      title: "Session Ended",
+      description: `You have successfully logged out of ${activeSession.roomId}.`,
+    });
   };
 
   const fullName = user?.displayName || 'Professor';
@@ -208,59 +239,86 @@ export default function ProfessorDashboard() {
       </div>
 
       <main className="flex-1 flex flex-col items-center justify-center p-6 space-y-6 -mt-12">
-        {statusMessage && (
+        {activeSession && (
           <div className="w-full max-w-md bg-green-50 border border-green-100 text-green-700 px-4 py-3 rounded-xl flex items-center gap-3 animate-in slide-in-from-top-4 shadow-sm">
             <CheckCircle2 className="h-5 w-5 text-green-500 shrink-0" />
-            <span className="font-bold text-sm">{statusMessage}</span>
+            <span className="font-bold text-sm">
+              Session verified. Thank you for using room {activeSession.roomId}.
+            </span>
           </div>
         )}
 
         <div className="text-center space-y-2">
           <h1 className="text-3xl font-black text-slate-900 tracking-tight">Welcome back, {firstName}!</h1>
-          <p className="text-base text-slate-400 font-bold">Which room are you using today?</p>
+          <p className="text-base text-slate-400 font-bold">
+            {activeSession ? "Current lab session in progress." : "Which room are you using today?"}
+          </p>
         </div>
 
-        <Card className="w-full max-w-[360px] border-none shadow-2xl rounded-[32px] overflow-hidden bg-white">
-          <CardContent className="p-8 space-y-6">
-            <div className="space-y-3">
-              <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-300 ml-1">
-                Laboratory Room
-              </label>
-              <Select value={selectedRoom} onValueChange={setSelectedRoom}>
-                <SelectTrigger className="h-12 rounded-2xl bg-slate-50 border-none text-base font-black text-slate-900 px-6 shadow-inner focus:ring-0">
-                  <SelectValue placeholder="Select a room" />
-                </SelectTrigger>
-                <SelectContent className="rounded-2xl border-none shadow-xl">
-                  {LAB_ROOMS.map(room => (
-                    <SelectItem key={room} value={room} className="font-bold h-10">
-                      {room}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+        {!activeSession ? (
+          <Card className="w-full max-w-[360px] border-none shadow-2xl rounded-[32px] overflow-hidden bg-white">
+            <CardContent className="p-8 space-y-6">
+              <div className="space-y-3">
+                <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-300 ml-1">
+                  Laboratory Room
+                </label>
+                <Select value={selectedRoom} onValueChange={setSelectedRoom}>
+                  <SelectTrigger className="h-12 rounded-2xl bg-slate-50 border-none text-base font-black text-slate-900 px-6 shadow-inner focus:ring-0">
+                    <SelectValue placeholder="Select a room" />
+                  </SelectTrigger>
+                  <SelectContent className="rounded-2xl border-none shadow-xl">
+                    {LAB_ROOMS.map(room => (
+                      <SelectItem key={room} value={room} className="font-bold h-10">
+                        {room}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
 
-            <div className="space-y-3">
-              <Button 
-                onClick={() => setIsScannerOpen(true)}
-                variant="outline"
-                className="w-full h-12 rounded-2xl bg-slate-50 border-none hover:bg-slate-100 text-slate-500 font-bold text-sm flex items-center justify-center gap-3 transition-all"
-              >
-                <QrCode className="h-4 w-4 text-slate-300" />
-                Auto-Log via QR
-              </Button>
+              <div className="space-y-3">
+                <Button 
+                  onClick={() => setIsScannerOpen(true)}
+                  variant="outline"
+                  className="w-full h-12 rounded-2xl bg-slate-50 border-none hover:bg-slate-100 text-slate-500 font-bold text-sm flex items-center justify-center gap-3 transition-all"
+                >
+                  <QrCode className="h-4 w-4 text-slate-300" />
+                  Auto-Log via QR
+                </Button>
+
+                <Button 
+                  onClick={() => handleLogEntry(selectedRoom)}
+                  disabled={isLogging}
+                  className="w-full h-12 rounded-2xl bg-primary hover:bg-primary/90 text-white font-black text-base flex items-center justify-center gap-3 shadow-lg shadow-primary/20 transition-all active:scale-[0.98] disabled:opacity-70"
+                >
+                  <ArrowRight className="h-4 w-4" />
+                  {isLogging ? 'Logging...' : `Log Entry ${selectedRoom}`}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        ) : (
+          <Card className="w-full max-w-[360px] border-none shadow-2xl rounded-[32px] overflow-hidden bg-white">
+            <CardContent className="p-8 space-y-6">
+              <div className="text-center space-y-2 py-4">
+                <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-1.5 rounded-full mb-2">
+                  <Clock className="h-3 w-3" />
+                  <span className="text-[10px] font-black uppercase tracking-widest">Active Usage</span>
+                </div>
+                <h2 className="text-5xl font-black text-slate-900">{activeSession.roomId}</h2>
+                <p className="text-xs font-bold text-slate-400">Institutional Session Registered</p>
+              </div>
 
               <Button 
-                onClick={() => handleLogEntry(selectedRoom)}
-                disabled={isLogging}
-                className="w-full h-12 rounded-2xl bg-primary hover:bg-primary/90 text-white font-black text-base flex items-center justify-center gap-3 shadow-lg shadow-primary/20 transition-all active:scale-[0.98] disabled:opacity-70"
+                onClick={handleEndSession}
+                className="w-full h-14 rounded-2xl bg-destructive hover:bg-destructive/90 text-white font-black text-base flex items-center justify-center gap-3 shadow-lg shadow-destructive/20 transition-all active:scale-[0.98]"
               >
-                <ArrowRight className="h-4 w-4" />
-                {isLogging ? 'Logging...' : `Log Entry ${selectedRoom}`}
+                <LogOut className="h-4 w-4" />
+                End Session
               </Button>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        )}
 
         <div className="w-full max-w-[360px] bg-white rounded-3xl p-4 shadow-sm flex items-center justify-between border border-slate-50">
           <div className="flex items-center gap-3">

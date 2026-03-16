@@ -26,10 +26,14 @@ service cloud.firestore {
 
     /** 
      * Checks if the authenticated user is an administrator.
-     * Uses the optimized /admin_roles collection for verification.
+     * Uses the optimized /admin_roles collection for verification,
+     * with a fallback for bootstrap admins to ensure immediate access.
      */
     function isAdmin() {
-      return isSignedIn() && exists(/databases/$(database)/documents/admin_roles/$(request.auth.uid));
+      return isSignedIn() && (
+        exists(/databases/$(database)/documents/admin_roles/$(request.auth.uid)) ||
+        isBootstrapAdmin()
+      );
     }
 
     /** 

@@ -69,9 +69,9 @@ export default function LoginPage() {
         return;
       }
 
-      // Sync user profile with Firestore
+      // Sync user profile with Firestore - Awaiting to ensure rules apply for next page
       const userRef = doc(db, 'user_profiles', user.uid);
-      setDoc(userRef, {
+      await setDoc(userRef, {
         id: user.uid,
         name: user.displayName,
         email: user.email,
@@ -79,9 +79,9 @@ export default function LoginPage() {
         updatedAt: serverTimestamp(),
       }, { merge: true });
 
-      // Ensure admin persistence for security rules
+      // Ensure admin persistence for security rules - Awaiting to prevent race condition
       if (isAdmin) {
-        setDoc(doc(db, 'admin_roles', user.uid), { active: true }, { merge: true });
+        await setDoc(doc(db, 'admin_roles', user.uid), { active: true }, { merge: true });
       }
 
       // Route based on role

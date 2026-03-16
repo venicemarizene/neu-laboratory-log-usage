@@ -1,6 +1,7 @@
+
 "use client"
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -9,7 +10,8 @@ import {
   LogOut,
   QrCode,
   ArrowRight,
-  CheckCircle2
+  CheckCircle2,
+  X
 } from 'lucide-react';
 import { LAB_ROOMS } from '@/lib/constants';
 import { 
@@ -24,6 +26,8 @@ import { useRouter } from 'next/navigation';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { doc, setDoc } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Html5QrcodeScanner } from 'html5-qrcode';
 
 export default function ProfessorDashboard() {
   const { user, isUserLoading } = useUser();
@@ -35,13 +39,14 @@ export default function ProfessorDashboard() {
   const [selectedRoom, setSelectedRoom] = useState<string>("M103");
   const [isLogging, setIsLogging] = useState(false);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
+  const [isScannerOpen, setIsScannerOpen] = useState(false);
 
   const handleSignOut = async () => {
     await auth.signOut();
     router.push('/login');
   };
 
-  const handleLogEntry = async () => {
+  const handleLogEntry = async (roomId: string) => {
     if (!user || !db) return;
     setIsLogging(true);
 
@@ -52,14 +57,14 @@ export default function ProfessorDashboard() {
       await setDoc(logRef, {
         id: logId,
         professorId: user.uid,
-        roomId: selectedRoom,
+        roomId: roomId,
         startTime: new Date().toISOString(),
         status: 'Active',
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       });
 
-      setStatusMessage(`Session verified. Thank you for using room ${selectedRoom}!`);
+      setStatusMessage(`Session verified. Thank you for using room ${roomId}!`);
       
       // Auto-clear success message after 5 seconds
       setTimeout(() => setStatusMessage(null), 5000);
@@ -74,10 +79,50 @@ export default function ProfessorDashboard() {
     }
   };
 
+  // QR Scanner Logic
+  useEffect(() => {
+    let scanner: Html5QrcodeScanner | null = null;
+
+    if (isScannerOpen) {
+      scanner = new Html5QrcodeScanner(
+        "qr-reader",
+        { fps: 10, qrbox: { width: 250, height: 250 } },
+        /* verbose= */ false
+      );
+
+      scanner.render(
+        (decodedText) => {
+          // Success callback
+          // Expect decodedText to be the Room ID like "M101"
+          const foundRoom = LAB_ROOMS.find(r => r === decodedText);
+          if (foundRoom) {
+            scanner?.clear();
+            setIsScannerOpen(false);
+            handleLogEntry(foundRoom);
+          } else {
+            toast({
+              variant: 'destructive',
+              title: 'Invalid QR Code',
+              description: 'This QR code is not recognized as a laboratory room.',
+            });
+          }
+        },
+        (error) => {
+          // Error callback - usually just standard scanning chatter
+        }
+      );
+    }
+
+    return () => {
+      if (scanner) {
+        scanner.clear().catch(e => console.warn("Failed to clear scanner", e));
+      }
+    };
+  }, [isScannerOpen]);
+
   // Extract first name for personalized greeting
   const fullName = user?.displayName || 'Professor';
   const firstName = fullName.split(' ')[0];
-  const email = user?.email || 'email@neu.edu.ph';
   const initial = firstName.charAt(0).toUpperCase();
 
   if (isUserLoading) {
@@ -103,10 +148,6 @@ export default function ProfessorDashboard() {
         </div>
 
         <div className="flex items-center gap-4">
-          <div className="text-right hidden sm:block">
-            <p className="text-sm font-bold text-slate-900 leading-tight">{fullName}</p>
-            <p className="text-[11px] text-slate-400 font-medium">{email}</p>
-          </div>
           <Button 
             variant="ghost" 
             size="sm" 
@@ -142,7 +183,7 @@ export default function ProfessorDashboard() {
               <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-300 ml-1">
                 Laboratory Room
               </label>
-              <Select defaultValue={selectedRoom} onValueChange={setSelectedRoom}>
+              <Select value={selectedRoom} onValueChange={setSelectedRoom}>
                 <SelectTrigger className="h-14 rounded-xl bg-slate-50 border-none text-lg font-black text-slate-900 px-6 shadow-inner ring-offset-0 focus:ring-0">
                   <SelectValue placeholder="Select a room" />
                 </SelectTrigger>
@@ -158,6 +199,7 @@ export default function ProfessorDashboard() {
 
             <div className="space-y-4">
               <Button 
+                onClick={() => setIsScannerOpen(true)}
                 variant="outline"
                 className="w-full h-14 rounded-xl bg-slate-50 border-none hover:bg-slate-100 text-slate-500 font-bold text-base flex items-center justify-center gap-3 transition-all"
               >
@@ -166,7 +208,7 @@ export default function ProfessorDashboard() {
               </Button>
 
               <Button 
-                onClick={handleLogEntry}
+                onClick={() => handleLogEntry(selectedRoom)}
                 disabled={isLogging}
                 className="w-full h-14 rounded-xl bg-primary hover:bg-primary/90 text-white font-black text-lg flex items-center justify-center gap-3 shadow-lg shadow-primary/20 transition-all active:scale-[0.98] disabled:opacity-70"
               >
@@ -177,7 +219,7 @@ export default function ProfessorDashboard() {
           </CardContent>
         </Card>
 
-        {/* User Profile Footer Card - Simplified */}
+        {/* User Profile Footer Card */}
         <div className="w-full max-w-md bg-white rounded-2xl p-4 shadow-sm flex items-center justify-between border border-slate-50">
           <div className="flex items-center gap-4">
             <Avatar className="h-12 w-12 bg-primary/10 rounded-xl border-none">
@@ -196,6 +238,21 @@ export default function ProfessorDashboard() {
         </div>
       </main>
       
+      {/* QR Scanner Dialog */}
+      <Dialog open={isScannerOpen} onOpenChange={setIsScannerOpen}>
+        <DialogContent className="sm:max-w-md p-0 overflow-hidden rounded-3xl border-none">
+          <DialogHeader className="p-6 bg-white border-b border-slate-50">
+            <DialogTitle className="text-xl font-black text-slate-900">Scan Room QR Code</DialogTitle>
+          </DialogHeader>
+          <div className="p-6">
+            <div id="qr-reader" className="w-full rounded-2xl overflow-hidden border-none bg-slate-50"></div>
+            <p className="text-center text-xs text-slate-400 mt-4 font-bold">
+              Point your camera at the laboratory's identification QR code.
+            </p>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       {/* Decorative Brand Accent */}
       <div className="fixed bottom-6 right-6 h-2 w-2 bg-primary rounded-full opacity-20 pointer-events-none" />
     </div>

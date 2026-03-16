@@ -24,13 +24,14 @@ import {
 import { useUser, useAuth, useFirestore } from '@/firebase';
 import { useRouter } from 'next/navigation';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { doc, setDoc, query, where, collection, getDocs, updateDoc, writeBatch } from 'firebase/firestore';
+import { doc, query, where, collection, getDocs, limit } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Html5Qrcode } from 'html5-qrcode';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { errorEmitter } from '@/firebase/error-emitter';
-import { FirestorePermissionError } from '@/firebase/errors';
+import { FirestorePermissionError, type SecurityRuleContext } from '@/firebase/errors';
+import { setDocumentNonBlocking, updateDocumentNonBlocking } from '@/firebase/non-blocking-updates';
 
 /**
  * Sub-component to handle QR scanning using the stable Html5Qrcode API.
@@ -41,7 +42,6 @@ function ScannerView({ onScan }: { onScan: (roomId: string) => void }) {
   const scannerRef = useRef<Html5Qrcode | null>(null);
 
   useEffect(() => {
-    // Initialize scanner on the specific element ID
     const html5QrCode = new Html5Qrcode("qr-reader");
     scannerRef.current = html5QrCode;
 
@@ -54,15 +54,13 @@ function ScannerView({ onScan }: { onScan: (roomId: string) => void }) {
             qrbox: { width: 250, height: 250 },
           },
           (decodedText) => {
-            // Success: check if it's a valid laboratory room
             const foundRoom = LAB_ROOMS.find(r => r === decodedText);
             if (foundRoom) {
-              // Stop scanner first to release camera resources
               html5QrCode.stop().then(() => {
                 onScan(foundRoom);
               }).catch(err => {
                 console.warn("Scanner stop failed", err);
-                onScan(foundRoom); // Continue anyway
+                onScan(foundRoom);
               });
             } else {
               toast({
@@ -72,9 +70,7 @@ function ScannerView({ onScan }: { onScan: (roomId: string) => void }) {
               });
             }
           },
-          () => {
-            // Scan failed or no QR in frame - handled silently
-          }
+          () => {}
         );
         setHasCameraPermission(true);
       } catch (err) {
@@ -83,7 +79,6 @@ function ScannerView({ onScan }: { onScan: (roomId: string) => void }) {
       }
     };
 
-    // Small delay to ensure the DOM element "qr-reader" is fully painted in the Dialog
     const timer = setTimeout(startScanner, 400);
 
     return () => {
@@ -130,37 +125,37 @@ export default function ProfessorDashboard() {
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [isScannerOpen, setIsScannerOpen] = useState(false);
 
-  // Automatic Session Management: Close active sessions on sign out
   const handleSignOut = async () => {
     if (user && db) {
-      try {
-        const q = query(
-          collection(db, 'room_logs'),
-          where('professorId', '==', user.uid),
-          where('status', '==', 'Active')
-        );
-        const querySnapshot = await getDocs(q);
-        
-        if (!querySnapshot.empty) {
-          const batch = writeBatch(db);
-          querySnapshot.docs.forEach(doc => {
-            batch.update(doc.ref, {
-              status: 'Completed',
-              endTime: new Date().toISOString(),
-              updatedAt: new Date().toISOString()
-            });
-          });
-          await batch.commit();
-        }
-      } catch (e) {
-        console.error("Session cleanup failed during sign out", e);
-      }
+      const q = query(
+        collection(db, 'room_logs'),
+        where('professorId', '==', user.uid),
+        where('status', '==', 'Active'),
+        limit(10)
+      );
+      
+      getDocs(q).then((querySnapshot) => {
+        querySnapshot.docs.forEach(snapshot => {
+          const updateData = {
+            status: 'Completed',
+            endTime: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+          };
+          updateDocumentNonBlocking(snapshot.ref, updateData);
+        });
+      }).catch(async (serverError) => {
+        const permissionError = new FirestorePermissionError({
+          path: 'room_logs',
+          operation: 'list',
+        } satisfies SecurityRuleContext);
+        errorEmitter.emit('permission-error', permissionError);
+      });
     }
     await auth.signOut();
     router.push('/login');
   };
 
-  const handleLogEntry = async (roomId: string) => {
+  const handleLogEntry = (roomId: string) => {
     if (!user || !db) return;
     setIsLogging(true);
 
@@ -178,28 +173,12 @@ export default function ProfessorDashboard() {
       updatedAt: now,
     };
 
-    // Non-blocking Firestore write
-    setDoc(logRef, logData)
-      .then(() => {
-        setStatusMessage(`Session verified. Successfully entered ${roomId}!`);
-        setIsLogging(false);
-        setTimeout(() => setStatusMessage(null), 5000);
-      })
-      .catch(async (error) => {
-        setIsLogging(false);
-        const permissionError = new FirestorePermissionError({
-          path: logRef.path,
-          operation: 'create',
-          requestResourceData: logData,
-        });
-        errorEmitter.emit('permission-error', permissionError);
-        
-        toast({
-          variant: 'destructive',
-          title: 'Logging Error',
-          description: 'Failed to record usage. Please ensure you have institutional access.',
-        });
-      });
+    setDocumentNonBlocking(logRef, logData, { merge: true });
+    
+    // Optimistically show success
+    setStatusMessage(`Session verified. Successfully entered ${roomId}!`);
+    setIsLogging(false);
+    setTimeout(() => setStatusMessage(null), 5000);
   };
 
   const fullName = user?.displayName || 'Professor';

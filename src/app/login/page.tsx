@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useState } from 'react';
@@ -8,8 +9,9 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth, useFirestore } from '@/firebase';
 import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
-import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { doc, serverTimestamp } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
+import { setDocumentNonBlocking } from '@/firebase/non-blocking-updates';
 
 /**
  * Institutional Administrators
@@ -33,7 +35,6 @@ export default function LoginPage() {
     setIsLoading(true);
     const provider = new GoogleAuthProvider();
     
-    // Standardize to institutional domain
     provider.setCustomParameters({
       hd: 'neu.edu.ph',
       prompt: 'select_account'
@@ -43,7 +44,6 @@ export default function LoginPage() {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
 
-      // Validate institutional account
       if (!user.email?.endsWith('@neu.edu.ph')) {
         await auth.signOut();
         toast({
@@ -57,7 +57,6 @@ export default function LoginPage() {
 
       const isAdmin = ADMIN_EMAILS.includes(user.email);
       
-      // If user clicked Admin but is not in the list
       if (activeTab === 'Admin' && !isAdmin) {
         await auth.signOut();
         toast({
@@ -69,9 +68,9 @@ export default function LoginPage() {
         return;
       }
 
-      // Sync user profile with Firestore - Awaiting to ensure rules apply for next page
+      // Sync user profile contextually
       const userRef = doc(db, 'user_profiles', user.uid);
-      await setDoc(userRef, {
+      setDocumentNonBlocking(userRef, {
         id: user.uid,
         name: user.displayName,
         email: user.email,
@@ -79,12 +78,11 @@ export default function LoginPage() {
         updatedAt: serverTimestamp(),
       }, { merge: true });
 
-      // Ensure admin persistence for security rules - Awaiting to prevent race condition
       if (isAdmin) {
-        await setDoc(doc(db, 'admin_roles', user.uid), { active: true }, { merge: true });
+        const adminRoleRef = doc(db, 'admin_roles', user.uid);
+        setDocumentNonBlocking(adminRoleRef, { active: true }, { merge: true });
       }
 
-      // Route based on role
       router.push(`/dashboard/${isAdmin ? 'admin' : 'professor'}`);
     } catch (error: any) {
       if (error.code !== 'auth/popup-closed-by-user') {
@@ -100,7 +98,6 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50 p-4">
-      {/* Branding Section */}
       <div className="flex flex-col items-center mb-8 space-y-3 text-center">
         <div className="bg-primary p-3 rounded-2xl shadow-lg shadow-primary/20">
           <Monitor className="text-white h-10 w-10" />
@@ -111,7 +108,6 @@ export default function LoginPage() {
         </p>
       </div>
 
-      {/* Standardized Card Container */}
       <Card className="w-full max-w-[400px] border-none shadow-2xl overflow-hidden rounded-3xl">
         <Tabs 
           defaultValue="Professor" 

@@ -2,14 +2,15 @@
 "use client"
 
 import { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { 
   Users, 
   Search,
   Calendar as CalendarIcon,
   Waves,
-  ChevronDown
+  ChevronDown,
+  Check
 } from 'lucide-react';
 import { 
   BarChart, 
@@ -34,14 +35,9 @@ import { useCollection, useFirestore, useMemoFirebase } from '@/firebase';
 import { collection, query, orderBy, limit, where } from 'firebase/firestore';
 import { LAB_ROOMS } from '@/lib/constants';
 import { cn } from '@/lib/utils';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar as CalendarUI } from '@/components/ui/calendar';
+import { Button } from '@/components/ui/button';
 import { DateRange } from 'react-day-picker';
 import { format, startOfDay, endOfDay, subWeeks, subMonths } from 'date-fns';
 
@@ -50,6 +46,7 @@ export default function AdminDashboard() {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterLabel, setFilterLabel] = useState('All Logs');
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
   const db = useFirestore();
 
   // Fetch real-time logs with proper memoization and filtering
@@ -80,9 +77,9 @@ export default function AdminDashboard() {
     return query(q, limit(100));
   }, [db, filterLabel, dateRange]);
   
-  const { data: logs, isLoading: isLogsLoading } = useCollection(logsQuery as any);
+  const { data: logs } = useCollection(logsQuery as any);
 
-  // Fetch users for blocked count with proper memoization
+  // Fetch users for blocked count
   const usersQuery = useMemoFirebase(() => {
     if (!db) return null;
     return collection(db, 'user_profiles');
@@ -131,6 +128,14 @@ export default function AdminDashboard() {
     const hours = Math.floor(diffMins / 60);
     const remainingMins = diffMins % 60;
     return `${hours}h ${remainingMins}m`;
+  };
+
+  const setFilter = (label: string) => {
+    setFilterLabel(label);
+    if (label !== 'Custom Range') {
+      setDateRange(undefined);
+      setIsFilterOpen(false);
+    }
   };
 
   return (
@@ -243,8 +248,8 @@ export default function AdminDashboard() {
               />
             </div>
             
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
+            <Popover open={isFilterOpen} onOpenChange={setIsFilterOpen}>
+              <PopoverTrigger asChild>
                 <div className="bg-white border border-slate-300 text-slate-900 h-11 px-4 rounded-xl flex items-center gap-2 font-bold cursor-pointer hover:bg-slate-50 transition-colors shadow-sm">
                   <CalendarIcon size={14} className="text-slate-400" />
                   <span className="text-xs">
@@ -254,36 +259,68 @@ export default function AdminDashboard() {
                   </span>
                   <ChevronDown size={14} className="text-slate-400 ml-1" />
                 </div>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48 rounded-xl border-none shadow-2xl p-2">
-                <DropdownMenuItem onClick={() => { setFilterLabel('Daily Logs'); setDateRange(undefined); }} className="rounded-lg font-bold text-xs h-10">Daily</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => { setFilterLabel('Weekly Logs'); setDateRange(undefined); }} className="rounded-lg font-bold text-xs h-10">Weekly</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => { setFilterLabel('Monthly Logs'); setDateRange(undefined); }} className="rounded-lg font-bold text-xs h-10">Monthly</DropdownMenuItem>
-                
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="rounded-lg font-bold text-xs h-10">
+              </PopoverTrigger>
+              <PopoverContent align="end" className="w-auto p-0 border-none shadow-2xl rounded-2xl overflow-hidden flex flex-col md:flex-row">
+                <div className="p-2 border-r border-slate-50 min-w-[160px] bg-white">
+                  <div className="space-y-1">
+                    {['Daily Logs', 'Weekly Logs', 'Monthly Logs', 'All Logs'].map((option) => (
+                      <Button
+                        key={option}
+                        variant="ghost"
+                        className={cn(
+                          "w-full justify-start text-xs font-bold h-9 rounded-lg px-3",
+                          filterLabel === option ? "bg-primary/10 text-primary" : "text-slate-500"
+                        )}
+                        onClick={() => setFilter(option)}
+                      >
+                        {option}
+                        {filterLabel === option && <Check className="ml-auto h-3 w-3" />}
+                      </Button>
+                    ))}
+                    <Button
+                      variant="ghost"
+                      className={cn(
+                        "w-full justify-start text-xs font-bold h-9 rounded-lg px-3",
+                        filterLabel === 'Custom Range' ? "bg-primary/10 text-primary" : "text-slate-500"
+                      )}
+                      onClick={() => setFilterLabel('Custom Range')}
+                    >
                       Custom Range
-                    </DropdownMenuItem>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0 border-none shadow-2xl" align="end">
+                      {filterLabel === 'Custom Range' && <Check className="ml-auto h-3 w-3" />}
+                    </Button>
+                  </div>
+                </div>
+                {filterLabel === 'Custom Range' && (
+                  <div className="p-2 bg-slate-50/50">
                     <CalendarUI
-                      initialFocus
                       mode="range"
-                      defaultMonth={dateRange?.from}
                       selected={dateRange}
-                      onSelect={(range) => {
-                        setDateRange(range);
-                        if (range?.from) setFilterLabel('Custom Range');
-                      }}
-                      numberOfMonths={1}
+                      onSelect={(range) => setDateRange(range)}
+                      initialFocus
+                      className="rounded-xl border-none bg-transparent"
                     />
-                  </PopoverContent>
-                </Popover>
-                
-                <DropdownMenuItem onClick={() => { setFilterLabel('All Logs'); setDateRange(undefined); }} className="rounded-lg font-bold text-xs h-10 border-t mt-1">Reset All</DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+                    <div className="p-2 flex justify-end gap-2">
+                       <Button 
+                         variant="ghost" 
+                         size="sm" 
+                         className="text-[10px] font-black h-8 px-4 rounded-lg"
+                         onClick={() => { setFilterLabel('All Logs'); setDateRange(undefined); setIsFilterOpen(false); }}
+                       >
+                         Clear
+                       </Button>
+                       <Button 
+                         size="sm" 
+                         className="text-[10px] font-black h-8 px-4 rounded-lg bg-primary"
+                         onClick={() => setIsFilterOpen(false)}
+                         disabled={!dateRange?.from}
+                       >
+                         Apply Range
+                       </Button>
+                    </div>
+                  </div>
+                )}
+              </PopoverContent>
+            </Popover>
           </div>
         </CardHeader>
         <CardContent className="p-0">

@@ -60,7 +60,7 @@ export function AdminSidebar() {
                   asChild 
                   isActive={isActive}
                   className={cn(
-                    "h-12 rounded-none font-bold transition-all px-6 border-l-4",
+                    "h-12 rounded-none font-bold transition-all px-6 border-l-[6px]",
                     isActive 
                       ? "bg-white/10 text-white border-white" 
                       : "text-white/60 hover:bg-white/5 hover:text-white border-transparent"

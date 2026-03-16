@@ -9,7 +9,8 @@ import {
   Calendar as CalendarIcon,
   Waves,
   ChevronDown,
-  Check
+  Check,
+  X
 } from 'lucide-react';
 import { 
   BarChart, 
@@ -35,45 +36,76 @@ import { collection, query, orderBy, limit, where } from 'firebase/firestore';
 import { LAB_ROOMS } from '@/lib/constants';
 import { cn } from '@/lib/utils';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Calendar as CalendarUI } from '@/components/ui/calendar';
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { DateRange } from 'react-day-picker';
-import { format, startOfDay, endOfDay, subWeeks, subMonths } from 'date-fns';
+import { startOfDay, endOfDay, subWeeks, subMonths, format, isBefore } from 'date-fns';
+
+const MONTHS = [
+  "January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December"
+];
+
+const DAYS = Array.from({ length: 31 }, (_, i) => (i + 1).toString());
+const YEARS = Array.from({ length: 5 }, (_, i) => (new Date().getFullYear() - 2 + i).toString());
+
+interface CustomDate {
+  month: string;
+  day: string;
+  year: string;
+}
 
 export default function AdminDashboard() {
   const [mounted, setMounted] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterLabel, setFilterLabel] = useState('All Logs');
-  const [dateRange, setDateRange] = useState<DateRange | undefined>();
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+  
+  // Custom Date States
+  const now = new Date();
+  const [customFrom, setCustomFrom] = useState<CustomDate>({
+    month: now.getMonth().toString(),
+    day: now.getDate().toString(),
+    year: now.getFullYear().toString()
+  });
+  const [customTo, setCustomTo] = useState<CustomDate>({
+    month: now.getMonth().toString(),
+    day: now.getDate().toString(),
+    year: now.getFullYear().toString()
+  });
+
   const db = useFirestore();
 
   const logsQuery = useMemoFirebase(() => {
     if (!db) return null;
     let q = query(collection(db, 'room_logs'), orderBy('createdAt', 'desc'));
 
-    const now = new Date();
+    const today = new Date();
     if (filterLabel === 'Daily Logs') {
-      const start = startOfDay(now).toISOString();
+      const start = startOfDay(today).toISOString();
       q = query(collection(db, 'room_logs'), where('createdAt', '>=', start), orderBy('createdAt', 'desc'));
     } else if (filterLabel === 'Weekly Logs') {
-      const start = subWeeks(now, 1).toISOString();
+      const start = subWeeks(today, 1).toISOString();
       q = query(collection(db, 'room_logs'), where('createdAt', '>=', start), orderBy('createdAt', 'desc'));
     } else if (filterLabel === 'Monthly Logs') {
-      const start = subMonths(now, 1).toISOString();
+      const start = subMonths(today, 1).toISOString();
       q = query(collection(db, 'room_logs'), where('createdAt', '>=', start), orderBy('createdAt', 'desc'));
-    } else if (filterLabel === 'Custom Range' && dateRange?.from) {
-      const start = startOfDay(dateRange.from).toISOString();
-      if (dateRange.to) {
-        const end = endOfDay(dateRange.to).toISOString();
-        q = query(collection(db, 'room_logs'), where('createdAt', '>=', start), where('createdAt', '<=', end), orderBy('createdAt', 'desc'));
-      } else {
-        q = query(collection(db, 'room_logs'), where('createdAt', '>=', start), orderBy('createdAt', 'desc'));
-      }
+    } else if (filterLabel === 'Custom Range') {
+      const fromDate = new Date(parseInt(customFrom.year), parseInt(customFrom.month), parseInt(customFrom.day));
+      const toDate = new Date(parseInt(customTo.year), parseInt(customTo.month), parseInt(customTo.day));
+      
+      const start = startOfDay(fromDate).toISOString();
+      const end = endOfDay(toDate).toISOString();
+      q = query(collection(db, 'room_logs'), where('createdAt', '>=', start), where('createdAt', '<=', end), orderBy('createdAt', 'desc'));
     }
 
     return query(q, limit(100));
-  }, [db, filterLabel, dateRange]);
+  }, [db, filterLabel, customFrom, customTo]);
   
   const { data: logs } = useCollection(logsQuery as any);
 
@@ -128,12 +160,29 @@ export default function AdminDashboard() {
     return `${hours}h ${remainingMins}m`;
   };
 
-  const setFilter = (label: string) => {
-    setFilterLabel(label);
-    if (label !== 'Custom Range') {
-      setDateRange(undefined);
-      setIsFilterOpen(false);
+  const handleApplyRange = () => {
+    const fromDate = new Date(parseInt(customFrom.year), parseInt(customFrom.month), parseInt(customFrom.day));
+    const toDate = new Date(parseInt(customTo.year), parseInt(customTo.month), parseInt(customTo.day));
+
+    if (isBefore(toDate, fromDate)) {
+      // In a real app we'd show a toast, but for now we'll just prevent apply
+      return;
     }
+    setFilterLabel('Custom Range');
+    setIsFilterOpen(false);
+  };
+
+  const handleClearRange = () => {
+    setFilterLabel('All Logs');
+    const resetDate = new Date();
+    const resetObj = {
+      month: resetDate.getMonth().toString(),
+      day: resetDate.getDate().toString(),
+      year: resetDate.getFullYear().toString()
+    };
+    setCustomFrom(resetObj);
+    setCustomTo(resetObj);
+    setIsFilterOpen(false);
   };
 
   return (
@@ -227,17 +276,17 @@ export default function AdminDashboard() {
       </Card>
 
       <Card className="border-none shadow-sm bg-white rounded-[32px] overflow-hidden">
-        <CardHeader className="p-8 border-b border-slate-50 flex flex-row items-center justify-between">
+        <CardHeader className="p-8 border-b border-slate-50 flex flex-col md:flex-row items-center justify-between gap-4">
           <div>
             <h2 className="text-lg font-black text-slate-900">Activity Logs</h2>
             <p className="text-xs font-bold text-slate-400">Search and filter institutional usage</p>
           </div>
-          <div className="flex gap-3">
-            <div className="relative">
+          <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+            <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
               <Input 
                 placeholder="Search faculty or lab..." 
-                className="pl-9 h-11 w-64 rounded-xl bg-white border-slate-200 text-xs font-bold shadow-sm focus-visible:ring-primary"
+                className="pl-9 h-11 w-full md:w-64 rounded-xl bg-white border-slate-200 text-xs font-bold shadow-sm focus-visible:ring-primary"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -248,72 +297,130 @@ export default function AdminDashboard() {
                 <div className="bg-white border border-slate-200 text-slate-900 h-11 px-4 rounded-xl flex items-center gap-2 font-bold cursor-pointer hover:bg-slate-50 transition-colors shadow-sm">
                   <CalendarIcon size={14} className="text-slate-400" />
                   <span className="text-xs">
-                    {filterLabel === 'Custom Range' && dateRange?.from
-                      ? `${format(dateRange.from, 'LLL dd, yyyy')}${dateRange.to ? ` - ${format(dateRange.to, 'LLL dd, yyyy')}` : ''}`
+                    {filterLabel === 'Custom Range' 
+                      ? `${MONTHS[parseInt(customFrom.month)]} ${customFrom.day}, ${customFrom.year} - ${MONTHS[parseInt(customTo.month)]} ${customTo.day}, ${customTo.year}`
                       : filterLabel}
                   </span>
                   <ChevronDown size={14} className="text-slate-400 ml-1" />
                 </div>
               </PopoverTrigger>
-              <PopoverContent align="end" className="w-auto p-0 border-none shadow-2xl rounded-2xl overflow-hidden flex flex-col md:flex-row bg-white">
-                <div className="p-2 border-r border-slate-50 min-w-[160px] bg-white">
-                  <div className="space-y-1">
-                    {['Daily Logs', 'Weekly Logs', 'Monthly Logs', 'All Logs'].map((option) => (
+              <PopoverContent align="end" className="w-[320px] sm:w-[500px] p-0 border-none shadow-2xl rounded-2xl overflow-hidden flex flex-col bg-white">
+                <div className="flex flex-col md:flex-row">
+                  <div className="p-3 border-r border-slate-50 min-w-[160px] bg-slate-50/30">
+                    <div className="space-y-1">
+                      {['Daily Logs', 'Weekly Logs', 'Monthly Logs', 'All Logs'].map((option) => (
+                        <Button
+                          key={option}
+                          variant="ghost"
+                          className={cn(
+                            "w-full justify-start text-xs font-bold h-9 rounded-lg px-3",
+                            filterLabel === option ? "bg-white text-primary shadow-sm" : "text-slate-500"
+                          )}
+                          onClick={() => {
+                            setFilterLabel(option);
+                            setIsFilterOpen(false);
+                          }}
+                        >
+                          {option}
+                          {filterLabel === option && <Check className="ml-auto h-3 w-3" />}
+                        </Button>
+                      ))}
                       <Button
-                        key={option}
                         variant="ghost"
                         className={cn(
                           "w-full justify-start text-xs font-bold h-9 rounded-lg px-3",
-                          filterLabel === option ? "bg-primary/10 text-primary" : "text-slate-500"
+                          filterLabel === 'Custom Range' ? "bg-white text-primary shadow-sm" : "text-slate-500"
                         )}
-                        onClick={() => setFilter(option)}
+                        onClick={() => setFilterLabel('Custom Range')}
                       >
-                        {option}
-                        {filterLabel === option && <Check className="ml-auto h-3 w-3" />}
+                        Custom Range
+                        {filterLabel === 'Custom Range' && <Check className="ml-auto h-3 w-3" />}
                       </Button>
-                    ))}
-                    <Button
-                      variant="ghost"
-                      className={cn(
-                        "w-full justify-start text-xs font-bold h-9 rounded-lg px-3",
-                        filterLabel === 'Custom Range' ? "bg-primary/10 text-primary" : "text-slate-500"
-                      )}
-                      onClick={() => setFilterLabel('Custom Range')}
-                    >
-                      Custom Range
-                      {filterLabel === 'Custom Range' && <Check className="ml-auto h-3 w-3" />}
-                    </Button>
-                  </div>
-                </div>
-                {filterLabel === 'Custom Range' && (
-                  <div className="p-0 bg-white border-l border-slate-50">
-                    <CalendarUI
-                      mode="range"
-                      selected={dateRange}
-                      onSelect={(range) => setDateRange(range)}
-                      initialFocus
-                      className="rounded-none border-none"
-                    />
-                    <div className="p-4 flex justify-end gap-2 border-t border-slate-50 bg-slate-50/50">
-                       <Button 
-                         variant="ghost" 
-                         size="sm" 
-                         className="text-[10px] font-black h-8 px-4 rounded-lg"
-                         onClick={() => { setFilterLabel('All Logs'); setDateRange(undefined); setIsFilterOpen(false); }}
-                       >
-                         Clear
-                       </Button>
-                       <Button 
-                         size="sm" 
-                         className="text-[10px] font-black h-8 px-4 rounded-lg bg-primary"
-                         onClick={() => setIsFilterOpen(false)}
-                         disabled={!dateRange?.from}
-                       >
-                         Apply Range
-                       </Button>
                     </div>
                   </div>
-                )}
+                  
+                  <div className="flex-1 p-6 space-y-6">
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Start Date</label>
+                        <div className="grid grid-cols-3 gap-2">
+                          <Select value={customFrom.month} onValueChange={(v) => setCustomFrom(prev => ({...prev, month: v}))}>
+                            <SelectTrigger className="h-9 rounded-lg text-[10px] font-bold border-slate-200">
+                              <SelectValue placeholder="Month" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {MONTHS.map((m, i) => <SelectItem key={m} value={i.toString()} className="text-[10px] font-bold">{m}</SelectItem>)}
+                            </SelectContent>
+                          </Select>
+                          <Select value={customFrom.day} onValueChange={(v) => setCustomFrom(prev => ({...prev, day: v}))}>
+                            <SelectTrigger className="h-9 rounded-lg text-[10px] font-bold border-slate-200">
+                              <SelectValue placeholder="Day" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {DAYS.map(d => <SelectItem key={d} value={d} className="text-[10px] font-bold">{d}</SelectItem>)}
+                            </SelectContent>
+                          </Select>
+                          <Select value={customFrom.year} onValueChange={(v) => setCustomFrom(prev => ({...prev, year: v}))}>
+                            <SelectTrigger className="h-9 rounded-lg text-[10px] font-bold border-slate-200">
+                              <SelectValue placeholder="Year" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {YEARS.map(y => <SelectItem key={y} value={y} className="text-[10px] font-bold">{y}</SelectItem>)}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">End Date</label>
+                        <div className="grid grid-cols-3 gap-2">
+                          <Select value={customTo.month} onValueChange={(v) => setCustomTo(prev => ({...prev, month: v}))}>
+                            <SelectTrigger className="h-9 rounded-lg text-[10px] font-bold border-slate-200">
+                              <SelectValue placeholder="Month" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {MONTHS.map((m, i) => <SelectItem key={m} value={i.toString()} className="text-[10px] font-bold">{m}</SelectItem>)}
+                            </SelectContent>
+                          </Select>
+                          <Select value={customTo.day} onValueChange={(v) => setCustomTo(prev => ({...prev, day: v}))}>
+                            <SelectTrigger className="h-9 rounded-lg text-[10px] font-bold border-slate-200">
+                              <SelectValue placeholder="Day" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {DAYS.map(d => <SelectItem key={d} value={d} className="text-[10px] font-bold">{d}</SelectItem>)}
+                            </SelectContent>
+                          </Select>
+                          <Select value={customTo.year} onValueChange={(v) => setCustomTo(prev => ({...prev, year: v}))}>
+                            <SelectTrigger className="h-9 rounded-lg text-[10px] font-bold border-slate-200">
+                              <SelectValue placeholder="Year" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {YEARS.map(y => <SelectItem key={y} value={y} className="text-[10px] font-bold">{y}</SelectItem>)}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex gap-2 pt-2">
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="flex-1 text-[10px] font-black h-9 rounded-xl border-none text-slate-400 hover:bg-slate-50"
+                        onClick={handleClearRange}
+                      >
+                        Clear Range
+                      </Button>
+                      <Button 
+                        size="sm" 
+                        className="flex-2 text-[10px] font-black h-9 rounded-xl bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20"
+                        onClick={handleApplyRange}
+                      >
+                        Apply Filters
+                      </Button>
+                    </div>
+                  </div>
+                </div>
               </PopoverContent>
             </Popover>
           </div>

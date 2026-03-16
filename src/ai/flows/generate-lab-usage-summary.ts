@@ -21,7 +21,7 @@ const RoomLogEntrySchema = z.object({
   status: z.enum(['Active', 'Completed']).describe('Status of the lab usage session (e.g., Active, Completed).'),
 });
 
-export const GenerateLabUsageSummaryInputSchema = z.object({
+const GenerateLabUsageSummaryInputSchema = z.object({
   logEntries: z.array(RoomLogEntrySchema).describe('A list of raw room log entries from Firestore for the specified period.'),
   timePeriod: z.enum(['Daily', 'Weekly', 'Monthly', 'Custom']).describe('The selected time period for the summary (Daily, Weekly, Monthly, or Custom).'),
   startDate: z.string().datetime().optional().describe('Optional: Start date of the custom period, if timePeriod is "Custom".'),
@@ -29,7 +29,7 @@ export const GenerateLabUsageSummaryInputSchema = z.object({
 });
 export type GenerateLabUsageSummaryInput = z.infer<typeof GenerateLabUsageSummaryInputSchema>;
 
-export const GenerateLabUsageSummaryOutputSchema = z.object({
+const GenerateLabUsageSummaryOutputSchema = z.object({
   summary: z.string().describe('A natural language summary of the overall laboratory usage patterns for the given period.'),
   totalRoomUses: z.number().describe('Total number of distinct room usage sessions logged.'),
   totalUniqueProfessors: z.number().describe('Total number of unique professors who used rooms.'),

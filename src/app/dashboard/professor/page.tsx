@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useState, useEffect } from 'react';
@@ -146,58 +145,46 @@ export default function ProfessorDashboard() {
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] flex flex-col font-body antialiased">
-      {/* Top Navigation Bar */}
-      <header className="bg-white border-b border-slate-100 px-6 py-4 flex items-center justify-between shadow-sm sticky top-0 z-50">
+      {/* Branding Header (Minimal) */}
+      <div className="w-full flex justify-center py-8">
         <div className="flex items-center gap-2">
-          <div className="bg-primary p-1.5 rounded-lg shadow-sm">
-            <Monitor className="text-white h-5 w-5" />
+          <div className="bg-primary p-2 rounded-xl shadow-lg shadow-primary/20">
+            <Monitor className="text-white h-6 w-6" />
           </div>
-          <span className="font-bold text-lg tracking-tight text-primary">NEU LabTrack</span>
+          <span className="font-black text-2xl tracking-tight text-primary">NEU LabTrack</span>
         </div>
-
-        <div className="flex items-center gap-4">
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={handleSignOut}
-            className="text-slate-500 hover:text-destructive flex items-center gap-2 px-3"
-          >
-            <LogOut className="h-4 w-4" />
-            <span className="font-bold text-sm">Sign Out</span>
-          </Button>
-        </div>
-      </header>
+      </div>
 
       {/* Main Content Area */}
-      <main className="flex-1 flex flex-col items-center justify-center p-6 space-y-6">
+      <main className="flex-1 flex flex-col items-center justify-center p-6 space-y-6 -mt-12">
         {/* Success Alert */}
         {statusMessage && (
-          <div className="w-full max-w-md bg-green-50 border border-green-100 text-green-700 px-4 py-3 rounded-xl flex items-center gap-3 animate-in fade-in slide-in-from-top-2 shadow-sm">
+          <div className="w-full max-w-md bg-green-50 border border-green-100 text-green-700 px-4 py-3 rounded-xl flex items-center gap-3 animate-in fade-in shadow-sm">
             <CheckCircle2 className="h-5 w-5 text-green-500 shrink-0" />
             <span className="font-bold text-sm">{statusMessage}</span>
           </div>
         )}
 
         {/* Welcome Section */}
-        <div className="text-center space-y-1">
+        <div className="text-center space-y-2">
           <h1 className="text-3xl font-black text-slate-900 tracking-tight">Welcome back, {firstName}!</h1>
           <p className="text-base text-slate-400 font-bold">Which room would you like to use?</p>
         </div>
 
         {/* Central Selection Card */}
-        <Card className="w-full max-w-md border-none shadow-xl rounded-3xl overflow-hidden bg-white">
-          <CardContent className="p-8 space-y-8">
+        <Card className="w-full max-w-[360px] border-none shadow-2xl rounded-[32px] overflow-hidden bg-white">
+          <CardContent className="p-8 space-y-6">
             <div className="space-y-3">
               <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-300 ml-1">
                 Laboratory Room
               </label>
               <Select value={selectedRoom} onValueChange={setSelectedRoom}>
-                <SelectTrigger className="h-14 rounded-xl bg-slate-50 border-none text-lg font-black text-slate-900 px-6 shadow-inner ring-offset-0 focus:ring-0">
+                <SelectTrigger className="h-12 rounded-2xl bg-slate-50 border-none text-base font-black text-slate-900 px-6 shadow-inner focus:ring-0">
                   <SelectValue placeholder="Select a room" />
                 </SelectTrigger>
-                <SelectContent className="rounded-xl border-none shadow-xl">
+                <SelectContent className="rounded-2xl border-none shadow-xl">
                   {LAB_ROOMS.map(room => (
-                    <SelectItem key={room} value={room} className="font-bold h-12">
+                    <SelectItem key={room} value={room} className="font-bold h-10">
                       {room}
                     </SelectItem>
                   ))}
@@ -205,50 +192,57 @@ export default function ProfessorDashboard() {
               </Select>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-3">
               <Button 
                 onClick={() => setIsScannerOpen(true)}
                 variant="outline"
-                className="w-full h-14 rounded-xl bg-slate-50 border-none hover:bg-slate-100 text-slate-500 font-bold text-base flex items-center justify-center gap-3 transition-all"
+                className="w-full h-12 rounded-2xl bg-slate-50 border-none hover:bg-slate-100 text-slate-500 font-bold text-sm flex items-center justify-center gap-3 transition-all"
               >
-                <QrCode className="h-5 w-5 text-slate-300" />
+                <QrCode className="h-4 w-4 text-slate-300" />
                 Auto-Log via QR
               </Button>
 
               <Button 
                 onClick={() => handleLogEntry(selectedRoom)}
                 disabled={isLogging}
-                className="w-full h-14 rounded-xl bg-primary hover:bg-primary/90 text-white font-black text-lg flex items-center justify-center gap-3 shadow-lg shadow-primary/20 transition-all active:scale-[0.98] disabled:opacity-70"
+                className="w-full h-12 rounded-2xl bg-primary hover:bg-primary/90 text-white font-black text-base flex items-center justify-center gap-3 shadow-lg shadow-primary/20 transition-all active:scale-[0.98] disabled:opacity-70"
               >
-                <ArrowRight className="h-5 w-5" />
+                <ArrowRight className="h-4 w-4" />
                 {isLogging ? 'Logging...' : `Log Entry ${selectedRoom}`}
               </Button>
             </div>
           </CardContent>
         </Card>
 
-        {/* User Profile Footer Card */}
-        <div className="w-full max-w-md bg-white rounded-2xl p-4 shadow-sm flex items-center justify-between border border-slate-50">
-          <div className="flex items-center gap-4">
-            <Avatar className="h-12 w-12 bg-primary/10 rounded-xl border-none">
-              <AvatarFallback className="text-primary font-black text-lg bg-transparent">
+        {/* User Profile & Sign Out Footer */}
+        <div className="w-full max-w-[360px] bg-white rounded-3xl p-4 shadow-sm flex items-center justify-between border border-slate-50">
+          <div className="flex items-center gap-3">
+            <Avatar className="h-10 w-10 bg-primary/10 rounded-2xl border-none">
+              <AvatarFallback className="text-primary font-black text-sm bg-transparent">
                 {initial}
               </AvatarFallback>
             </Avatar>
-            <div>
-              <p className="font-black text-base text-slate-900 leading-tight">{fullName}</p>
-              <p className="text-xs text-slate-400 font-semibold">Institutional Account</p>
+            <div className="flex flex-col">
+              <p className="font-black text-sm text-slate-900 leading-none">{fullName}</p>
+              <Badge variant="secondary" className="bg-transparent p-0 text-slate-300 font-black text-[9px] tracking-wider uppercase border-none">
+                PROFESSOR
+              </Badge>
             </div>
           </div>
-          <Badge variant="secondary" className="bg-slate-50 text-slate-300 font-black text-[10px] tracking-wider px-3 py-1 rounded-full border-none">
-            PROFESSOR
-          </Badge>
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={handleSignOut}
+            className="text-slate-300 hover:text-destructive hover:bg-destructive/5 rounded-xl"
+          >
+            <LogOut className="h-4 w-4" />
+          </Button>
         </div>
       </main>
       
       {/* QR Scanner Dialog */}
       <Dialog open={isScannerOpen} onOpenChange={setIsScannerOpen}>
-        <DialogContent className="sm:max-w-md p-0 overflow-hidden rounded-3xl border-none">
+        <DialogContent className="sm:max-w-md p-0 overflow-hidden rounded-[32px] border-none">
           <DialogHeader className="p-6 bg-white border-b border-slate-50">
             <DialogTitle className="text-xl font-black text-slate-900">Scan Room QR Code</DialogTitle>
           </DialogHeader>
@@ -261,9 +255,6 @@ export default function ProfessorDashboard() {
           )}
         </DialogContent>
       </Dialog>
-
-      {/* Decorative Brand Accent */}
-      <div className="fixed bottom-6 right-6 h-2 w-2 bg-primary rounded-full opacity-20 pointer-events-none" />
     </div>
   );
 }

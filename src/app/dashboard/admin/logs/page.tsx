@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Navbar } from '@/components/layout/Navbar';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -17,7 +17,6 @@ import { Badge } from '@/components/ui/badge';
 import { 
   Search, 
   Filter, 
-  Calendar as CalendarIcon,
   Download,
   DoorOpen
 } from 'lucide-react';
@@ -33,11 +32,25 @@ import {
 export default function RoomLogsPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [dateFilter, setDateFilter] = useState('all');
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const filteredLogs = MOCK_ROOM_LOGS.filter(log => 
     log.professorName.toLowerCase().includes(searchTerm.toLowerCase()) ||
     log.roomId.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const formatDateTime = (dateString: string) => {
+    if (!mounted) return { date: "", time: "" };
+    const date = new Date(dateString);
+    return {
+      date: date.toLocaleDateString(),
+      time: date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    };
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -81,9 +94,6 @@ export default function RoomLogsPage() {
                     <SelectItem value="monthly">Monthly</SelectItem>
                   </SelectContent>
                 </Select>
-                <Button variant="ghost" size="icon" className="md:hidden">
-                  <Filter size={18} />
-                </Button>
               </div>
             </div>
           </CardHeader>
@@ -99,44 +109,47 @@ export default function RoomLogsPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredLogs.map((log) => (
-                  <TableRow key={log.id}>
-                    <TableCell>
-                      <div className="flex flex-col">
-                        <span className="font-medium">
-                          {new Date(log.timestamp).toLocaleDateString()}
-                        </span>
-                        <span className="text-xs text-muted-foreground">
-                          {new Date(log.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                        </span>
-                      </div>
-                    </TableCell>
-                    <TableCell>{log.professorName}</TableCell>
-                    <TableCell>
-                      <Badge variant="outline" className="flex w-fit items-center gap-1 font-mono">
-                        <DoorOpen size={12} />
-                        {log.roomId}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      {log.endTime ? (
-                        <span className="text-sm text-muted-foreground">
-                          {Math.round((new Date(log.endTime).getTime() - new Date(log.timestamp).getTime()) / 60000)} mins
-                        </span>
-                      ) : (
-                        <span className="text-sm font-medium text-green-600 animate-pulse">In Progress</span>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      <Badge 
-                        variant={log.status === 'Active' ? 'default' : 'secondary'}
-                        className={log.status === 'Active' ? 'bg-green-500 hover:bg-green-600' : ''}
-                      >
-                        {log.status}
-                      </Badge>
-                    </TableCell>
-                  </TableRow>
-                ))}
+                {filteredLogs.map((log) => {
+                  const dt = formatDateTime(log.timestamp);
+                  return (
+                    <TableRow key={log.id}>
+                      <TableCell>
+                        <div className="flex flex-col">
+                          <span className="font-medium">
+                            {dt.date}
+                          </span>
+                          <span className="text-xs text-muted-foreground">
+                            {dt.time}
+                          </span>
+                        </div>
+                      </TableCell>
+                      <TableCell>{log.professorName}</TableCell>
+                      <TableCell>
+                        <Badge variant="outline" className="flex w-fit items-center gap-1 font-mono">
+                          <DoorOpen size={12} />
+                          {log.roomId}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        {log.endTime ? (
+                          <span className="text-sm text-muted-foreground">
+                            {mounted ? Math.round((new Date(log.endTime).getTime() - new Date(log.timestamp).getTime()) / 60000) : "..."} mins
+                          </span>
+                        ) : (
+                          <span className="text-sm font-medium text-green-600 animate-pulse">In Progress</span>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        <Badge 
+                          variant={log.status === 'Active' ? 'default' : 'secondary'}
+                          className={log.status === 'Active' ? 'bg-green-500 hover:bg-green-600' : ''}
+                        >
+                          {log.status}
+                        </Badge>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
               </TableBody>
             </Table>
           </CardContent>

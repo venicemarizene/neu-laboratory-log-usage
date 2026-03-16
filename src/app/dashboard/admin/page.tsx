@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Navbar } from '@/components/layout/Navbar';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -17,13 +17,18 @@ import {
   Calendar,
   Monitor
 } from 'lucide-react';
-import { MOCK_ROOM_LOGS, MOCK_USERS } from '@/lib/placeholder-data';
+import { MOCK_ROOM_LOGS } from '@/lib/placeholder-data';
 import { generateLabUsageSummary, type GenerateLabUsageSummaryOutput } from '@/ai/flows/generate-lab-usage-summary';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
 export default function AdminDashboard() {
   const [aiReport, setAiReport] = useState<GenerateLabUsageSummaryOutput | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const stats = [
     { label: "Room Uses Today", value: "24", icon: <DoorOpen className="text-primary" />, trend: "+12%" },
@@ -51,6 +56,11 @@ export default function AdminDashboard() {
     } finally {
       setIsGenerating(false);
     }
+  };
+
+  const formatTime = (dateString: string) => {
+    if (!mounted) return "";
+    return new Date(dateString).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
 
   return (
@@ -117,8 +127,8 @@ export default function AdminDashboard() {
                           <div>
                             <p className="font-medium">{log.professorName}</p>
                             <p className="text-xs text-muted-foreground">
-                              {new Date(log.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                              {log.endTime && ` - ${new Date(log.endTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`}
+                              {formatTime(log.timestamp)}
+                              {log.endTime && mounted && ` - ${formatTime(log.endTime)}`}
                             </p>
                           </div>
                         </div>

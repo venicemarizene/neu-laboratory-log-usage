@@ -12,6 +12,8 @@ import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { doc, serverTimestamp } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 import { setDocumentNonBlocking } from '@/firebase/non-blocking-updates';
+import { errorEmitter } from '@/firebase/error-emitter';
+import { FirestorePermissionError } from '@/firebase/errors';
 
 /**
  * Institutional Administrators
@@ -55,7 +57,7 @@ export default function LoginPage() {
         return;
       }
 
-      const isAdmin = ADMIN_EMAILS.includes(user.email);
+      const isAdmin = ADMIN_EMAILS.includes(user.email || '');
       
       if (activeTab === 'Admin' && !isAdmin) {
         await auth.signOut();
@@ -86,11 +88,11 @@ export default function LoginPage() {
       router.push(`/dashboard/${isAdmin ? 'admin' : 'professor'}`);
     } catch (error: any) {
       if (error.code !== 'auth/popup-closed-by-user') {
-        toast({
-          variant: "destructive",
-          title: "Authentication Error",
-          description: error.message || "An unexpected error occurred.",
+        const contextualError = new FirestorePermissionError({
+          operation: 'write',
+          path: 'auth/sign-in',
         });
+        errorEmitter.emit('permission-error', contextualError);
       }
       setIsLoading(false);
     }

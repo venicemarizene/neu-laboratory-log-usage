@@ -9,8 +9,7 @@ import {
   Calendar as CalendarIcon,
   Waves,
   ChevronDown,
-  Check,
-  X
+  Check
 } from 'lucide-react';
 import { 
   BarChart, 
@@ -44,7 +43,7 @@ import {
   SelectValue 
 } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { startOfDay, endOfDay, subWeeks, subMonths, format, isBefore } from 'date-fns';
+import { startOfDay, endOfDay, subWeeks, subMonths, isBefore } from 'date-fns';
 
 const MONTHS = [
   "January", "February", "March", "April", "May", "June",
@@ -66,7 +65,6 @@ export default function AdminDashboard() {
   const [filterLabel, setFilterLabel] = useState('All Logs');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   
-  // Custom Date States
   const now = new Date();
   const [customFrom, setCustomFrom] = useState<CustomDate>({
     month: now.getMonth().toString(),
@@ -132,8 +130,9 @@ export default function AdminDashboard() {
 
   const filteredLogs = logs?.filter(log => {
     const searchLower = searchTerm.toLowerCase();
+    const profName = (log.professorName || log.professorId || '').toLowerCase();
     return (
-      log.professorId?.toLowerCase().includes(searchLower) || 
+      profName.includes(searchLower) || 
       log.roomId?.toLowerCase().includes(searchLower)
     );
   }) || [];
@@ -165,7 +164,6 @@ export default function AdminDashboard() {
     const toDate = new Date(parseInt(customTo.year), parseInt(customTo.month), parseInt(customTo.day));
 
     if (isBefore(toDate, fromDate)) {
-      // In a real app we'd show a toast, but for now we'll just prevent apply
       return;
     }
     setFilterLabel('Custom Range');
@@ -442,7 +440,7 @@ export default function AdminDashboard() {
                 <TableRow key={log.id} className="border-slate-50 hover:bg-slate-50/30 transition-colors h-16">
                   <TableCell className="px-8">
                     <div className="flex flex-col">
-                      <span className="font-bold text-sm text-slate-800">{log.professorId}</span>
+                      <span className="font-bold text-sm text-slate-800">{log.professorName || log.professorId}</span>
                     </div>
                   </TableCell>
                   <TableCell className="text-center">

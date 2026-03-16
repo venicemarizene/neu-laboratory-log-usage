@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useState, useEffect, useRef } from 'react';
@@ -92,7 +91,6 @@ function ScannerView({ onScan }: { onScan: (roomId: string) => void }) {
 
   return (
     <div className="p-6 space-y-4">
-      {/* Scanner Container with strict overflow-hidden to stay in border */}
       <div className="relative w-full aspect-square rounded-[2rem] overflow-hidden bg-slate-100 border-4 border-slate-50 shadow-inner flex items-center justify-center">
         <div 
           id="qr-reader" 
@@ -129,7 +127,6 @@ export default function ProfessorDashboard() {
   const [activeSession, setActiveSession] = useState<{id: string, roomId: string} | null>(null);
   const [isScannerOpen, setIsScannerOpen] = useState(false);
 
-  // Check for active sessions on load
   useEffect(() => {
     if (user && db) {
       const q = query(
@@ -144,7 +141,6 @@ export default function ProfessorDashboard() {
           setActiveSession({ id: doc.id, roomId: doc.data().roomId });
         }
       }).catch(async (err) => {
-        // Emit contextual error for standard permission issues
         const permissionError = new FirestorePermissionError({
           path: 'room_logs',
           operation: 'list',
@@ -169,7 +165,17 @@ export default function ProfessorDashboard() {
   };
 
   const handleLogEntry = (roomId: string) => {
-    if (!user || !db) return;
+    if (!user || !db || isLogging) return;
+
+    if (activeSession) {
+      toast({
+        variant: 'destructive',
+        title: 'Session Already Active',
+        description: `You are currently logged into room ${activeSession.roomId}. Please end that session first.`,
+      });
+      return;
+    }
+
     setIsLogging(true);
 
     const logId = crypto.randomUUID();
@@ -179,6 +185,7 @@ export default function ProfessorDashboard() {
     const logData = {
       id: logId,
       professorId: user.uid,
+      professorName: user.displayName || 'Professor',
       roomId: roomId,
       startTime: now,
       status: 'Active',
@@ -188,7 +195,6 @@ export default function ProfessorDashboard() {
 
     setDocumentNonBlocking(logRef, logData, { merge: true });
     
-    // Set active session contextually
     setActiveSession({ id: logId, roomId: roomId });
     setIsLogging(false);
   };
@@ -203,10 +209,8 @@ export default function ProfessorDashboard() {
       updatedAt: new Date().toISOString()
     };
     
-    // Finalize the log in the background
     updateDocumentNonBlocking(logRef, updateData);
     
-    // Automatic logout and redirect as requested
     setActiveSession(null);
     await auth.signOut();
     router.push('/login');

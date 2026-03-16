@@ -22,7 +22,7 @@ import {
   MoreVertical,
   QrCode
 } from 'lucide-react';
-import { useCollection, useFirestore } from '@/firebase';
+import { useCollection, useFirestore, useMemoFirebase } from '@/firebase';
 import { collection, doc, updateDoc } from 'firebase/firestore';
 import {
   DropdownMenu,
@@ -36,7 +36,11 @@ export default function UserManagementPage() {
   const [mounted, setMounted] = useState(false);
   const db = useFirestore();
 
-  const { data: users, isLoading } = useCollection(collection(db, 'user_profiles') as any);
+  const usersQuery = useMemoFirebase(() => {
+    if (!db) return null;
+    return collection(db, 'user_profiles');
+  }, [db]);
+  const { data: users, isLoading } = useCollection(usersQuery as any);
 
   useEffect(() => {
     setMounted(true);

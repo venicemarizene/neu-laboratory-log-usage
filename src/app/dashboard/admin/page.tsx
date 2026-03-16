@@ -31,21 +31,28 @@ import {
   TableRow 
 } from '@/components/ui/table';
 import { Input } from '@/components/ui/input';
-import { useCollection, useFirestore } from '@/firebase';
+import { useCollection, useFirestore, useMemoFirebase } from '@/firebase';
 import { collection, query, orderBy, limit } from 'firebase/firestore';
 import { LAB_ROOMS } from '@/lib/constants';
+import { cn } from '@/lib/utils';
 
 export default function AdminDashboard() {
   const [mounted, setMounted] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const db = useFirestore();
 
-  // Fetch real-time logs
-  const logsQuery = query(collection(db, 'room_logs'), orderBy('createdAt', 'desc'), limit(50));
+  // Fetch real-time logs with proper memoization
+  const logsQuery = useMemoFirebase(() => {
+    if (!db) return null;
+    return query(collection(db, 'room_logs'), orderBy('createdAt', 'desc'), limit(50));
+  }, [db]);
   const { data: logs, isLoading: isLogsLoading } = useCollection(logsQuery as any);
 
-  // Fetch users for blocked count
-  const usersQuery = collection(db, 'user_profiles');
+  // Fetch users for blocked count with proper memoization
+  const usersQuery = useMemoFirebase(() => {
+    if (!db) return null;
+    return collection(db, 'user_profiles');
+  }, [db]);
   const { data: users } = useCollection(usersQuery as any);
 
   useEffect(() => {
@@ -66,11 +73,12 @@ export default function AdminDashboard() {
   }));
 
   const filteredLogs = logs?.filter(log => 
-    log.professorId.toLowerCase().includes(searchTerm.toLowerCase()) || 
-    log.roomId.toLowerCase().includes(searchTerm.toLowerCase())
+    log.professorId?.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    log.roomId?.toLowerCase().includes(searchTerm.toLowerCase())
   ) || [];
 
   const formatDateTime = (dateString: string) => {
+    if (!dateString) return "N/A";
     return new Date(dateString).toLocaleString('en-US', {
       month: 'numeric',
       day: 'numeric',

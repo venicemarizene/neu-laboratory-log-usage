@@ -1,220 +1,247 @@
+
 "use client"
 
 import { useState, useEffect } from 'react';
-import { Navbar } from '@/components/layout/Navbar';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { 
   Users, 
   DoorOpen, 
   Ban, 
-  TrendingUp, 
-  BrainCircuit, 
-  Clock, 
-  Filter,
-  Download,
+  Search,
   Calendar,
-  Monitor
+  Waves
 } from 'lucide-react';
-import { MOCK_ROOM_LOGS } from '@/lib/placeholder-data';
-import { generateLabUsageSummary, type GenerateLabUsageSummaryOutput } from '@/ai/flows/generate-lab-usage-summary';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { 
+  BarChart, 
+  Bar, 
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
+  Tooltip, 
+  ResponsiveContainer,
+  Cell
+} from 'recharts';
+import { 
+  Table, 
+  TableBody, 
+  TableCell, 
+  TableHead, 
+  TableHeader, 
+  TableRow 
+} from '@/components/ui/table';
+import { Input } from '@/components/ui/input';
+import { useCollection, useFirestore } from '@/firebase';
+import { collection, query, orderBy, limit } from 'firebase/firestore';
+import { LAB_ROOMS } from '@/lib/constants';
 
 export default function AdminDashboard() {
-  const [aiReport, setAiReport] = useState<GenerateLabUsageSummaryOutput | null>(null);
-  const [isGenerating, setIsGenerating] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const db = useFirestore();
+
+  // Fetch real-time logs
+  const logsQuery = query(collection(db, 'room_logs'), orderBy('createdAt', 'desc'), limit(50));
+  const { data: logs, isLoading: isLogsLoading } = useCollection(logsQuery as any);
+
+  // Fetch users for blocked count
+  const usersQuery = collection(db, 'user_profiles');
+  const { data: users } = useCollection(usersQuery as any);
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  const stats = [
-    { label: "Room Uses Today", value: "24", icon: <DoorOpen className="text-primary" />, trend: "+12%" },
-    { label: "Active Professors", value: "8", icon: <Users className="text-accent" />, trend: "Normal" },
-    { label: "Blocked Users", value: "3", icon: <Ban className="text-destructive" />, trend: "0 change" },
-    { label: "Avg Session", value: "45m", icon: <Clock className="text-blue-500" />, trend: "-5m" },
-  ];
+  if (!mounted) return null;
 
-  const handleGenerateAIReport = async () => {
-    setIsGenerating(true);
-    try {
-      const result = await generateLabUsageSummary({
-        logEntries: MOCK_ROOM_LOGS.map(log => ({
-          professorId: log.professorId,
-          roomId: log.roomId,
-          timestamp: log.timestamp,
-          endTime: log.endTime,
-          status: log.status as 'Active' | 'Completed'
-        })),
-        timePeriod: 'Weekly'
-      });
-      setAiReport(result);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setIsGenerating(false);
-    }
-  };
+  // Process data for charts and stats
+  const activeLogsCount = logs?.filter(l => l.status === 'Active').length || 0;
+  const uniqueFacultyCount = new Set(logs?.map(l => l.professorId)).size || 0;
+  const blockedCount = users?.filter(u => u.isBlocked).length || 0;
 
-  const formatTime = (dateString: string) => {
-    if (!mounted) return "";
-    return new Date(dateString).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  // Lab distribution data
+  const labDistributionData = LAB_ROOMS.map(room => ({
+    name: room,
+    usage: logs?.filter(l => l.roomId === room).length || 0
+  }));
+
+  const filteredLogs = logs?.filter(log => 
+    log.professorId.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    log.roomId.toLowerCase().includes(searchTerm.toLowerCase())
+  ) || [];
+
+  const formatDateTime = (dateString: string) => {
+    return new Date(dateString).toLocaleString('en-US', {
+      month: 'numeric',
+      day: 'numeric',
+      year: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: true
+    });
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar />
-      <main className="container mx-auto px-4 py-8 space-y-8">
-        <header className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+    <div className="p-8 space-y-8 max-w-[1400px] mx-auto">
+      <header className="space-y-1">
+        <h1 className="text-3xl font-black text-slate-900 tracking-tight">Laboratory Analytics</h1>
+        <p className="text-xs font-black uppercase tracking-widest text-slate-400">
+          NEU COMPUTER LABORATORY MANAGEMENT
+        </p>
+      </header>
+
+      {/* Stats Section */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <Card className="border-none shadow-xl bg-primary text-white rounded-[32px] overflow-hidden relative">
+          <div className="absolute top-6 right-6 opacity-20">
+            <Waves size={32} />
+          </div>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-xs font-black uppercase tracking-widest text-white/60">
+              Active Logs Today
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-5xl font-black mb-1">{activeLogsCount}</div>
+            <p className="text-[10px] font-bold text-white/60">New sessions since 00:00</p>
+          </CardContent>
+        </Card>
+
+        <Card className="border-none shadow-sm bg-white rounded-[32px] overflow-hidden relative">
+          <div className="absolute top-6 right-6 opacity-10 text-primary">
+            <Users size={24} />
+          </div>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-xs font-black uppercase tracking-widest text-slate-400">
+              Unique Faculty
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-4xl font-black text-slate-900 mb-1">{uniqueFacultyCount}</div>
+            <p className="text-[10px] font-bold text-slate-300">Active teaching staff</p>
+          </CardContent>
+        </Card>
+
+        <Card className="border-none shadow-sm bg-white rounded-[32px] overflow-hidden relative">
+          <div className="absolute top-6 right-6 opacity-20 text-destructive">
+            <Ban size={24} />
+          </div>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-xs font-black uppercase tracking-widest text-slate-400">
+              Blocked Accounts
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-4xl font-black text-destructive mb-1">{blockedCount}</div>
+            <p className="text-[10px] font-bold text-slate-300">Restricted system access</p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Chart Section */}
+      <Card className="border-none shadow-sm bg-white rounded-[32px] p-8">
+        <div className="mb-8">
+          <h2 className="text-lg font-black text-slate-900">Computer Laboratory Distribution</h2>
+          <p className="text-xs font-bold text-slate-400">Visual frequency of usage across M101-M111</p>
+        </div>
+        <div className="h-[300px] w-full">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={labDistributionData} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+              <XAxis 
+                dataKey="name" 
+                axisLine={false} 
+                tickLine={false} 
+                tick={{ fill: '#94a3b8', fontSize: 10, fontWeight: 700 }}
+              />
+              <YAxis 
+                axisLine={false} 
+                tickLine={false} 
+                tick={{ fill: '#94a3b8', fontSize: 10, fontWeight: 700 }}
+              />
+              <Tooltip 
+                cursor={{ fill: '#f8fafc' }}
+                contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
+              />
+              <Bar dataKey="usage" radius={[4, 4, 0, 0]} barSize={24}>
+                {labDistributionData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={index % 2 === 0 ? '#1e40af' : '#38bdf8'} />
+                ))}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </Card>
+
+      {/* Activity Logs Table */}
+      <Card className="border-none shadow-sm bg-white rounded-[32px] overflow-hidden">
+        <CardHeader className="p-8 border-b border-slate-50 flex flex-row items-center justify-between">
           <div>
-            <h1 className="text-3xl font-headline font-bold text-foreground">Admin Overview</h1>
-            <p className="text-muted-foreground">Laboratory analytics and management insights.</p>
+            <h2 className="text-lg font-black text-slate-900">Activity Logs</h2>
+            <p className="text-xs font-bold text-slate-400">Search and filter institutional usage</p>
           </div>
-          <div className="flex gap-2">
-            <Button variant="outline" size="sm">
-              <Calendar className="mr-2 h-4 w-4" />
-              Custom Range
-            </Button>
-            <Button variant="outline" size="sm">
-              <Download className="mr-2 h-4 w-4" />
-              Export CSV
-            </Button>
+          <div className="flex gap-3">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
+              <Input 
+                placeholder="Search..." 
+                className="pl-9 h-9 w-48 rounded-xl bg-slate-50 border-none text-xs font-bold"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+            <Badge variant="secondary" className="bg-slate-50 text-slate-900 h-9 px-4 rounded-xl border-none flex gap-2 font-bold cursor-pointer hover:bg-slate-100">
+              <Calendar size={14} className="text-slate-400" />
+              All Logs
+            </Badge>
           </div>
-        </header>
-
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {stats.map((stat, i) => (
-            <Card key={i} className="border-none shadow-md hover:shadow-lg transition-shadow">
-              <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-                <CardTitle className="text-sm font-medium text-muted-foreground">{stat.label}</CardTitle>
-                <div className="p-2 bg-muted/50 rounded-lg">{stat.icon}</div>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{stat.value}</div>
-                <div className="flex items-center text-xs mt-1">
-                  <TrendingUp className="mr-1 h-3 w-3 text-green-500" />
-                  <span className="text-green-500 font-medium">{stat.trend}</span>
-                  <span className="text-muted-foreground ml-1">from yesterday</span>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Main Content Area: Recent Activity */}
-          <div className="lg:col-span-2 space-y-6">
-            <Card className="border-none shadow-md">
-              <CardHeader className="flex flex-row items-center justify-between">
-                <div>
-                  <CardTitle>Recent Room Activity</CardTitle>
-                  <CardDescription>Latest laboratory usage sessions across campus.</CardDescription>
-                </div>
-                <Button variant="ghost" size="sm" className="text-primary font-medium">View All</Button>
-              </CardHeader>
-              <CardContent>
-                <ScrollArea className="h-[400px] pr-4">
-                  <div className="space-y-4">
-                    {MOCK_ROOM_LOGS.map((log) => (
-                      <div key={log.id} className="flex items-center justify-between p-4 bg-muted/30 rounded-xl border border-border/50">
-                        <div className="flex items-center gap-4">
-                          <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">
-                            {log.roomId}
-                          </div>
-                          <div>
-                            <p className="font-medium">{log.professorName}</p>
-                            <p className="text-xs text-muted-foreground">
-                              {formatTime(log.timestamp)}
-                              {log.endTime && mounted && ` - ${formatTime(log.endTime)}`}
-                            </p>
-                          </div>
-                        </div>
-                        <Badge variant={log.status === 'Active' ? 'default' : 'secondary'} className={log.status === 'Active' ? 'bg-green-500 hover:bg-green-600' : ''}>
-                          {log.status}
-                        </Badge>
-                      </div>
-                    ))}
-                  </div>
-                </ScrollArea>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* AI Insights Panel */}
-          <div className="space-y-6">
-            <Card className="border-none shadow-md bg-gradient-to-br from-primary to-accent text-white overflow-hidden relative">
-              <div className="absolute top-0 right-0 p-8 opacity-10">
-                <BrainCircuit size={120} />
-              </div>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <BrainCircuit className="h-6 w-6" />
-                  AI Usage Summary
-                </CardTitle>
-                <CardDescription className="text-primary-foreground/70">
-                  Generate intelligent insights from recent laboratory data.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Button 
-                  onClick={handleGenerateAIReport}
-                  disabled={isGenerating}
-                  className="w-full bg-white text-primary hover:bg-white/90 font-bold h-11"
-                >
-                  {isGenerating ? "Analyzing Patterns..." : "Generate AI Insights"}
-                </Button>
-
-                {aiReport && (
-                  <div className="mt-6 space-y-4 text-sm animate-in fade-in slide-in-from-top-4 duration-500">
-                    <div className="p-3 bg-white/10 rounded-lg backdrop-blur-sm border border-white/20">
-                      <p className="font-semibold mb-1">Total Rooms Used: <span className="text-accent-foreground font-bold">{aiReport.totalRoomUses}</span></p>
-                      <p className="text-white/80">{aiReport.summary}</p>
-                    </div>
-                    
-                    <div>
-                      <p className="font-bold text-xs uppercase tracking-wider mb-2 text-white/60">Peak Periods</p>
-                      <div className="flex flex-wrap gap-2">
-                        {aiReport.peakUsageTimes.map((time, idx) => (
-                          <Badge key={idx} variant="secondary" className="bg-white/20 text-white border-none">{time}</Badge>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div>
-                      <p className="font-bold text-xs uppercase tracking-wider mb-2 text-white/60">Key Insights</p>
-                      <ul className="list-disc list-inside space-y-1 text-white/90">
-                        {aiReport.keyInsights.slice(0, 3).map((insight, idx) => (
-                          <li key={idx} className="line-clamp-2">{insight}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-
-            <Card className="border-none shadow-md">
-              <CardHeader>
-                <CardTitle className="text-lg">Quick Actions</CardTitle>
-              </CardHeader>
-              <CardContent className="grid grid-cols-1 gap-2">
-                <Button variant="outline" className="justify-start">
-                  <Filter className="mr-2 h-4 w-4" /> Filter Logs
-                </Button>
-                <Button variant="outline" className="justify-start">
-                  <Users className="mr-2 h-4 w-4" /> Manage Professors
-                </Button>
-                <Button variant="outline" className="justify-start">
-                  <Monitor className="mr-2 h-4 w-4" /> Room Settings
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </main>
+        </CardHeader>
+        <CardContent className="p-0">
+          <Table>
+            <TableHeader className="bg-slate-50/50">
+              <TableRow className="border-none hover:bg-transparent">
+                <TableHead className="px-8 h-12 text-[10px] font-black uppercase tracking-widest text-slate-400">Faculty</TableHead>
+                <TableHead className="h-12 text-[10px] font-black uppercase tracking-widest text-slate-400 text-center">Laboratory</TableHead>
+                <TableHead className="h-12 text-[10px] font-black uppercase tracking-widest text-slate-400 text-center">Timestamp</TableHead>
+                <TableHead className="px-8 h-12 text-[10px] font-black uppercase tracking-widest text-slate-400 text-right">Status</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredLogs.map((log) => (
+                <TableRow key={log.id} className="border-slate-50 hover:bg-slate-50/30 transition-colors h-16">
+                  <TableCell className="px-8 font-bold text-sm text-slate-700">{log.professorId}</TableCell>
+                  <TableCell className="text-center">
+                    <Badge variant="outline" className="rounded-full bg-slate-50 border-slate-200 text-slate-400 px-3 py-0.5 text-[9px] font-black">
+                      {log.roomId}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-center text-[10px] font-bold text-slate-400">
+                    {formatDateTime(log.startTime)}
+                  </TableCell>
+                  <TableCell className="px-8 text-right">
+                    <Badge 
+                      className={cn(
+                        "rounded-full px-3 py-0.5 text-[9px] font-black uppercase tracking-wider border-none",
+                        log.status === 'Active' ? "bg-green-100 text-green-600" : "bg-slate-100 text-slate-500"
+                      )}
+                    >
+                      {log.status}
+                    </Badge>
+                  </TableCell>
+                </TableRow>
+              ))}
+              {filteredLogs.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={4} className="h-32 text-center text-slate-300 font-bold italic">
+                    No activity logs found.
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
     </div>
   );
 }

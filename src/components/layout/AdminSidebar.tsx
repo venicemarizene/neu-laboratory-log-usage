@@ -1,0 +1,95 @@
+
+"use client"
+
+import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
+import { 
+  LayoutDashboard, 
+  Users, 
+  LogOut, 
+  Monitor,
+  ShieldCheck
+} from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { 
+  Sidebar, 
+  SidebarContent, 
+  SidebarHeader, 
+  SidebarMenu, 
+  SidebarMenuItem, 
+  SidebarMenuButton,
+  SidebarFooter
+} from '@/components/ui/sidebar';
+import { useAuth } from '@/firebase';
+
+export function AdminSidebar() {
+  const pathname = usePathname();
+  const auth = useAuth();
+  const router = useRouter();
+
+  const handleSignOut = async () => {
+    await auth.signOut();
+    router.push('/login');
+  };
+
+  const navItems = [
+    { name: 'Dashboard', href: '/dashboard/admin', icon: LayoutDashboard },
+    { name: 'Professor Directory', href: '/dashboard/admin/users', icon: Users },
+  ];
+
+  return (
+    <Sidebar className="border-none bg-primary text-white">
+      <SidebarHeader className="p-6">
+        <div className="flex items-center gap-3">
+          <div className="bg-white/10 p-2 rounded-xl">
+            <Monitor className="text-white h-6 w-6" />
+          </div>
+          <span className="font-black text-xl tracking-tight text-white">NEU LabTrack</span>
+        </div>
+      </SidebarHeader>
+
+      <SidebarContent className="px-4 py-4">
+        <SidebarMenu className="gap-2">
+          {navItems.map((item) => {
+            const isActive = pathname === item.href;
+            return (
+              <SidebarMenuItem key={item.name}>
+                <SidebarMenuButton 
+                  asChild 
+                  isActive={isActive}
+                  className={cn(
+                    "h-12 rounded-xl font-bold transition-all px-4",
+                    isActive 
+                      ? "bg-white/10 text-white hover:bg-white/20 hover:text-white" 
+                      : "text-white/60 hover:bg-white/5 hover:text-white"
+                  )}
+                >
+                  <Link href={item.href}>
+                    <item.icon className={cn("h-5 w-5 mr-3", isActive ? "text-white" : "text-white/60")} />
+                    {item.name}
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            );
+          })}
+        </SidebarMenu>
+      </SidebarContent>
+
+      <SidebarFooter className="p-6 space-y-4">
+        <div className="flex items-center gap-3 px-4 py-2 rounded-xl bg-white/5 border border-white/10">
+          <ShieldCheck className="h-4 w-4 text-white/60" />
+          <span className="text-[10px] font-black uppercase tracking-widest text-white/60">
+            Admin Mode
+          </span>
+        </div>
+        <button 
+          onClick={handleSignOut}
+          className="flex items-center gap-3 px-4 py-2 w-full text-white/60 hover:text-white transition-colors text-sm font-bold"
+        >
+          <LogOut className="h-4 w-4" />
+          Sign Out
+        </button>
+      </SidebarFooter>
+    </Sidebar>
+  );
+}

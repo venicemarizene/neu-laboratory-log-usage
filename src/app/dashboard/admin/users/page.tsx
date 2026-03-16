@@ -1,8 +1,8 @@
+
 "use client"
 
-import { useState } from 'react';
-import { Navbar } from '@/components/layout/Navbar';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { useState, useEffect } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { 
@@ -22,7 +22,8 @@ import {
   MoreVertical,
   QrCode
 } from 'lucide-react';
-import { MOCK_USERS } from '@/lib/placeholder-data';
+import { useCollection, useFirestore } from '@/firebase';
+import { collection, doc, updateDoc } from 'firebase/firestore';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -32,116 +33,135 @@ import {
 
 export default function UserManagementPage() {
   const [searchTerm, setSearchTerm] = useState('');
-  const [users, setUsers] = useState(MOCK_USERS);
+  const [mounted, setMounted] = useState(false);
+  const db = useFirestore();
 
-  const filteredUsers = users.filter(user => 
-    user.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-    user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.QR_String.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const { data: users, isLoading } = useCollection(collection(db, 'user_profiles') as any);
 
-  const toggleBlockStatus = (uid: string) => {
-    setUsers(prev => prev.map(u => 
-      u.uid === uid ? { ...u, blocked: !u.blocked } : u
-    ));
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const filteredUsers = users?.filter(user => 
+    user.name?.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    user.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    user.qrString?.toLowerCase().includes(searchTerm.toLowerCase())
+  ) || [];
+
+  const toggleBlockStatus = async (uid: string, currentStatus: boolean) => {
+    const userRef = doc(db, 'user_profiles', uid);
+    await updateDoc(userRef, { isBlocked: !currentStatus });
   };
 
-  return (
-    <div className="min-h-screen bg-background">
-      <Navbar />
-      <main className="container mx-auto px-4 py-8 space-y-6">
-        <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-headline font-bold text-foreground">Professor Management</h1>
-            <p className="text-muted-foreground">Manage laboratory access and institutional credentials.</p>
-          </div>
-          <Button className="bg-primary hover:bg-primary/90">
-            <UserPlus className="mr-2 h-4 w-4" />
-            Invite Professor
-          </Button>
-        </header>
+  if (!mounted) return null;
 
-        <Card className="border-none shadow-md">
-          <CardHeader>
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-              <div className="relative w-full md:w-96">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input 
-                  placeholder="Search by name, email, or QR code..." 
-                  className="pl-10"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-              </div>
+  return (
+    <div className="p-8 space-y-8 max-w-[1400px] mx-auto">
+      <header className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div className="space-y-1">
+          <h1 className="text-3xl font-black text-slate-900 tracking-tight">Professor Directory</h1>
+          <p className="text-xs font-black uppercase tracking-widest text-slate-400">
+            Institutional account management and laboratory access control
+          </p>
+        </div>
+        <Button className="bg-primary hover:bg-primary/90 rounded-2xl h-11 px-6 font-bold shadow-lg shadow-primary/20">
+          <UserPlus className="mr-2 h-4 w-4" />
+          Invite Professor
+        </Button>
+      </header>
+
+      <Card className="border-none shadow-sm bg-white rounded-[32px] overflow-hidden">
+        <CardHeader className="p-8 border-b border-slate-50">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="relative w-full md:w-96">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-300" />
+              <Input 
+                placeholder="Search faculty by name or email..." 
+                className="pl-10 h-11 rounded-2xl bg-slate-50 border-none text-sm font-bold placeholder:text-slate-300"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
             </div>
-          </CardHeader>
-          <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Professor</TableHead>
-                  <TableHead>ID / QR String</TableHead>
-                  <TableHead>Role</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+          </div>
+        </CardHeader>
+        <CardContent className="p-0">
+          <Table>
+            <TableHeader className="bg-slate-50/50">
+              <TableRow className="border-none hover:bg-transparent">
+                <TableHead className="px-8 h-12 text-[10px] font-black uppercase tracking-widest text-slate-400">Professor</TableHead>
+                <TableHead className="h-12 text-[10px] font-black uppercase tracking-widest text-slate-400">QR ID</TableHead>
+                <TableHead className="h-12 text-[10px] font-black uppercase tracking-widest text-slate-400">Role</TableHead>
+                <TableHead className="h-12 text-[10px] font-black uppercase tracking-widest text-slate-400">Status</TableHead>
+                <TableHead className="px-8 h-12 text-[10px] font-black uppercase tracking-widest text-slate-400 text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredUsers.map((user) => (
+                <TableRow key={user.id} className="border-slate-50 hover:bg-slate-50/30 transition-colors h-20">
+                  <TableCell className="px-8">
+                    <div className="flex flex-col">
+                      <span className="font-bold text-slate-700">{user.name}</span>
+                      <span className="text-[11px] text-slate-400 font-medium">{user.email}</span>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <code className="bg-slate-100 px-3 py-1 rounded-full text-[10px] font-black text-slate-400 border border-slate-200">
+                      {user.qrString || 'NOT_ASSIGNED'}
+                    </code>
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant="outline" className="rounded-full bg-slate-50 border-none text-[9px] font-black uppercase tracking-widest px-3 py-0.5 text-slate-400">
+                      {user.role}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    {user.isBlocked ? (
+                      <Badge className="bg-red-50 text-red-600 rounded-full px-3 py-0.5 text-[9px] font-black uppercase tracking-widest border-none">
+                        Blocked
+                      </Badge>
+                    ) : (
+                      <Badge className="bg-green-50 text-green-600 rounded-full px-3 py-0.5 text-[9px] font-black uppercase tracking-widest border-none">
+                        Active
+                      </Badge>
+                    )}
+                  </TableCell>
+                  <TableCell className="px-8 text-right">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon" className="h-10 w-10 rounded-xl hover:bg-slate-100 text-slate-300">
+                          <MoreVertical className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-56 p-2 rounded-2xl border-none shadow-2xl">
+                        <DropdownMenuItem 
+                          onClick={() => toggleBlockStatus(user.id, user.isBlocked)}
+                          className="rounded-xl h-10 font-bold text-sm cursor-pointer"
+                        >
+                          {user.isBlocked ? (
+                            <><ShieldCheck className="mr-3 h-4 w-4 text-green-500" /> Restore Access</>
+                          ) : (
+                            <><ShieldAlert className="mr-3 h-4 w-4 text-destructive" /> Revoke Access</>
+                          )}
+                        </DropdownMenuItem>
+                        <DropdownMenuItem className="rounded-xl h-10 font-bold text-sm cursor-pointer">
+                          <QrCode className="mr-3 h-4 w-4 text-slate-400" /> Regenerate QR
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
                 </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredUsers.map((user) => (
-                  <TableRow key={user.uid} className="group">
-                    <TableCell>
-                      <div className="flex flex-col">
-                        <span className="font-medium">{user.name}</span>
-                        <span className="text-xs text-muted-foreground">{user.email}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <code className="bg-muted px-2 py-1 rounded text-xs font-mono">{user.QR_String}</code>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant="outline" className="font-normal">{user.role}</Badge>
-                    </TableCell>
-                    <TableCell>
-                      {user.blocked ? (
-                        <Badge variant="destructive" className="flex w-fit items-center gap-1">
-                          <ShieldAlert size={12} />
-                          Blocked
-                        </Badge>
-                      ) : (
-                        <Badge variant="secondary" className="bg-green-100 text-green-700 hover:bg-green-100 border-none flex w-fit items-center gap-1">
-                          <ShieldCheck size={12} />
-                          Active
-                        </Badge>
-                      )}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon">
-                            <MoreVertical className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-48">
-                          <DropdownMenuItem onClick={() => toggleBlockStatus(user.uid)}>
-                            {user.blocked ? (
-                              <><ShieldCheck className="mr-2 h-4 w-4 text-green-500" /> Restore Access</>
-                            ) : (
-                              <><ShieldAlert className="mr-2 h-4 w-4 text-destructive" /> Revoke Access</>
-                            )}
-                          </DropdownMenuItem>
-                          <DropdownMenuItem>
-                            <QrCode className="mr-2 h-4 w-4" /> Regenerate QR
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
-      </main>
+              ))}
+              {!isLoading && filteredUsers.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={5} className="h-32 text-center text-slate-300 font-bold italic">
+                    No faculty records found.
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
     </div>
   );
 }

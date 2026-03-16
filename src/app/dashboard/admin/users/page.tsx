@@ -21,7 +21,8 @@ import {
   MoreVertical
 } from 'lucide-react';
 import { useCollection, useFirestore, useMemoFirebase } from '@/firebase';
-import { collection, doc, updateDoc } from 'firebase/firestore';
+import { collection, doc } from 'firebase/firestore';
+import { updateDocumentNonBlocking } from '@/firebase/non-blocking-updates';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -51,7 +52,7 @@ export default function UserManagementPage() {
 
   const toggleBlockStatus = async (uid: string, currentStatus: boolean) => {
     const userRef = doc(db, 'user_profiles', uid);
-    await updateDoc(userRef, { isBlocked: !currentStatus });
+    updateDocumentNonBlocking(userRef, { isBlocked: !currentStatus });
   };
 
   if (!mounted) return null;

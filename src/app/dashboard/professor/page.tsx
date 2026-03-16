@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useState, useEffect, useRef } from 'react';
@@ -30,6 +31,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Html5Qrcode } from 'html5-qrcode';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { setDocumentNonBlocking, updateDocumentNonBlocking } from '@/firebase/non-blocking-updates';
+import { errorEmitter } from '@/firebase/error-emitter';
+import { FirestorePermissionError } from '@/firebase/errors';
 
 /**
  * Sub-component to handle QR scanning with strict border containment.
@@ -140,6 +143,13 @@ export default function ProfessorDashboard() {
           const doc = snapshot.docs[0];
           setActiveSession({ id: doc.id, roomId: doc.data().roomId });
         }
+      }).catch(async (err) => {
+        // Emit contextual error for standard permission issues
+        const permissionError = new FirestorePermissionError({
+          path: 'room_logs',
+          operation: 'list',
+        });
+        errorEmitter.emit('permission-error', permissionError);
       });
     }
   }, [user, db]);

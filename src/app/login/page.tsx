@@ -117,7 +117,7 @@ export default function LoginPage() {
           </p>
         </div>
 
-        <Card className="login-card w-full max-w-[400px] border overflow-hidden rounded-[2.5rem]">
+        <Card className="login-card w-full max-w-[400px] border overflow-hidden rounded-2xl shadow-xl">
           <Tabs 
             defaultValue="Professor" 
             onValueChange={(v) => setActiveTab(v as 'Professor' | 'Admin')}
@@ -181,8 +181,10 @@ export default function LoginPage() {
 
       {/* Institutional Footer */}
       <footer className="h-20 border-t flex flex-col items-center justify-center text-center px-4">
-        <p className="footer-text text-xs font-bold">
-          © 2026 New Era University • College of Informatics and Computing Science
+        <p className="footer-text text-xs font-bold flex flex-col sm:flex-row items-center gap-2 sm:gap-6 text-slate-500 dark:text-slate-400">
+          <span>© 2026 New Era University</span>
+          <span className="hidden sm:inline text-slate-300 dark:text-slate-700 font-normal">|</span>
+          <span>College of Informatics and Computing Science</span>
         </p>
       </footer>
     </div>

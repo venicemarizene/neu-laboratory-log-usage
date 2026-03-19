@@ -97,9 +97,9 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex flex-col transition-colors">
       {/* Top Navigation Bar */}
-      <header className="h-16 border-b flex items-center justify-between px-6 sm:px-12 sticky top-0 z-50">
+      <header className="h-16 border-b flex items-center justify-between px-6 sm:px-12 sticky top-0 z-50 shadow-sm">
         <div className="flex items-center gap-3">
-          <div className="bg-white rounded-full p-0.5 shadow-lg border border-slate-100">
+          <div className="bg-white rounded-full p-0.5 shadow-sm border border-slate-100">
             <img
               src="/NEU_LOGO.png"
               alt="New Era University Logo"
@@ -114,17 +114,19 @@ export default function LoginPage() {
       {/* Main Content Area */}
       <main className="flex-1 flex flex-col items-center justify-center p-4 bg-[var(--color-page-bg)]">
         <Card className="w-full max-w-[420px] bg-white dark:bg-slate-900 border-none shadow-2xl rounded-[40px] overflow-hidden">
-          <CardContent className="p-10 flex flex-col items-center gap-6">
-            {/* Institution Logo */}
-            <img
-              src="/NEU_LOGO.png"
-              alt="New Era University Logo"
-              className="w-20 h-20 object-contain"
-            />
+          <CardContent className="p-10 flex flex-col items-center gap-6 text-center">
+            {/* Institution Logo Wrapper - Fixed for Dim Mode visibility */}
+            <div className="bg-white p-2 rounded-full shadow-sm">
+              <img
+                src="/NEU_LOGO.png"
+                alt="New Era University Logo"
+                className="w-16 h-16 object-contain"
+              />
+            </div>
 
             {/* Site Identity */}
-            <div className="text-center space-y-1">
-              <h2 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">
+            <div className="space-y-1">
+              <h2 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">
                 NEU <span className="text-primary">LabTrack</span>
               </h2>
               <p className="text-sm font-bold text-slate-500 dark:text-slate-400">
@@ -194,7 +196,7 @@ export default function LoginPage() {
       </main>
 
       {/* Institutional Footer */}
-      <footer className="h-20 border-t flex flex-col items-center justify-center text-center px-4">
+      <footer className="h-20 border-t flex flex-col items-center justify-center text-center px-4 bg-slate-50 dark:bg-slate-900 transition-colors shadow-[0_-1px_3px_rgba(0,0,0,0.05)]">
         <p className="footer-text text-xs font-bold flex flex-col sm:flex-row items-center gap-2 sm:gap-6 text-slate-500 dark:text-slate-400">
           <span>© 2026 New Era University</span>
           <span className="hidden sm:inline text-slate-300 dark:text-slate-700 font-normal">|</span>

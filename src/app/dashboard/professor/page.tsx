@@ -21,17 +21,15 @@ import {
   SelectTrigger, 
   SelectValue 
 } from '@/components/ui/select';
-import { useUser, useAuth, useFirestore } from '@/firebase';
+import { useUser, useAuth, useFirestore, useCollection, useMemoFirebase } from '@/firebase';
 import { useRouter } from 'next/navigation';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { doc, query, where, collection, getDocs, limit } from 'firebase/firestore';
+import { doc, query, where, collection, limit } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Html5Qrcode } from 'html5-qrcode';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { setDocumentNonBlocking, updateDocumentNonBlocking } from '@/firebase/non-blocking-updates';
-import { errorEmitter } from '@/firebase/error-emitter';
-import { FirestorePermissionError } from '@/firebase/errors';
 import { ThemeToggle } from '@/components/ThemeToggle';
 
 function ScannerView({ onScan }: { onScan: (roomId: string) => void }) {
@@ -125,28 +123,34 @@ export default function ProfessorDashboard() {
   const [activeSession, setActiveSession] = useState<{id: string, roomId: string} | null>(null);
   const [isScannerOpen, setIsScannerOpen] = useState(false);
 
+  // Security guard: Redirect if not authenticated
   useEffect(() => {
-    if (user && db) {
-      const q = query(
-        collection(db, 'room_logs'),
-        where('professorId', '==', user.uid),
-        where('status', '==', 'Active'),
-        limit(1)
-      );
-      getDocs(q).then((snapshot) => {
-        if (!snapshot.empty) {
-          const doc = snapshot.docs[0];
-          setActiveSession({ id: doc.id, roomId: doc.data().roomId });
-        }
-      }).catch(async (err) => {
-        const permissionError = new FirestorePermissionError({
-          path: 'room_logs',
-          operation: 'list',
-        });
-        errorEmitter.emit('permission-error', permissionError);
-      });
+    if (!isUserLoading && !user) {
+      router.push('/login');
     }
+  }, [user, isUserLoading, router]);
+
+  // Reactive query for finding an active session
+  const activeSessionQuery = useMemoFirebase(() => {
+    if (!user || !db) return null;
+    return query(
+      collection(db, 'room_logs'),
+      where('professorId', '==', user.uid),
+      where('status', '==', 'Active'),
+      limit(1)
+    );
   }, [user, db]);
+
+  const { data: activeSessions } = useCollection(activeSessionQuery);
+
+  // Synchronize state with reactive query result
+  useEffect(() => {
+    if (activeSessions && activeSessions.length > 0) {
+      setActiveSession({ id: activeSessions[0].id, roomId: activeSessions[0].roomId });
+    } else {
+      setActiveSession(null);
+    }
+  }, [activeSessions]);
 
   const handleSignOut = async () => {
     if (user && db && activeSession) {
@@ -234,9 +238,10 @@ export default function ProfessorDashboard() {
     );
   }
 
+  if (!user) return null;
+
   return (
     <div className="min-h-screen bg-[#F8FAFC] dark:bg-slate-950 flex flex-col font-body antialiased transition-colors">
-      {/* Global Theme Toggle */}
       <div className="fixed top-6 right-6 z-50">
         <ThemeToggle />
       </div>

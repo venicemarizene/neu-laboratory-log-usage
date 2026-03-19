@@ -30,7 +30,7 @@ import {
   TableRow 
 } from '@/components/ui/table';
 import { Input } from '@/components/ui/input';
-import { useCollection, useFirestore, useMemoFirebase } from '@/firebase';
+import { useCollection, useFirestore, useMemoFirebase, useUser } from '@/firebase';
 import { collection, query, orderBy, limit, where } from 'firebase/firestore';
 import { LAB_ROOMS } from '@/lib/constants';
 import { cn } from '@/lib/utils';
@@ -60,6 +60,7 @@ interface CustomDate {
 }
 
 export default function AdminDashboard() {
+  const { user } = useUser();
   const [mounted, setMounted] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterLabel, setFilterLabel] = useState('All Logs');
@@ -80,9 +81,9 @@ export default function AdminDashboard() {
   const db = useFirestore();
 
   const usersQuery = useMemoFirebase(() => {
-    if (!db) return null;
+    if (!db || !user) return null;
     return collection(db, 'user_profiles');
-  }, [db]);
+  }, [db, user]);
   const { data: users } = useCollection(usersQuery as any);
 
   // Create a lookup map for names to handle legacy logs or missing fields
@@ -95,7 +96,7 @@ export default function AdminDashboard() {
   }, [users]);
 
   const logsQuery = useMemoFirebase(() => {
-    if (!db) return null;
+    if (!db || !user) return null;
     let q = query(collection(db, 'room_logs'), orderBy('createdAt', 'desc'));
 
     const today = new Date();
@@ -118,7 +119,7 @@ export default function AdminDashboard() {
     }
 
     return query(q, limit(100));
-  }, [db, filterLabel, customFrom, customTo]);
+  }, [db, user, filterLabel, customFrom, customTo]);
   
   const { data: logs } = useCollection(logsQuery as any);
 
@@ -126,7 +127,7 @@ export default function AdminDashboard() {
     setMounted(true);
   }, []);
 
-  if (!mounted) return null;
+  if (!mounted || !user) return null;
 
   const activeLogsCount = logs?.filter(l => l.status === 'Active').length || 0;
   const uniqueFacultyCount = new Set(logs?.map(l => l.professorId)).size || 0;

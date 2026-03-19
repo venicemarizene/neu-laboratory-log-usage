@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useState, useEffect } from 'react';
@@ -20,7 +19,7 @@ import {
   ShieldCheck, 
   MoreVertical
 } from 'lucide-react';
-import { useCollection, useFirestore, useMemoFirebase } from '@/firebase';
+import { useCollection, useFirestore, useMemoFirebase, useUser } from '@/firebase';
 import { collection, doc } from 'firebase/firestore';
 import { updateDocumentNonBlocking } from '@/firebase/non-blocking-updates';
 import {
@@ -31,14 +30,15 @@ import {
 } from '@/components/ui/dropdown-menu';
 
 export default function UserManagementPage() {
+  const { user } = useUser();
   const [searchTerm, setSearchTerm] = useState('');
   const [mounted, setMounted] = useState(false);
   const db = useFirestore();
 
   const usersQuery = useMemoFirebase(() => {
-    if (!db) return null;
+    if (!db || !user) return null;
     return collection(db, 'user_profiles');
-  }, [db]);
+  }, [db, user]);
   const { data: users, isLoading } = useCollection(usersQuery as any);
 
   useEffect(() => {
@@ -55,7 +55,7 @@ export default function UserManagementPage() {
     updateDocumentNonBlocking(userRef, { isBlocked: !currentStatus });
   };
 
-  if (!mounted) return null;
+  if (!mounted || !user) return null;
 
   return (
     <div className="p-8 space-y-8 max-w-[1400px] mx-auto">

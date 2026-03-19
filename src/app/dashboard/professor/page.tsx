@@ -246,7 +246,7 @@ export default function ProfessorDashboard() {
           <div className="bg-primary p-2 rounded-xl shadow-lg shadow-primary/20">
             <Monitor className="text-white h-6 w-6" />
           </div>
-          <span className="font-black text-2xl tracking-tight text-primary">NEU LabTrack</span>
+          <span className="font-black text-2xl tracking-tight text-primary">New Era University</span>
         </div>
       </div>
 

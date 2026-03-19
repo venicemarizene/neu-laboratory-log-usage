@@ -4,7 +4,7 @@ import { Toaster } from "@/components/ui/toaster"
 import { FirebaseClientProvider } from '@/firebase/client-provider';
 
 export const metadata: Metadata = {
-  title: 'NEU LabTrack - Institutional Laboratory Management',
+  title: 'New Era University - Institutional Laboratory Management',
   description: 'Track and manage university laboratory usage with secure institutional access and AI insights.',
 };
 

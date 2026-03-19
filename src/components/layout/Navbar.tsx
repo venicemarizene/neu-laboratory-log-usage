@@ -1,4 +1,3 @@
-
 "use client"
 
 import Link from 'next/link';
@@ -27,7 +26,7 @@ export function Navbar() {
           <div className="bg-primary p-1.5 rounded-lg">
             <Monitor className="text-white h-6 w-6" />
           </div>
-          <span className="font-headline font-bold text-xl tracking-tight text-primary">NEU LabTrack</span>
+          <span className="font-headline font-bold text-xl tracking-tight text-primary">New Era University</span>
         </div>
 
         <div className="flex items-center gap-4">

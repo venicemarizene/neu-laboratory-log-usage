@@ -1,4 +1,3 @@
-
 "use client"
 
 import Link from 'next/link';
@@ -46,7 +45,7 @@ export function AdminSidebar() {
           <div className="bg-white/10 p-2 rounded-xl">
             <Monitor className="text-white h-6 w-6" />
           </div>
-          <span className="font-black text-xl tracking-tight text-white">NEU LabTrack</span>
+          <span className="font-black text-xl tracking-tight text-white">New Era University</span>
         </div>
       </SidebarHeader>
 

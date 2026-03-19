@@ -102,7 +102,7 @@ export default function LoginPage() {
           <div className="bg-primary p-2 rounded-xl shadow-lg shadow-primary/20">
             <Monitor className="text-white h-5 w-5" />
           </div>
-          <span className="font-black text-lg tracking-tight text-slate-900 dark:text-white">NEU LabTrack</span>
+          <span className="font-black text-lg tracking-tight text-slate-900 dark:text-white">New Era University</span>
         </div>
         <ThemeToggle />
       </header>
@@ -169,7 +169,7 @@ export default function LoginPage() {
 
                 <div className="pt-4 border-t border-slate-100 dark:border-slate-800">
                   <p className="text-center text-[10px] text-slate-400 uppercase tracking-[0.2em] font-black">
-                    Institutional Accounts Only
+                    NEU Institutional accounts Only
                   </p>
                 </div>
               </div>
@@ -179,12 +179,9 @@ export default function LoginPage() {
       </main>
 
       {/* Institutional Footer */}
-      <footer className="h-20 border-t bg-white dark:bg-slate-900 flex flex-col items-center justify-center text-center px-4 space-y-1">
-        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">
-          Developed by the College of Computer Studies
-        </p>
+      <footer className="h-20 border-t bg-white dark:bg-slate-900 flex flex-col items-center justify-center text-center px-4">
         <p className="text-xs font-bold text-slate-900 dark:text-white">
-          New Era University | CCS Department
+          © 2026 New Era University • College of Informatics and Computing Science
         </p>
       </footer>
     </div>

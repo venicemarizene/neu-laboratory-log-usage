@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useState } from 'react';
@@ -132,34 +131,38 @@ export default function LoginPage() {
               </h2>
             </div>
 
-            <Tabs 
-              defaultValue="Professor" 
-              onValueChange={(v) => setActiveTab(v as 'Professor' | 'Admin')}
-              className="w-full"
-            >
-              <p className="text-sm font-bold text-slate-500 dark:text-slate-400 mb-4">
-                Sign in with your university credentials
-              </p>
-              
-              {/* Pill Switcher */}
-              <TabsList className="grid grid-cols-2 w-full h-14 bg-slate-100 dark:bg-slate-800 p-1.5 rounded-2xl border-none">
-                <TabsTrigger 
-                  value="Professor" 
-                  className="rounded-xl h-full gap-2 text-xs font-black transition-all data-[state=active]:bg-white dark:data-[state=active]:bg-slate-700 data-[state=active]:text-primary dark:data-[state=active]:text-white data-[state=active]:shadow-sm"
+            <div className="w-full flex flex-col gap-8">
+              <div className="flex flex-col gap-4">
+                <p className="text-sm font-bold text-slate-500 dark:text-slate-400">
+                  Sign in with your university credentials
+                </p>
+                
+                <Tabs 
+                  defaultValue="Professor" 
+                  onValueChange={(v) => setActiveTab(v as 'Professor' | 'Admin')}
+                  className="w-full"
                 >
-                  <User size={16} />
-                  Faculty
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="Admin" 
-                  className="rounded-xl h-full gap-2 text-xs font-black transition-all data-[state=active]:bg-white dark:data-[state=active]:bg-slate-700 data-[state=active]:text-primary dark:data-[state=active]:text-white data-[state=active]:shadow-sm"
-                >
-                  <ShieldCheck size={16} />
-                  Admin
-                </TabsTrigger>
-              </TabsList>
+                  {/* Pill Switcher */}
+                  <TabsList className="grid grid-cols-2 w-full h-14 bg-slate-100 dark:bg-slate-800 p-1.5 rounded-2xl border-none">
+                    <TabsTrigger 
+                      value="Professor" 
+                      className="rounded-xl h-full gap-2 text-xs font-black transition-all data-[state=active]:bg-white dark:data-[state=active]:bg-slate-700 data-[state=active]:text-primary dark:data-[state=active]:text-white data-[state=active]:shadow-sm"
+                    >
+                      <User size={16} />
+                      Faculty
+                    </TabsTrigger>
+                    <TabsTrigger 
+                      value="Admin" 
+                      className="rounded-xl h-full gap-2 text-xs font-black transition-all data-[state=active]:bg-white dark:data-[state=active]:bg-slate-700 data-[state=active]:text-primary dark:data-[state=active]:text-white data-[state=active]:shadow-sm"
+                    >
+                      <ShieldCheck size={16} />
+                      Admin
+                    </TabsTrigger>
+                  </TabsList>
+                </Tabs>
+              </div>
 
-              <div className="mt-8 space-y-6">
+              <div className="space-y-6">
                 {/* Google Login Button */}
                 <Button 
                   onClick={handleSignIn}
@@ -192,13 +195,13 @@ export default function LoginPage() {
                   An institutional @neu.edu.ph account is required.
                 </p>
               </div>
-            </Tabs>
+            </div>
           </CardContent>
         </Card>
       </main>
 
       {/* Institutional Footer */}
-      <footer className="h-20 border-t flex flex-col items-center justify-center text-center px-4 bg-slate-50 dark:bg-slate-900 transition-colors shadow-[0_-1px_3px_rgba(0,0,0,0.05)]">
+      <footer className="h-14 border-t flex flex-col items-center justify-center text-center px-4 bg-slate-50 dark:bg-slate-900 transition-colors shadow-[0_-1px_3px_rgba(0,0,0,0.05)]">
         <p className="footer-text text-xs font-bold flex flex-col sm:flex-row items-center gap-2 sm:gap-6 text-slate-500 dark:text-slate-400">
           <span>© 2026 New Era University</span>
           <span className="hidden sm:inline text-slate-300 dark:text-slate-700 font-normal">|</span>

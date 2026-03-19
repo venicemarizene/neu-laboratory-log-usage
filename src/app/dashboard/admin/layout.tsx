@@ -1,3 +1,4 @@
+
 "use client"
 
 import { ReactNode, useEffect } from 'react';
@@ -51,7 +52,7 @@ export default function AdminDashboardLayout({ children }: { children: ReactNode
                   style={{ width: '40px', height: '40px', objectFit: 'contain' }}
                 />
               </div>
-              <span className="text-sm font-black text-primary dark:text-slate-400 uppercase tracking-widest">New Era University</span>
+              <span className="text-sm font-black text-primary uppercase tracking-widest">New Era University</span>
             </div>
             <div className="flex items-center gap-6">
               <ThemeToggle />

@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useState } from 'react';
@@ -106,14 +107,14 @@ export default function LoginPage() {
               style={{ width: '40px', height: '40px', objectFit: 'contain' }}
             />
           </div>
-          <span className="font-black text-lg tracking-tight text-primary dark:text-[var(--color-text-primary)]">New Era University</span>
+          <span className="font-black text-lg tracking-tight text-primary">New Era University</span>
         </div>
         <ThemeToggle />
       </header>
 
       {/* Main Content Area */}
       <main className="flex-1 flex flex-col items-center justify-center p-4 bg-[var(--color-page-bg)]">
-        <Card className="w-full max-w-[420px] bg-white dark:bg-card border-none shadow-2xl rounded-[40px] overflow-hidden">
+        <Card className="w-full max-w-[420px] bg-white dark:bg-[#3D4966] border-none shadow-2xl rounded-[40px] overflow-hidden">
           <CardContent className="p-10 flex flex-col items-center gap-6 text-center">
             {/* Institution Logo Wrapper */}
             <div className="bg-white p-0.5 rounded-full shadow-sm">

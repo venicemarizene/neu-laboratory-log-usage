@@ -111,10 +111,7 @@ export default function LoginPage() {
       {/* Main Content Area */}
       <main className="flex-1 flex flex-col items-center justify-center p-4 bg-[var(--color-page-bg)]">
         <div className="flex flex-col items-center mb-8 space-y-2 text-center">
-          <h1 className="text-3xl font-black tracking-tight text-[var(--color-text-primary)]">Institutional Access</h1>
-          <p className="text-[var(--color-text-secondary)] max-w-sm font-bold text-sm">
-            Sign in with your university credentials
-          </p>
+          <h1 className="text-3xl font-black tracking-tight text-[var(--color-text-primary)]">Institutional Laboratory Management</h1>
         </div>
 
         <Card className="login-card w-full max-w-[400px] border overflow-hidden rounded-2xl shadow-xl">
@@ -142,6 +139,9 @@ export default function LoginPage() {
 
             <CardContent className="p-8 pt-10">
               <div className="space-y-6">
+                <p className="text-[var(--color-text-secondary)] text-center font-bold text-sm mb-4">
+                  Sign in with your university credentials
+                </p>
                 <Button 
                   onClick={handleSignIn}
                   disabled={isLoading}

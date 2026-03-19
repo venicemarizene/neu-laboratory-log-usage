@@ -115,7 +115,7 @@ export default function LoginPage() {
       <main className="flex-1 flex flex-col items-center justify-center p-4 bg-[var(--color-page-bg)]">
         <Card className="w-full max-w-[420px] bg-white dark:bg-card border-none shadow-2xl rounded-[40px] overflow-hidden">
           <CardContent className="p-10 flex flex-col items-center gap-6 text-center">
-            {/* Institution Logo Wrapper - Slightly enlarged */}
+            {/* Institution Logo Wrapper */}
             <div className="bg-white p-0.5 rounded-full shadow-sm">
               <img
                 src="/NEU_LOGO.png"
@@ -126,7 +126,7 @@ export default function LoginPage() {
 
             {/* Site Identity */}
             <div className="space-y-1">
-              <h2 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">
+              <h2 className="text-2xl font-black text-slate-900 dark:text-primary tracking-tight">
                 Institutional Laboratory Management
               </h2>
               <p className="text-sm font-bold text-slate-500 dark:text-slate-400">

@@ -113,51 +113,54 @@ export default function LoginPage() {
 
       {/* Main Content Area */}
       <main className="flex-1 flex flex-col items-center justify-center p-4 bg-[var(--color-page-bg)]">
-        <div className="flex flex-col items-center mb-8 space-y-2 text-center">
-          <h1 className="text-3xl font-black tracking-tight text-[var(--color-text-primary)]">Institutional Laboratory Management</h1>
-        </div>
+        <Card className="w-full max-w-[420px] bg-white dark:bg-slate-900 border-none shadow-2xl rounded-[40px] overflow-hidden">
+          <CardContent className="p-10 flex flex-col items-center gap-6">
+            {/* Institution Logo */}
+            <img
+              src="/NEU_LOGO.png"
+              alt="New Era University Logo"
+              className="w-20 h-20 object-contain"
+            />
 
-        <Card className="login-card w-full max-w-[400px] border overflow-hidden rounded-2xl shadow-xl">
-          <Tabs 
-            defaultValue="Professor" 
-            onValueChange={(v) => setActiveTab(v as 'Professor' | 'Admin')}
-            className="w-full"
-          >
-            <TabsList className="portal-tab-container w-full h-14 rounded-none p-1.5 gap-1.5 border-b border-inherit">
-              <TabsTrigger 
-                value="Professor" 
-                className="portal-tab flex-1 h-full rounded-3xl gap-2 text-xs font-black transition-all"
-              >
-                <User size={16} className={activeTab === 'Professor' ? 'text-primary dark:text-white' : 'text-slate-400'} />
-                Faculty
-              </TabsTrigger>
-              <TabsTrigger 
-                value="Admin" 
-                className="portal-tab flex-1 h-full rounded-3xl gap-2 text-xs font-black transition-all"
-              >
-                <ShieldCheck size={16} className={activeTab === 'Admin' ? 'text-primary dark:text-white' : 'text-slate-400'} />
-                Admin
-              </TabsTrigger>
-            </TabsList>
+            {/* Site Identity */}
+            <div className="text-center space-y-1">
+              <h2 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">
+                NEU <span className="text-primary">LabTrack</span>
+              </h2>
+              <p className="text-sm font-bold text-slate-500 dark:text-slate-400">
+                Institutional Laboratory Management
+              </p>
+            </div>
 
-            <CardContent className="p-8 pt-10">
-              <div className="space-y-6">
-                <div className="flex justify-center mb-2">
-                  <div className="bg-white rounded-full p-1 shadow-md border border-slate-100 card-logo-wrapper">
-                    <img
-                      src="/NEU_LOGO.png"
-                      alt="New Era University Logo"
-                      style={{ width: '48px', height: '48px', objectFit: 'contain' }}
-                    />
-                  </div>
-                </div>
-                <p className="text-[var(--color-text-secondary)] text-center font-bold text-sm mb-4">
-                  Sign in with your university credentials
-                </p>
+            <Tabs 
+              defaultValue="Professor" 
+              onValueChange={(v) => setActiveTab(v as 'Professor' | 'Admin')}
+              className="w-full"
+            >
+              {/* Pill Switcher */}
+              <TabsList className="grid grid-cols-2 w-full h-14 bg-slate-100 dark:bg-slate-800 p-1.5 rounded-2xl border-none">
+                <TabsTrigger 
+                  value="Professor" 
+                  className="rounded-xl h-full gap-2 text-xs font-black transition-all data-[state=active]:bg-white dark:data-[state=active]:bg-slate-700 data-[state=active]:text-primary dark:data-[state=active]:text-white data-[state=active]:shadow-sm"
+                >
+                  <User size={16} />
+                  Faculty
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="Admin" 
+                  className="rounded-xl h-full gap-2 text-xs font-black transition-all data-[state=active]:bg-white dark:data-[state=active]:bg-slate-700 data-[state=active]:text-primary dark:data-[state=active]:text-white data-[state=active]:shadow-sm"
+                >
+                  <ShieldCheck size={16} />
+                  Admin
+                </TabsTrigger>
+              </TabsList>
+
+              <div className="mt-8 space-y-6">
+                {/* Google Login Button */}
                 <Button 
                   onClick={handleSignIn}
                   disabled={isLoading}
-                  className="google-login-btn w-full h-14 rounded-2xl text-lg font-black gap-3 transition-all active:scale-[0.98] shadow-lg shadow-primary/10 border-none"
+                  className="w-full h-14 rounded-2xl bg-[#3D5C99] hover:bg-[#3D5C99]/90 text-white font-black text-lg gap-3 transition-all active:scale-[0.98] shadow-lg shadow-[#3D5C99]/10 border-none"
                 >
                   <svg className="w-5 h-5" viewBox="0 0 24 24">
                     <path
@@ -180,14 +183,13 @@ export default function LoginPage() {
                   {isLoading ? "Connecting..." : "Google Login"}
                 </Button>
 
-                <div className="pt-4 border-t border-slate-100 dark:border-slate-800">
-                  <p className="login-footnote text-center text-[10px] uppercase tracking-[0.2em] font-black">
-                    NEU Institutional accounts Only
-                  </p>
-                </div>
+                {/* Footnote */}
+                <p className="text-center text-[10px] uppercase tracking-[0.2em] font-black text-slate-400">
+                  An institutional @neu.edu.ph account is required.
+                </p>
               </div>
-            </CardContent>
-          </Tabs>
+            </Tabs>
+          </CardContent>
         </Card>
       </main>
 

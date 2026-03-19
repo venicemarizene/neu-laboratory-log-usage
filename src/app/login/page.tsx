@@ -98,7 +98,7 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex flex-col transition-colors">
       {/* Top Navigation Bar */}
-      <header className="h-16 border-b flex items-center justify-between px-6 sm:px-12 sticky top-0 z-50 shadow-sm">
+      <header className="h-16 border-b flex items-center justify-between px-6 sm:px-12 sticky top-0 z-50 shadow-sm bg-white dark:bg-[#2A3245]">
         <div className="flex items-center gap-3">
           <div className="bg-white rounded-full p-0.5 shadow-sm border border-slate-100">
             <img
@@ -130,9 +130,6 @@ export default function LoginPage() {
               <h2 className="text-2xl font-black text-primary tracking-tight">
                 Institutional Laboratory Management
               </h2>
-              <p className="text-sm font-bold text-slate-500 dark:text-slate-400">
-                Sign in with your university credentials
-              </p>
             </div>
 
             <Tabs 
@@ -140,6 +137,10 @@ export default function LoginPage() {
               onValueChange={(v) => setActiveTab(v as 'Professor' | 'Admin')}
               className="w-full"
             >
+              <p className="text-sm font-bold text-slate-500 dark:text-slate-400 mb-4">
+                Sign in with your university credentials
+              </p>
+              
               {/* Pill Switcher */}
               <TabsList className="grid grid-cols-2 w-full h-14 bg-slate-100 dark:bg-slate-800 p-1.5 rounded-2xl border-none">
                 <TabsTrigger 
@@ -163,7 +164,7 @@ export default function LoginPage() {
                 <Button 
                   onClick={handleSignIn}
                   disabled={isLoading}
-                  className="w-full h-14 rounded-2xl bg-[#3D5C99] hover:bg-[#3D5C99]/90 text-white font-black text-lg gap-3 transition-all active:scale-[0.98] shadow-lg shadow-[#3D5C99]/10 border-none"
+                  className="w-full h-14 rounded-2xl bg-[#3D5C99] dark:bg-[#5578B8] hover:bg-[#3D5C99]/90 dark:hover:bg-[#5578B8]/90 text-white font-black text-lg gap-3 transition-all active:scale-[0.98] shadow-lg shadow-[#3D5C99]/10 border-none"
                 >
                   <svg className="w-5 h-5" viewBox="0 0 24 24">
                     <path
@@ -187,7 +188,7 @@ export default function LoginPage() {
                 </Button>
 
                 {/* Footnote */}
-                <p className="text-center text-[10px] uppercase tracking-[0.2em] font-black text-slate-400">
+                <p className="text-center text-[10px] font-bold text-slate-400">
                   An institutional @neu.edu.ph account is required.
                 </p>
               </div>

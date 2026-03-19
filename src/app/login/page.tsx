@@ -103,10 +103,10 @@ export default function LoginPage() {
             <img
               src="/NEU_LOGO.png"
               alt="New Era University Logo"
-              style={{ width: '32px', height: '32px', objectFit: 'contain' }}
+              style={{ width: '40px', height: '40px', objectFit: 'contain' }}
             />
           </div>
-          <span className="font-black text-lg tracking-tight text-[var(--color-text-primary)]">New Era University</span>
+          <span className="font-black text-lg tracking-tight text-primary dark:text-[var(--color-text-primary)]">New Era University</span>
         </div>
         <ThemeToggle />
       </header>
@@ -115,22 +115,22 @@ export default function LoginPage() {
       <main className="flex-1 flex flex-col items-center justify-center p-4 bg-[var(--color-page-bg)]">
         <Card className="w-full max-w-[420px] bg-white dark:bg-slate-900 border-none shadow-2xl rounded-[40px] overflow-hidden">
           <CardContent className="p-10 flex flex-col items-center gap-6 text-center">
-            {/* Institution Logo Wrapper - Tighter circle */}
+            {/* Institution Logo Wrapper - Slightly enlarged */}
             <div className="bg-white p-0.5 rounded-full shadow-sm">
               <img
                 src="/NEU_LOGO.png"
                 alt="New Era University Logo"
-                className="w-12 h-12 object-contain"
+                className="w-14 h-14 object-contain"
               />
             </div>
 
             {/* Site Identity */}
             <div className="space-y-1">
               <h2 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">
-                NEU <span className="text-primary">LabTrack</span>
+                Institutional Laboratory Management
               </h2>
               <p className="text-sm font-bold text-slate-500 dark:text-slate-400">
-                Institutional Laboratory Management
+                Sign in with your university credentials
               </p>
             </div>
 

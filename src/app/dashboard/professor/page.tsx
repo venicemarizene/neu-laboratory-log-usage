@@ -251,7 +251,7 @@ export default function ProfessorDashboard() {
             <img
               src="/NEU_LOGO.png"
               alt="New Era University Logo"
-              style={{ width: '32px', height: '32px', objectFit: 'contain' }}
+              style={{ width: '40px', height: '40px', objectFit: 'contain' }}
             />
           </div>
           <span className="font-black text-2xl tracking-tight text-primary">New Era University</span>

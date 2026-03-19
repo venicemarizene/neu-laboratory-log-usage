@@ -126,7 +126,7 @@ export default function LoginPage() {
 
             {/* Site Identity */}
             <div className="space-y-1">
-              <h2 className="text-2xl font-black text-slate-900 dark:text-primary tracking-tight">
+              <h2 className="text-2xl font-black text-primary tracking-tight">
                 Institutional Laboratory Management
               </h2>
               <p className="text-sm font-bold text-slate-500 dark:text-slate-400">

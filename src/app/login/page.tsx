@@ -99,7 +99,7 @@ export default function LoginPage() {
       {/* Top Navigation Bar */}
       <header className="h-16 border-b flex items-center justify-between px-6 sm:px-12 sticky top-0 z-50">
         <div className="flex items-center gap-3">
-          <div className="bg-white rounded-full p-1 shadow-lg border border-slate-100">
+          <div className="bg-white rounded-full p-0.5 shadow-lg border border-slate-100">
             <img
               src="/NEU_LOGO.png"
               alt="New Era University Logo"
@@ -143,7 +143,7 @@ export default function LoginPage() {
             <CardContent className="p-8 pt-10">
               <div className="space-y-6">
                 <div className="flex justify-center mb-2">
-                  <div className="bg-white rounded-full p-2 shadow-md border border-slate-100 card-logo-wrapper">
+                  <div className="bg-white rounded-full p-1 shadow-md border border-slate-100 card-logo-wrapper">
                     <img
                       src="/NEU_LOGO.png"
                       alt="New Era University Logo"

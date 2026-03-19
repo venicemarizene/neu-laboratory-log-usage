@@ -44,7 +44,7 @@ export default function AdminDashboardLayout({ children }: { children: ReactNode
           {/* Top Header */}
           <header className="h-16 border-b bg-white dark:bg-slate-900 flex items-center justify-between px-8 sticky top-0 z-40 transition-colors">
             <div className="flex items-center gap-3">
-              <div className="bg-white rounded-full p-1 shadow-sm border border-slate-100">
+              <div className="bg-white rounded-full p-0.5 shadow-sm border border-slate-100">
                 <img
                   src="/NEU_LOGO.png"
                   alt="New Era University Logo"

@@ -113,7 +113,7 @@ export default function LoginPage() {
 
       {/* Main Content Area */}
       <main className="flex-1 flex flex-col items-center justify-center p-4 bg-[var(--color-page-bg)]">
-        <Card className="w-full max-w-[420px] bg-white dark:bg-slate-900 border-none shadow-2xl rounded-[40px] overflow-hidden">
+        <Card className="w-full max-w-[420px] bg-white dark:bg-card border-none shadow-2xl rounded-[40px] overflow-hidden">
           <CardContent className="p-10 flex flex-col items-center gap-6 text-center">
             {/* Institution Logo Wrapper - Slightly enlarged */}
             <div className="bg-white p-0.5 rounded-full shadow-sm">

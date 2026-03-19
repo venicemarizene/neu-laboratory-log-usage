@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useState, useEffect, useRef } from 'react';
@@ -111,7 +112,7 @@ function ScannerView({ onScan }: { onScan: (roomId: string) => void }) {
 }
 
 export default function ProfessorDashboard() {
-  const { user, isUserLoading } = useUser();
+  const { user, isUserLoading } = userHook();
   const auth = useAuth();
   const db = useFirestore();
   const router = useRouter();
@@ -121,6 +122,10 @@ export default function ProfessorDashboard() {
   const [isLogging, setIsLogging] = useState(false);
   const [activeSession, setActiveSession] = useState<{id: string, roomId: string} | null>(null);
   const [isScannerOpen, setIsScannerOpen] = useState(false);
+
+  function userHook() {
+      return useUser();
+  }
 
   // Security guard: Redirect if not authenticated
   useEffect(() => {
@@ -241,24 +246,22 @@ export default function ProfessorDashboard() {
 
   return (
     <div className="min-h-screen bg-[var(--color-page-bg)] flex flex-col font-body antialiased transition-colors">
-      <div className="fixed top-8 right-8 z-50">
-        <ThemeToggle />
-      </div>
-
-      <div className="w-full flex justify-center py-8">
+      {/* Top Navigation Bar */}
+      <header className="h-16 border-b flex items-center justify-between px-6 sm:px-12 sticky top-0 z-50 shadow-sm bg-[var(--color-card-bg)] transition-colors">
         <div className="flex items-center gap-3">
-          <div className="bg-white rounded-full p-0.5 shadow-lg border border-slate-100">
+          <div className="bg-white rounded-full p-0.5 shadow-sm border border-slate-100">
             <img
               src="/NEU_LOGO.png"
               alt="New Era University Logo"
               style={{ width: '40px', height: '40px', objectFit: 'contain' }}
             />
           </div>
-          <span className="font-black text-2xl tracking-tight text-primary">New Era University</span>
+          <span className="font-black text-lg tracking-tight text-primary">New Era University</span>
         </div>
-      </div>
+        <ThemeToggle />
+      </header>
 
-      <main className="flex-1 flex flex-col items-center justify-center p-6 space-y-6 -mt-12">
+      <main className="flex-1 flex flex-col items-center justify-center p-6 space-y-8">
         {activeSession && (
           <div className="w-full max-w-md bg-[var(--color-status-active-bg)] border border-transparent text-[var(--color-status-active-text)] px-4 py-3 rounded-xl flex items-center gap-3 animate-in slide-in-from-top-4 shadow-sm">
             <CheckCircle2 className="h-5 w-5 shrink-0" />

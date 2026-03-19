@@ -48,7 +48,7 @@ export default function AdminDashboardLayout({ children }: { children: ReactNode
                 <img
                   src="/NEU_LOGO.png"
                   alt="New Era University Logo"
-                  style={{ width: '40px', height: '40px', objectFit: 'contain' }}
+                  style={{ width: '32px', height: '32px', objectFit: 'contain' }}
                 />
               </div>
               <span className="text-sm font-black text-slate-400 uppercase tracking-widest">Admin Portal</span>

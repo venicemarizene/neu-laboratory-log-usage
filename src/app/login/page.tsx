@@ -103,7 +103,7 @@ export default function LoginPage() {
             <img
               src="/NEU_LOGO.png"
               alt="New Era University Logo"
-              style={{ width: '40px', height: '40px', objectFit: 'contain' }}
+              style={{ width: '32px', height: '32px', objectFit: 'contain' }}
             />
           </div>
           <span className="font-black text-lg tracking-tight text-[var(--color-text-primary)]">New Era University</span>
@@ -115,12 +115,12 @@ export default function LoginPage() {
       <main className="flex-1 flex flex-col items-center justify-center p-4 bg-[var(--color-page-bg)]">
         <Card className="w-full max-w-[420px] bg-white dark:bg-slate-900 border-none shadow-2xl rounded-[40px] overflow-hidden">
           <CardContent className="p-10 flex flex-col items-center gap-6 text-center">
-            {/* Institution Logo Wrapper - Fixed for Dim Mode visibility */}
-            <div className="bg-white p-2 rounded-full shadow-sm">
+            {/* Institution Logo Wrapper - Tighter circle */}
+            <div className="bg-white p-0.5 rounded-full shadow-sm">
               <img
                 src="/NEU_LOGO.png"
                 alt="New Era University Logo"
-                className="w-16 h-16 object-contain"
+                className="w-12 h-12 object-contain"
               />
             </div>
 

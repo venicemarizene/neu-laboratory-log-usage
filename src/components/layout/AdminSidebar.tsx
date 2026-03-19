@@ -45,7 +45,7 @@ export function AdminSidebar() {
             <img
               src="/NEU_LOGO.png"
               alt="New Era University Logo"
-              style={{ width: '40px', height: '40px', objectFit: 'contain' }}
+              style={{ width: '32px', height: '32px', objectFit: 'contain' }}
             />
           </div>
           <span className="font-black text-xl tracking-tight text-white">New Era University</span>

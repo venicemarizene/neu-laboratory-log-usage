@@ -44,40 +44,40 @@
 }
 
 .dark {
-  --color-page-bg: #252D3D;
-  --color-card-bg: #2E3850;
-  --color-sidebar-bg: #1E2740;
+  --color-page-bg: #2A3245;
+  --color-card-bg: #323D56;
+  --color-sidebar-bg: #232D42;
   --color-primary: #5578B8;
   --color-accent-bg: #2A3A5A;
   --color-accent-border: #3A5080;
-  --color-text-primary: #D8DEEE;
-  --color-text-secondary: #8E97B4;
-  --color-text-tertiary: #5E6680;
-  --color-border: #3A4560;
+  --color-text-primary: #E2E8F4;
+  --color-text-secondary: #A8B4CC;
+  --color-text-tertiary: #6E7D9C;
+  --color-border: #424F6A;
   --color-status-active-bg: #233A30;
   --color-status-active-text: #82C4A0;
   --color-status-blocked-bg: #3A2228;
   --color-status-blocked-text: #C49090;
 
-  /* shadcn/ui variables mapping for dark mode */
-  --background: 222 24% 19%;
-  --foreground: 210 40% 98%;
-  --card: 222 27% 25%;
-  --card-foreground: 210 40% 98%;
-  --popover: 222 27% 25%;
-  --popover-foreground: 210 40% 98%;
+  /* shadcn/ui variables mapping for dim mode */
+  --background: 222 24% 22%;
+  --foreground: 210 40% 96%;
+  --card: 222 26% 27%;
+  --card-foreground: 210 40% 96%;
+  --popover: 222 26% 27%;
+  --popover-foreground: 210 40% 96%;
   --primary: 218 41% 53%;
-  --primary-foreground: 222 47% 11.2%;
-  --secondary: 217.2 32.6% 17.5%;
+  --primary-foreground: 210 40% 98%;
+  --secondary: 222 24% 31%;
   --secondary-foreground: 210 40% 98%;
-  --muted: 217.2 32.6% 17.5%;
-  --muted-foreground: 215 20.2% 65.1%;
-  --accent: 217.2 32.6% 17.5%;
+  --muted: 222 24% 31%;
+  --muted-foreground: 220 23% 70%;
+  --accent: 222 24% 31%;
   --accent-foreground: 210 40% 98%;
   --destructive: 0 62.8% 30.6%;
   --destructive-foreground: 210 40% 98%;
-  --border: 222 24% 31%;
-  --input: 222 24% 31%;
+  --border: 220 23% 34%;
+  --input: 220 23% 34%;
   --ring: 218 41% 53%;
 }
 
@@ -87,5 +87,35 @@
   }
   body {
     @apply bg-[var(--color-page-bg)] text-[var(--color-text-primary)] font-body;
+  }
+  header, footer, .top-bar, .bottom-bar {
+    @apply bg-[#E8EDF5] dark:bg-[#2E3A52] border-[#CDD5E4] dark:border-[#424F6A];
+  }
+  h1, h2, h3, h4, h5, h6 {
+    @apply text-[var(--color-text-primary)];
+  }
+  p, label, span {
+    @apply text-[var(--color-text-secondary)];
+  }
+  small {
+    @apply text-[var(--color-text-tertiary)];
+  }
+}
+
+@layer components {
+  .login-card {
+    @apply bg-[#F0F4FA] dark:bg-[#323D56] border-[#CDD5E4] dark:border-[#424F6A] shadow-[0_2px_8px_rgba(30,40,80,0.08)];
+  }
+  .portal-tab-container {
+    @apply bg-slate-200/50 dark:bg-[#2A3245] border-transparent dark:border-[#424F6A];
+  }
+  .portal-tab {
+    @apply text-slate-500 dark:text-[#A8B4CC];
+  }
+  .portal-tab[data-state="active"] {
+    @apply bg-white dark:bg-[#5578B8] text-primary dark:text-white shadow-sm;
+  }
+  .google-login-btn {
+    @apply bg-primary dark:bg-[#5578B8] text-white hover:bg-primary/90 dark:hover:bg-[#4A6BAD];
   }
 }

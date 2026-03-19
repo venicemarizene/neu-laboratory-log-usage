@@ -14,6 +14,7 @@ import { setDocumentNonBlocking } from '@/firebase/non-blocking-updates';
 import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError } from '@/firebase/errors';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import { cn } from '@/lib/utils';
 
 const ADMIN_EMAILS = [
   'venicemarizene.linga@neu.edu.ph',
@@ -95,46 +96,46 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950 transition-colors">
+    <div className="min-h-screen flex flex-col transition-colors">
       {/* Top Navigation Bar */}
-      <header className="h-16 border-b bg-white dark:bg-slate-900 flex items-center justify-between px-6 sm:px-12 sticky top-0 z-50">
+      <header className="h-16 border-b flex items-center justify-between px-6 sm:px-12 sticky top-0 z-50">
         <div className="flex items-center gap-3">
           <div className="bg-primary p-2 rounded-xl shadow-lg shadow-primary/20">
             <Monitor className="text-white h-5 w-5" />
           </div>
-          <span className="font-black text-lg tracking-tight text-slate-900 dark:text-white">New Era University</span>
+          <span className="font-black text-lg tracking-tight text-[var(--color-text-primary)]">New Era University</span>
         </div>
         <ThemeToggle />
       </header>
 
       {/* Main Content Area */}
-      <main className="flex-1 flex flex-col items-center justify-center p-4">
+      <main className="flex-1 flex flex-col items-center justify-center p-4 bg-[var(--color-page-bg)]">
         <div className="flex flex-col items-center mb-8 space-y-2 text-center">
-          <h1 className="text-3xl font-black tracking-tight text-slate-900 dark:text-white">Institutional Access</h1>
-          <p className="text-slate-500 dark:text-slate-400 max-w-sm font-bold text-sm">
+          <h1 className="text-3xl font-black tracking-tight text-[var(--color-text-primary)]">Institutional Access</h1>
+          <p className="text-[var(--color-text-secondary)] max-w-sm font-bold text-sm">
             Sign in with your university credentials
           </p>
         </div>
 
-        <Card className="w-full max-w-[400px] border-none shadow-2xl dark:shadow-primary/5 overflow-hidden rounded-[2.5rem] bg-white dark:bg-slate-900">
+        <Card className="login-card w-full max-w-[400px] border overflow-hidden rounded-[2.5rem]">
           <Tabs 
             defaultValue="Professor" 
             onValueChange={(v) => setActiveTab(v as 'Professor' | 'Admin')}
             className="w-full"
           >
-            <TabsList className="w-full h-14 bg-slate-100/50 dark:bg-slate-800/50 rounded-none p-1.5 gap-1.5">
+            <TabsList className="portal-tab-container w-full h-14 rounded-none p-1.5 gap-1.5 border-b border-inherit">
               <TabsTrigger 
                 value="Professor" 
-                className="flex-1 h-full rounded-3xl data-[state=active]:bg-white dark:data-[state=active]:bg-slate-900 data-[state=active]:shadow-sm gap-2 text-xs font-black transition-all"
+                className="portal-tab flex-1 h-full rounded-3xl gap-2 text-xs font-black transition-all"
               >
-                <User size={16} className={activeTab === 'Professor' ? 'text-primary' : 'text-slate-400'} />
+                <User size={16} className={activeTab === 'Professor' ? 'text-primary dark:text-white' : 'text-slate-400'} />
                 Faculty
               </TabsTrigger>
               <TabsTrigger 
                 value="Admin" 
-                className="flex-1 h-full rounded-3xl data-[state=active]:bg-white dark:data-[state=active]:bg-slate-900 data-[state=active]:shadow-sm gap-2 text-xs font-black transition-all"
+                className="portal-tab flex-1 h-full rounded-3xl gap-2 text-xs font-black transition-all"
               >
-                <ShieldCheck size={16} className={activeTab === 'Admin' ? 'text-primary' : 'text-slate-400'} />
+                <ShieldCheck size={16} className={activeTab === 'Admin' ? 'text-primary dark:text-white' : 'text-slate-400'} />
                 Admin
               </TabsTrigger>
             </TabsList>
@@ -144,7 +145,7 @@ export default function LoginPage() {
                 <Button 
                   onClick={handleSignIn}
                   disabled={isLoading}
-                  className="w-full h-14 bg-primary hover:bg-primary/90 text-white rounded-2xl text-lg font-black gap-3 transition-all active:scale-[0.98] shadow-lg shadow-primary/10"
+                  className="google-login-btn w-full h-14 rounded-2xl text-lg font-black gap-3 transition-all active:scale-[0.98] shadow-lg shadow-primary/10 border-none"
                 >
                   <svg className="w-5 h-5" viewBox="0 0 24 24">
                     <path
@@ -168,7 +169,7 @@ export default function LoginPage() {
                 </Button>
 
                 <div className="pt-4 border-t border-slate-100 dark:border-slate-800">
-                  <p className="text-center text-[10px] text-slate-400 uppercase tracking-[0.2em] font-black">
+                  <p className="login-footnote text-center text-[10px] uppercase tracking-[0.2em] font-black">
                     NEU Institutional accounts Only
                   </p>
                 </div>
@@ -179,8 +180,8 @@ export default function LoginPage() {
       </main>
 
       {/* Institutional Footer */}
-      <footer className="h-20 border-t bg-white dark:bg-slate-900 flex flex-col items-center justify-center text-center px-4">
-        <p className="text-xs font-bold text-slate-900 dark:text-white">
+      <footer className="h-20 border-t flex flex-col items-center justify-center text-center px-4">
+        <p className="footer-text text-xs font-bold">
           © 2026 New Era University • College of Informatics and Computing Science
         </p>
       </footer>

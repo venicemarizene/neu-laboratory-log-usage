@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Monitor, ShieldCheck, User } from 'lucide-react';
+import { ShieldCheck, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -14,7 +14,6 @@ import { setDocumentNonBlocking } from '@/firebase/non-blocking-updates';
 import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError } from '@/firebase/errors';
 import { ThemeToggle } from '@/components/ThemeToggle';
-import { cn } from '@/lib/utils';
 
 const ADMIN_EMAILS = [
   'venicemarizene.linga@neu.edu.ph',
@@ -100,8 +99,12 @@ export default function LoginPage() {
       {/* Top Navigation Bar */}
       <header className="h-16 border-b flex items-center justify-between px-6 sm:px-12 sticky top-0 z-50">
         <div className="flex items-center gap-3">
-          <div className="bg-primary p-2 rounded-xl shadow-lg shadow-primary/20">
-            <Monitor className="text-white h-5 w-5" />
+          <div className="bg-white rounded-full p-1 shadow-lg border border-slate-100">
+            <img
+              src="/NEU_LOGO.png"
+              alt="New Era University Logo"
+              style={{ width: '40px', height: '40px', objectFit: 'contain' }}
+            />
           </div>
           <span className="font-black text-lg tracking-tight text-[var(--color-text-primary)]">New Era University</span>
         </div>
@@ -139,6 +142,15 @@ export default function LoginPage() {
 
             <CardContent className="p-8 pt-10">
               <div className="space-y-6">
+                <div className="flex justify-center mb-2">
+                  <div className="bg-white rounded-full p-2 shadow-md border border-slate-100 card-logo-wrapper">
+                    <img
+                      src="/NEU_LOGO.png"
+                      alt="New Era University Logo"
+                      style={{ width: '48px', height: '48px', objectFit: 'contain' }}
+                    />
+                  </div>
+                </div>
                 <p className="text-[var(--color-text-secondary)] text-center font-bold text-sm mb-4">
                   Sign in with your university credentials
                 </p>

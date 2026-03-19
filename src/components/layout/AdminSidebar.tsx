@@ -6,7 +6,6 @@ import {
   LayoutDashboard, 
   Users, 
   LogOut, 
-  Monitor,
   ShieldCheck,
   QrCode
 } from 'lucide-react';
@@ -42,8 +41,12 @@ export function AdminSidebar() {
     <Sidebar className="border-none bg-primary text-white">
       <SidebarHeader className="p-6">
         <div className="flex items-center gap-3">
-          <div className="bg-white/10 p-2 rounded-xl">
-            <Monitor className="text-white h-6 w-6" />
+          <div className="bg-white rounded-full p-1.5 shadow-sm border border-slate-100">
+            <img
+              src="/NEU_LOGO.png"
+              alt="New Era University Logo"
+              style={{ width: '40px', height: '40px', objectFit: 'contain' }}
+            />
           </div>
           <span className="font-black text-xl tracking-tight text-white">New Era University</span>
         </div>

@@ -5,7 +5,6 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { 
-  Monitor, 
   LogOut,
   QrCode,
   ArrowRight,
@@ -247,9 +246,13 @@ export default function ProfessorDashboard() {
       </div>
 
       <div className="w-full flex justify-center py-8">
-        <div className="flex items-center gap-2">
-          <div className="bg-primary p-2 rounded-xl shadow-lg shadow-primary/20">
-            <Monitor className="text-white h-6 w-6" />
+        <div className="flex items-center gap-3">
+          <div className="bg-white rounded-full p-1.5 shadow-lg border border-slate-100">
+            <img
+              src="/NEU_LOGO.png"
+              alt="New Era University Logo"
+              style={{ width: '40px', height: '40px', objectFit: 'contain' }}
+            />
           </div>
           <span className="font-black text-2xl tracking-tight text-primary">New Era University</span>
         </div>

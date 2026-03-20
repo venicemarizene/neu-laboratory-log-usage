@@ -280,7 +280,6 @@ export default function ProfessorDashboard() {
             {!activeSession ? (
               <Card className="w-full max-w-[360px] border-none shadow-2xl rounded-[32px] overflow-hidden bg-[var(--color-card-bg)]">
                 <CardContent className="p-8 space-y-6">
-                  {/* Reordered items: Auto-Log → Select Room → Log Entry */}
                   <Button 
                     onClick={() => setIsScannerOpen(true)}
                     className="w-full h-12 rounded-2xl bg-primary dark:bg-[#4A6BAD] hover:opacity-90 text-white font-black text-base flex items-center justify-center gap-3 shadow-lg transition-all active:scale-[0.98] border-none"
@@ -307,12 +306,11 @@ export default function ProfessorDashboard() {
                     </Select>
                   </div>
 
-                  {/* Secondary action: Outlined style with enhanced dim mode visibility */}
                   <Button 
                     onClick={() => handleLogEntry(selectedRoom)}
                     disabled={isLogging}
                     variant="outline"
-                    className="w-full h-12 rounded-2xl border-2 border-[#475569] dark:border-[#4A6BAD] bg-transparent text-[#475569] dark:text-white hover:bg-[#475569]/5 dark:hover:bg-[#4A6BAD]/5 font-black text-base flex items-center justify-center gap-3 transition-all active:scale-[0.98] disabled:opacity-70"
+                    className="w-full h-12 rounded-2xl border-2 border-[#475569] dark:border-[#4A6BAD] bg-transparent text-[#475569] dark:text-white hover:bg-[#1E3A8A] hover:text-white hover:border-[#1E3A8A] dark:hover:bg-[#4A6BAD] dark:hover:text-white dark:hover:border-[#4A6BAD] font-black text-base flex items-center justify-center gap-3 transition-all duration-200 active:scale-[0.98] disabled:opacity-70"
                   >
                     <ArrowRight className="h-4 w-4" />
                     {isLogging ? 'Logging...' : `Log Entry ${selectedRoom}`}

@@ -5,7 +5,7 @@ import { ReactNode, useEffect } from 'react';
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { AdminSidebar } from '@/components/layout/AdminSidebar';
 import { useUser, useFirestore, useMemoFirebase, useDoc } from '@/firebase';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { doc } from 'firebase/firestore';
 
@@ -13,6 +13,7 @@ export default function AdminDashboardLayout({ children }: { children: ReactNode
   const { user, isUserLoading } = useUser();
   const db = useFirestore();
   const router = useRouter();
+  const pathname = usePathname();
 
   // Fetch the user's profile to verify their role
   const profileRef = useMemoFirebase(() => {
@@ -33,6 +34,33 @@ export default function AdminDashboardLayout({ children }: { children: ReactNode
       router.push('/dashboard/professor');
     }
   }, [profile, isProfileLoading, isUserLoading, router]);
+
+  const getPageInfo = () => {
+    switch (pathname) {
+      case '/dashboard/admin':
+        return {
+          title: "Laboratory Analytics",
+          subtitle: "NEU COMPUTER LABORATORY MANAGEMENT"
+        };
+      case '/dashboard/admin/users':
+        return {
+          title: "Professor Directory",
+          subtitle: "Institutional account management and laboratory access control"
+        };
+      case '/dashboard/admin/rooms':
+        return {
+          title: "Laboratory QR Registry",
+          subtitle: "Generate and manage institutional QR identification for physical lab rooms"
+        };
+      default:
+        return {
+          title: "Admin's Portal",
+          subtitle: ""
+        };
+    }
+  };
+
+  const { title, subtitle } = getPageInfo();
 
   if (isUserLoading || isProfileLoading) {
     return (
@@ -58,7 +86,14 @@ export default function AdminDashboardLayout({ children }: { children: ReactNode
           <div className="flex items-center justify-between px-6 py-4 bg-transparent shrink-0">
             <div className="flex items-center gap-4">
               <SidebarTrigger className="h-9 w-9 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-colors" />
-              <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">Admin's Portal</h1>
+              <div className="flex flex-col">
+                <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight leading-none">{title}</h1>
+                {subtitle && (
+                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mt-1">
+                    {subtitle}
+                  </p>
+                )}
+              </div>
             </div>
             <ThemeToggle />
           </div>

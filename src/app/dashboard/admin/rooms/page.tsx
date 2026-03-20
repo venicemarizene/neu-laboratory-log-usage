@@ -1,3 +1,4 @@
+
 "use client"
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -40,13 +41,6 @@ export default function RoomQrGeneratorPage() {
 
   return (
     <div className="p-8 space-y-8 max-w-[1400px] mx-auto">
-      <header className="space-y-1">
-        <h1 className="text-3xl font-black text-slate-900 tracking-tight">Laboratory QR Registry</h1>
-        <p className="text-xs font-black uppercase tracking-widest text-slate-400">
-          Generate and manage institutional QR identification for physical lab rooms
-        </p>
-      </header>
-
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {LAB_ROOMS.map((room) => (
           <Card key={room} className="border-none shadow-sm bg-card dark:bg-[#3D4966] rounded-[32px] overflow-hidden hover:shadow-md transition-shadow">

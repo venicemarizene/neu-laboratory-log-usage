@@ -278,13 +278,6 @@ export default function AdminDashboard() {
 
   return (
     <div className="p-8 space-y-8 max-w-[1400px] mx-auto">
-      <header className="space-y-1 bg-transparent">
-        <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">Laboratory Analytics</h1>
-        <p className="text-xs font-black uppercase tracking-widest text-slate-400">
-          NEU COMPUTER LABORATORY MANAGEMENT
-        </p>
-      </header>
-
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card className="border-none shadow-xl bg-primary text-white rounded-[32px] overflow-hidden relative">
           <div className="absolute top-6 right-6 opacity-20">

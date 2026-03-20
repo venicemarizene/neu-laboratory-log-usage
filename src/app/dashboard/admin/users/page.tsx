@@ -98,23 +98,14 @@ export default function UserManagementPage() {
 
   return (
     <div className="p-8 space-y-8 max-w-[1400px] mx-auto">
-      <header className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-        <div className="space-y-1">
-          <h1 className="text-3xl font-black text-slate-900 tracking-tight">Professor Directory</h1>
-          <p className="text-xs font-black uppercase tracking-widest text-slate-400">
-            Institutional account management and laboratory access control
-          </p>
-        </div>
-      </header>
-
       <Card className="border-none shadow-sm bg-card dark:bg-[#3D4966] rounded-[32px] overflow-hidden">
         <CardHeader className="p-8 border-b border-slate-50 dark:border-slate-800">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div className="relative w-full md:w-96">
+            <div className="relative w-full">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-300" />
               <Input 
                 placeholder="Search faculty by name or email..." 
-                className="pl-10 h-11 rounded-xl bg-background border-slate-300 dark:border-slate-700 text-sm font-bold placeholder:text-slate-300 shadow-sm focus-visible:ring-primary"
+                className="pl-10 h-11 rounded-xl bg-background border-slate-300 dark:border-slate-700 text-sm font-bold placeholder:text-slate-300 shadow-sm focus-visible:ring-primary w-full"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -134,18 +125,18 @@ export default function UserManagementPage() {
             <TableBody>
               {filteredUsers.map((user) => (
                 <TableRow key={user.id} className="border-slate-50 dark:border-slate-800 hover:bg-slate-50/30 dark:hover:bg-slate-800/30 transition-colors h-20">
-                  <TableCell className="px-8">
-                    <div className="flex flex-col">
+                  <TableCell className="px-8 text-center">
+                    <div className="flex flex-col items-center">
                       <span className="font-bold text-slate-800 dark:text-slate-200">{user.name}</span>
                       <span className="text-[11px] text-slate-400 font-medium">{user.email}</span>
                     </div>
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="text-center">
                     <Badge variant="outline" className="rounded-full bg-slate-50 dark:bg-slate-900 border-none text-[9px] font-black uppercase tracking-widest px-3 py-0.5 text-slate-400">
                       {user.role}
                     </Badge>
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="text-center">
                     {user.isBlocked ? (
                       <Badge className="bg-red-50 text-red-600 rounded-full px-3 py-0.5 text-[9px] font-black uppercase tracking-widest border-none">
                         Blocked

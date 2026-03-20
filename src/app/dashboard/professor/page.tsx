@@ -311,7 +311,7 @@ export default function ProfessorDashboard() {
                     onClick={() => handleLogEntry(selectedRoom)}
                     disabled={isLogging}
                     variant="outline"
-                    className="w-full h-12 rounded-2xl border-2 border-[#475569] dark:border-[#4A6BAD] bg-transparent text-[#475569] dark:text-white hover:bg-[#1E3A8A] hover:text-white hover:border-[#1E3A8A] dark:hover:bg-[#4A6BAD] dark:hover:text-white dark:hover:border-[#4A6BAD] font-black text-base flex items-center justify-center gap-3 transition-all duration-200 active:scale-[0.98] disabled:opacity-70"
+                    className="w-full h-12 rounded-2xl border-2 border-[#475569] dark:border-[#4A6BAD] bg-transparent text-[#475569] dark:text-white hover:bg-[#1E3A8A]/10 hover:text-[#1E3A8A] hover:border-[#1E3A8A] dark:hover:bg-[#4A6BAD]/20 dark:hover:text-white dark:hover:border-[#4A6BAD] font-black text-base flex items-center justify-center gap-3 transition-all duration-200 active:scale-[0.98] disabled:opacity-70"
                   >
                     <ArrowRight className="h-4 w-4" />
                     {isLogging ? 'Logging...' : selectedRoom ? `Log Entry ${selectedRoom}` : 'Log Entry'}

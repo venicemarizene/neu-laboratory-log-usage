@@ -581,20 +581,20 @@ export default function ProfessorDashboard() {
                         <span className="font-bold text-sm">Session verified. Thank you for using room {activeSession.roomId}.</span>
                       </div>
                     )}
-                    <div className="flex flex-col items-center gap-6">
+                    <div className="flex flex-col items-center gap-6 md:gap-8">
                       <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-5 py-2 rounded-full">
                         <div className="h-2 w-2 rounded-full bg-green-500 animate-custom-pulse" />
                         <Clock className="h-4 w-4" />
                         <span className="text-[11px] font-black uppercase tracking-widest">Active Usage</span>
                       </div>
-                      <div className="flex flex-col items-center gap-2">
+                      <div className="flex flex-col items-center gap-4 md:gap-6">
                         <h2 className="text-6xl md:text-8xl font-black text-[var(--color-text-primary)] tracking-tighter">{activeSession.roomId}</h2>
                         <div className="flex flex-col items-center gap-1">
-                          <p className="text-[18px] font-semibold text-[var(--color-text-secondary)] leading-tight">{activeSession.subject || '—'}</p>
-                          <p className="text-[15px] font-medium text-[var(--color-text-tertiary)] leading-tight">{activeSession.classSection || '—'}</p>
+                          <p className="text-[16px] md:text-[18px] font-semibold text-[var(--color-text-secondary)] leading-tight text-center">{activeSession.subject || '—'}</p>
+                          <p className="text-[13px] md:text-[15px] font-medium text-[var(--color-text-tertiary)] leading-tight text-center">{activeSession.classSection || '—'}</p>
                         </div>
                       </div>
-                      <div className="text-[22px] font-semibold text-primary">
+                      <div className="text-[20px] md:text-[22px] font-semibold text-primary">
                         {elapsedTime}
                       </div>
                     </div>

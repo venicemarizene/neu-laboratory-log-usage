@@ -589,9 +589,9 @@ export default function ProfessorDashboard() {
                       </div>
                       <div className="flex flex-col items-center gap-2">
                         <h2 className="text-6xl md:text-8xl font-black text-[var(--color-text-primary)] tracking-tighter">{activeSession.roomId}</h2>
-                        <div className="flex flex-col">
-                          <p className="text-[14px] font-medium text-[var(--color-text-secondary)]">{activeSession.subject || '—'}</p>
-                          <p className="text-[14px] font-medium text-[var(--color-text-secondary)]">{activeSession.classSection || '—'}</p>
+                        <div className="flex flex-col items-center gap-1">
+                          <p className="text-[18px] font-semibold text-[var(--color-text-secondary)] leading-tight">{activeSession.subject || '—'}</p>
+                          <p className="text-[15px] font-medium text-[var(--color-text-tertiary)] leading-tight">{activeSession.classSection || '—'}</p>
                         </div>
                       </div>
                       <div className="text-[22px] font-semibold text-primary">

@@ -181,7 +181,6 @@ export default function ProfessorDashboard() {
   const router = useRouter();
   const { toast } = useToast();
   
-  // State for manual entry
   const [selectedRoom, setSelectedRoom] = useState<string>("");
   const [subject, setSubject] = useState<string>("");
   const [classSection, setClassSection] = useState<string>("");
@@ -194,7 +193,6 @@ export default function ProfessorDashboard() {
   const [showSuccess, setShowSuccess] = useState(false);
   const [isFading, setIsFading] = useState(false);
   
-  // Validation and Suggestions state
   const [errors, setErrors] = useState<{subject?: string, classSection?: string, room?: string}>({});
   const [activeInput, setActiveInput] = useState<'subject' | 'classSection' | null>(null);
 
@@ -226,7 +224,6 @@ export default function ProfessorDashboard() {
     else setGreeting("Good evening");
   }, [user, isUserLoading, router]);
 
-  // QUERY: Active Session - FILTERED BY professorId
   const activeSessionQuery = useMemoFirebase(() => {
     if (!user?.uid || !db) return null;
     return query(
@@ -239,7 +236,6 @@ export default function ProfessorDashboard() {
 
   const { data: activeSessions } = useCollection(activeSessionQuery);
 
-  // QUERY: Personal History - FILTERED BY professorId for Suggestions and Stats
   const personalLogsQuery = useMemoFirebase(() => {
     if (!user?.uid || !db) return null;
     return query(
@@ -252,7 +248,6 @@ export default function ProfessorDashboard() {
 
   const { data: personalLogs } = useCollection(personalLogsQuery);
 
-  // Logic for smart suggestions (Top 5 unique subjects/sections)
   const suggestions = useMemo(() => {
     if (!personalLogs) return { subjects: [], classSections: [] };
     const subjectsSet = new Set<string>();
@@ -311,20 +306,11 @@ export default function ProfessorDashboard() {
   }, [activeSessions]);
 
   const handleSignOut = async () => {
-    if (user && db && activeSession) {
-      const logRef = doc(db, 'room_logs', activeSession.id);
-      updateDocumentNonBlocking(logRef, {
-        status: 'Completed',
-        endTime: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      });
-    }
     await auth.signOut();
     router.push('/login');
   };
 
   const handleLogEntry = (roomId: string) => {
-    // Validation
     const newErrors: {subject?: string, classSection?: string, room?: string} = {};
     if (!roomId) newErrors.room = "Room is required";
     if (!subject.trim()) newErrors.subject = "This field is required.";
@@ -378,18 +364,14 @@ export default function ProfessorDashboard() {
     const logRef = doc(db, 'room_logs', activeSession.id);
     
     try {
-      // First write to the active session document and await confirmation
       await updateDoc(logRef, {
         status: 'Completed',
         endTime: new Date().toISOString(),
         updatedAt: new Date().toISOString()
       });
-      
-      // Then immediately sign out and redirect to login
       await auth.signOut();
       router.push('/login');
     } catch (e: any) {
-      // Emit permission error if update fails using the institutional pattern
       errorEmitter.emit('permission-error', new FirestorePermissionError({
         path: logRef.path,
         operation: 'update',
@@ -448,22 +430,17 @@ export default function ProfessorDashboard() {
 
       <main className="flex-1 flex flex-col items-center justify-start p-6 pt-12 md:pt-16">
         <div className="w-full max-w-6xl flex flex-col gap-8 md:gap-10">
-          
-          {/* Mobile Heading (When NO session) */}
           {!activeSession && (
             <div className="md:hidden w-full space-y-8">
               <GreetingContent />
             </div>
           )}
 
-          {/* Desktop Heading Area (Standalone) */}
           <div className="hidden md:block">
             <GreetingContent />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start relative">
-            
-            {/* Left Column (Stats) - Promoted when NO session on mobile */}
             <div className={cn(
               "md:col-span-4 flex flex-col gap-4 w-full md:border-r md:border-[var(--color-border)] md:pr-10",
               !activeSession ? "order-2 md:order-1" : "order-3 md:order-1"
@@ -493,12 +470,10 @@ export default function ProfessorDashboard() {
               </div>
             </div>
 
-            {/* Right Column (Action/Session Cards) */}
             <div className={cn(
               "md:col-span-8 w-full flex flex-col gap-8",
               activeSession ? "order-1 md:order-2" : "order-3 md:order-2"
             )}>
-              {/* Mobile Heading (When Session ACTIVE) */}
               {activeSession && (
                 <div className="md:hidden w-full space-y-4">
                   <GreetingContent />
@@ -530,7 +505,6 @@ export default function ProfessorDashboard() {
                           </Select>
                         </div>
 
-                        {/* Subject Input with Suggestions */}
                         <div className="relative space-y-4">
                           <label className="text-[11px] font-black uppercase tracking-[0.2em] text-[var(--color-text-tertiary)] ml-2">Subject</label>
                           <Input 
@@ -545,7 +519,6 @@ export default function ProfessorDashboard() {
                           {activeInput === 'subject' && <SuggestionBox items={filteredSuggestions} onSelect={(val) => { setSubject(val); setActiveInput(null); }} />}
                         </div>
 
-                        {/* Class Section Input with Suggestions */}
                         <div className="relative space-y-4">
                           <label className="text-[11px] font-black uppercase tracking-[0.2em] text-[var(--color-text-tertiary)] ml-2">Class Section</label>
                           <Input 
@@ -591,7 +564,6 @@ export default function ProfessorDashboard() {
             </div>
           </div>
 
-          {/* Mobile User Profile (Bottom) */}
           <div className="md:hidden w-full mt-4">
             <UserProfileCard />
           </div>
@@ -621,28 +593,26 @@ export default function ProfessorDashboard() {
         <DialogContent 
           className={cn(
             "p-0 overflow-hidden border-none bg-[var(--color-card-bg)] flex flex-col",
-            "sm:max-w-[420px] sm:rounded-[14px] sm:p-8 sm:h-auto sm:max-h-[85vh]", // Desktop styling: auto height, max height
-            "max-sm:fixed max-sm:bottom-0 max-sm:left-0 max-sm:right-0 max-sm:max-w-none max-sm:translate-x-0 max-sm:translate-y-0 max-sm:h-[90dvh] max-sm:rounded-t-[32px]" // Mobile bottom sheet styling
+            "sm:max-w-[420px] sm:rounded-[14px] sm:p-8 sm:h-auto sm:max-h-[85vh]",
+            "max-sm:fixed max-sm:bottom-0 max-sm:left-0 max-sm:right-0 max-sm:max-w-none max-sm:translate-x-0 max-sm:translate-y-0 max-sm:h-[92dvh] max-sm:rounded-t-[32px]"
           )}
         >
-          {/* FIXED HEADER: Drag Handle + DialogHeader */}
-          <div className="shrink-0">
-            {/* Mobile Drag Handle */}
+          {/* Section 1: Fixed Header */}
+          <div className="shrink-0 z-20">
             <div className="md:hidden w-12 h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full mx-auto mt-4 mb-2" />
             <DialogHeader className="p-6 sm:p-0 sm:mb-8 bg-transparent border-b sm:border-none border-[var(--color-border)] relative flex flex-row items-center justify-between">
               <DialogTitle className="text-xl font-black text-[var(--color-text-primary)] tracking-tight">Confirm Laboratory Session</DialogTitle>
             </DialogHeader>
           </div>
 
-          {/* SCROLLABLE MIDDLE SECTION */}
-          <div className="flex-1 overflow-y-auto p-6 sm:p-0 space-y-8">
+          {/* Section 2: Scrollable Middle Content */}
+          <div className="flex-1 overflow-y-auto p-6 sm:p-0 space-y-8 max-sm:pb-[100px]">
             <div className="flex items-center gap-3 bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 p-4 rounded-2xl">
               <CheckCircle2 className="h-6 w-6" />
               <span className="font-black text-lg">Room {scannedRoomId} detected</span>
             </div>
 
-            <div className="space-y-6 pb-12 sm:pb-0">
-              {/* Subject Input with Suggestions */}
+            <div className="space-y-6">
               <div className="relative space-y-4">
                 <label className="text-[11px] font-black uppercase tracking-[0.2em] text-[var(--color-text-tertiary)] ml-2">Subject</label>
                 <Input 
@@ -661,7 +631,6 @@ export default function ProfessorDashboard() {
                 {activeInput === 'subject' && <SuggestionBox items={filteredSuggestions} onSelect={(val) => { setSubject(val); setActiveInput(null); }} />}
               </div>
 
-              {/* Class Section Input with Suggestions */}
               <div className="relative space-y-4">
                 <label className="text-[11px] font-black uppercase tracking-[0.2em] text-[var(--color-text-tertiary)] ml-2">Class Section</label>
                 <Input 
@@ -682,8 +651,11 @@ export default function ProfessorDashboard() {
             </div>
           </div>
 
-          {/* FIXED FOOTER: Confirm Session Button */}
-          <div className="shrink-0 p-6 sm:p-0 sm:mt-8 bg-[var(--color-card-bg)] border-t sm:border-none border-[var(--color-border)] z-10">
+          {/* Section 3: Fixed Footer */}
+          <div className={cn(
+            "shrink-0 p-6 sm:p-0 sm:mt-8 bg-[var(--color-card-bg)] border-t sm:border-none border-[var(--color-border)] z-10",
+            "max-sm:fixed max-sm:bottom-0 max-sm:left-0 max-sm:right-0 max-sm:bg-[var(--color-card-bg)] max-sm:p-4 max-sm:z-50"
+          )}>
             <Button 
               onClick={() => handleLogEntry(scannedRoomId)} 
               className="w-full h-16 rounded-[2rem] bg-primary text-white font-black text-lg flex items-center justify-center gap-4 shadow-lg transition-all active:scale-[0.98] border-none"

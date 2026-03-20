@@ -397,7 +397,7 @@ export default function ProfessorDashboard() {
             
             {/* Stats Column - Left (Stack on Desktop | Row on Mobile) */}
             <div className="md:col-span-4 flex flex-col gap-4 w-full md:border-r md:border-[var(--color-border)] md:pr-10">
-              <label className="text-[11px] font-black uppercase tracking-[0.2em] text-[var(--color-text-tertiary)] ml-2 mb-2">
+              <label className="text-[13px] font-black uppercase tracking-[0.2em] text-[var(--color-text-tertiary)] ml-2 mb-2">
                 Usage Statistics
               </label>
               
@@ -500,8 +500,9 @@ export default function ProfessorDashboard() {
                 <Card className="w-full border-none shadow-2xl rounded-[40px] overflow-hidden bg-[var(--color-card-bg)]">
                   <CardContent className="p-8 md:p-16 space-y-10 text-center">
                     {/* Desktop Greeting Header */}
-                    <div className="hidden md:block mb-10">
+                    <div className="hidden md:block mb-10 text-left">
                       <GreetingContent />
+                      <Separator className="bg-[var(--color-border)] opacity-50 mt-8" />
                     </div>
 
                     <div className="flex flex-col items-center gap-6">

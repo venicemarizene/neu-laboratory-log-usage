@@ -620,9 +620,9 @@ export default function ProfessorDashboard() {
       <Dialog open={isConfirmModalOpen} onOpenChange={setIsConfirmModalOpen}>
         <DialogContent 
           className={cn(
-            "p-0 overflow-hidden border-none bg-[var(--color-card-bg)]",
-            "sm:max-w-[420px] sm:rounded-[14px] sm:p-8", // Desktop styling
-            "max-sm:fixed max-sm:bottom-0 max-sm:left-0 max-sm:right-0 max-sm:max-w-none max-sm:translate-x-0 max-sm:translate-y-0 max-sm:h-[90dvh] max-sm:rounded-t-[32px] max-sm:flex max-sm:flex-col" // Mobile bottom sheet styling
+            "p-0 overflow-hidden border-none bg-[var(--color-card-bg)] flex flex-col",
+            "sm:max-w-[420px] sm:rounded-[14px] sm:p-8 sm:h-auto sm:max-h-[85vh]", // Desktop styling: auto height, max height
+            "max-sm:fixed max-sm:bottom-0 max-sm:left-0 max-sm:right-0 max-sm:max-w-none max-sm:translate-x-0 max-sm:translate-y-0 max-sm:h-[90dvh] max-sm:rounded-t-[32px]" // Mobile bottom sheet styling
           )}
         >
           {/* FIXED HEADER: Drag Handle + DialogHeader */}

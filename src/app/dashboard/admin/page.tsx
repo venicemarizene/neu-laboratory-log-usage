@@ -86,29 +86,21 @@ export default function AdminDashboard() {
 
   const db = useFirestore();
 
-  // Guard: Verify user role using both profile and admin_roles collection to match Security Rules
+  // Guard: Verify user role using admin_roles collection to match Security Rules source of truth
   const adminRoleRef = useMemoFirebase(() => {
     if (!user?.uid || !db) return null;
     return doc(db, 'admin_roles', user.uid);
   }, [user?.uid, db]);
   const { data: adminRole, isLoading: isAdminRoleLoading } = useDoc(adminRoleRef);
 
-  const profileRef = useMemoFirebase(() => {
-    if (!user?.uid || !db) return null;
-    return doc(db, 'user_profiles', user.uid);
-  }, [user?.uid, db]);
-  const { data: profile, isLoading: isProfileLoading } = useDoc(profileRef);
-
   const isAuthorizedAdmin = useMemo(() => {
-    if (isAdminRoleLoading || isProfileLoading) return false;
-    return (
-      !!adminRole || 
-      profile?.role === 'Admin' || 
-      BOOTSTRAP_ADMINS.includes(user?.email || '')
-    );
-  }, [adminRole, profile, user, isAdminRoleLoading, isProfileLoading]);
+    if (isAdminRoleLoading) return false;
+    // Authorized if they exist in the admin_roles collection OR are a bootstrap admin
+    return !!adminRole || BOOTSTRAP_ADMINS.includes(user?.email || '');
+  }, [adminRole, user, isAdminRoleLoading]);
 
   const usersQuery = useMemoFirebase(() => {
+    // ONLY query if the user is explicitly authorized to prevent permission errors
     if (!db || !user || !isAuthorizedAdmin) return null;
     return collection(db, 'user_profiles');
   }, [db, user, isAuthorizedAdmin]);
@@ -123,7 +115,9 @@ export default function AdminDashboard() {
   }, [users]);
 
   const logsQuery = useMemoFirebase(() => {
+    // ONLY query if the user is explicitly authorized to prevent permission errors
     if (!db || !user || !isAuthorizedAdmin) return null;
+    
     let q = query(collection(db, 'room_logs'), orderBy('createdAt', 'desc'));
 
     const today = new Date();
@@ -154,7 +148,7 @@ export default function AdminDashboard() {
     setMounted(true);
   }, []);
 
-  if (!mounted || !user || isAdminRoleLoading || isProfileLoading) {
+  if (!mounted || !user || isAdminRoleLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="animate-pulse flex flex-col items-center gap-4">
@@ -165,6 +159,7 @@ export default function AdminDashboard() {
     );
   }
 
+  // Final check to prevent unauthorized layout from rendering briefly
   if (!isAuthorizedAdmin) return null;
 
   const activeLogsCount = logs?.filter(l => l.status === 'Active').length || 0;
@@ -407,7 +402,7 @@ export default function AdminDashboard() {
                               {DAYS.map(d => <SelectItem key={d} value={d} className="text-[10px] font-bold">{d}</SelectItem>)}
                             </SelectContent>
                           </Select>
-                          <Select value={customFrom.year} onValueChange={(v) => setCustomFrom(prev => ({...prev, year: v}))}>
+                          <Select value={customFrom.year} onValueChange={(v) => setCustomFrom(prev, year: v}))}>
                             <SelectTrigger className="h-9 rounded-lg text-[10px] font-bold border-slate-200 dark:border-slate-700">
                               <SelectValue placeholder="Year" />
                             </SelectTrigger>
@@ -437,7 +432,7 @@ export default function AdminDashboard() {
                               {DAYS.map(d => <SelectItem key={d} value={d} className="text-[10px] font-bold">{d}</SelectItem>)}
                             </SelectContent>
                           </Select>
-                          <Select value={customTo.year} onValueChange={(v) => setCustomTo(prev => ({...prev, year: v}))}>
+                          <Select value={customTo.year} onValueChange={(v) => setCustomTo(prev, year: v}))}>
                             <SelectTrigger className="h-9 rounded-lg text-[10px] font-bold border-slate-200 dark:border-slate-700">
                               <SelectValue placeholder="Year" />
                             </SelectTrigger>

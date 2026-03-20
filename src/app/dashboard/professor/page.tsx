@@ -578,7 +578,19 @@ export default function ProfessorDashboard() {
           <DialogHeader className="p-6 bg-[var(--color-card-bg)] border-b border-[var(--color-border)]">
             <DialogTitle className="text-xl font-black text-[var(--color-text-primary)] tracking-tight">Scan Room QR Code</DialogTitle>
           </DialogHeader>
-          {isScannerOpen && <ScannerView onScan={(roomId) => { setIsScannerOpen(false); handleLogEntry(roomId); }} />}
+          {isScannerOpen && (
+            <div className="p-6 space-y-4">
+              <ScannerView onScan={(roomId) => {
+                setIsScannerOpen(false);
+                // Pause for a moment to let the scanner close before potential next dialog
+                setTimeout(() => {
+                  setSelectedRoom(roomId);
+                  // We could trigger a confirmation modal here in Sprint 2 Part 2
+                  handleLogEntry(roomId);
+                }, 100);
+              }} />
+            </div>
+          )}
         </DialogContent>
       </Dialog>
     </div>

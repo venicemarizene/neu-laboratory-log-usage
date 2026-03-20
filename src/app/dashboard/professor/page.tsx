@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useState, useEffect, useRef, useMemo } from 'react';
@@ -13,7 +12,8 @@ import {
   CheckCircle2,
   AlertCircle,
   Clock,
-  X
+  X,
+  Check
 } from 'lucide-react';
 import { LAB_ROOMS } from '@/lib/constants';
 import { 
@@ -179,6 +179,8 @@ export default function ProfessorDashboard() {
   const [isLogging, setIsLogging] = useState(false);
   const [activeSession, setActiveSession] = useState<{id: string, roomId: string} | null>(null);
   const [isScannerOpen, setIsScannerOpen] = useState(false);
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+  const [scannedRoomId, setScannedRoomId] = useState<string>("");
   const [greeting, setGreeting] = useState("Welcome back");
   const [showSuccess, setShowSuccess] = useState(false);
   const [isFading, setIsFading] = useState(false);
@@ -359,6 +361,7 @@ export default function ProfessorDashboard() {
     setSubject("");
     setClassSection("");
     setSelectedRoom("");
+    setIsConfirmModalOpen(false);
   };
 
   const handleEndSession = async () => {
@@ -582,15 +585,63 @@ export default function ProfessorDashboard() {
             <div className="p-6 space-y-4">
               <ScannerView onScan={(roomId) => {
                 setIsScannerOpen(false);
-                // Pause for a moment to let the scanner close before potential next dialog
                 setTimeout(() => {
-                  setSelectedRoom(roomId);
-                  // We could trigger a confirmation modal here in Sprint 2 Part 2
-                  handleLogEntry(roomId);
-                }, 100);
+                  setScannedRoomId(roomId);
+                  setIsConfirmModalOpen(true);
+                }, 400);
               }} />
             </div>
           )}
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isConfirmModalOpen} onOpenChange={setIsConfirmModalOpen}>
+        <DialogContent className="sm:max-w-md p-0 overflow-hidden rounded-[32px] border-none bg-[var(--color-card-bg)]">
+          <DialogHeader className="p-6 bg-[var(--color-card-bg)] border-b border-[var(--color-border)] relative">
+            <DialogTitle className="text-xl font-black text-[var(--color-text-primary)] tracking-tight">Confirm Laboratory Session</DialogTitle>
+          </DialogHeader>
+          <div className="p-8 space-y-8">
+            <div className="flex items-center gap-3 bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 p-4 rounded-2xl">
+              <CheckCircle2 className="h-6 w-6" />
+              <span className="font-black text-lg">Room {scannedRoomId} detected</span>
+            </div>
+
+            <div className="space-y-6">
+              {/* Subject Input with Suggestions */}
+              <div className="relative space-y-4">
+                <label className="text-[11px] font-black uppercase tracking-[0.2em] text-[var(--color-text-tertiary)] ml-2">Subject</label>
+                <Input 
+                  placeholder="e.g. Data Structures" 
+                  value={subject} 
+                  onFocus={() => setActiveInput('subject')}
+                  onBlur={() => setTimeout(() => setActiveInput(null), 200)}
+                  onChange={(e) => { setSubject(e.target.value); setErrors(prev => ({...prev, subject: ""})); }}
+                  className={cn("h-14 rounded-[2rem] bg-[var(--color-accent-bg)] border-none text-lg font-black text-[var(--color-text-primary)] px-8 shadow-inner", errors.subject && "ring-2 ring-red-500")} 
+                />
+                {errors.subject && <p className="text-red-500 text-[12px] font-bold ml-4 mt-1">{errors.subject}</p>}
+                {activeInput === 'subject' && <SuggestionBox items={filteredSuggestions} onSelect={(val) => { setSubject(val); setActiveInput(null); }} />}
+              </div>
+
+              {/* Class Section Input with Suggestions */}
+              <div className="relative space-y-4">
+                <label className="text-[11px] font-black uppercase tracking-[0.2em] text-[var(--color-text-tertiary)] ml-2">Class Section</label>
+                <Input 
+                  placeholder="e.g. BSIT 2-1" 
+                  value={classSection} 
+                  onFocus={() => setActiveInput('classSection')}
+                  onBlur={() => setTimeout(() => setActiveInput(null), 200)}
+                  onChange={(e) => { setClassSection(e.target.value); setErrors(prev => ({...prev, classSection: ""})); }}
+                  className={cn("h-14 rounded-[2rem] bg-[var(--color-accent-bg)] border-none text-lg font-black text-[var(--color-text-primary)] px-8 shadow-inner", errors.classSection && "ring-2 ring-red-500")} 
+                />
+                {errors.classSection && <p className="text-red-500 text-[12px] font-bold ml-4 mt-1">{errors.classSection}</p>}
+                {activeInput === 'classSection' && <SuggestionBox items={filteredSuggestions} onSelect={(val) => { setClassSection(val); setActiveInput(null); }} />}
+              </div>
+            </div>
+
+            <Button onClick={() => handleLogEntry(scannedRoomId)} className="w-full h-16 rounded-[2rem] bg-primary text-white font-black text-lg flex items-center justify-center gap-4 shadow-lg transition-all active:scale-[0.98] border-none">
+              <Check className="h-6 w-6" /> Confirm Session
+            </Button>
+          </div>
         </DialogContent>
       </Dialog>
     </div>

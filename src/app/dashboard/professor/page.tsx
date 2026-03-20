@@ -269,7 +269,7 @@ export default function ProfessorDashboard() {
             )}
 
             <div className="text-center space-y-2">
-              <h1 className="text-3xl font-black text-[var(--color-text-primary)] tracking-tight">Welcome back, {firstName}!</h1>
+              <h1 className="text-3xl font-black text-primary tracking-tight">Welcome back, {firstName}!</h1>
               <p className="text-base text-[var(--color-text-secondary)] font-bold">
                 {activeSession ? "Current lab session in progress." : "Which room are you using today?"}
               </p>
@@ -312,7 +312,7 @@ export default function ProfessorDashboard() {
                     onClick={() => handleLogEntry(selectedRoom)}
                     disabled={isLogging}
                     variant="outline"
-                    className="w-full h-12 rounded-2xl border-2 border-[#475569] dark:border-[#94A3B8] bg-transparent text-[#475569] dark:text-[#94A3B8] hover:bg-[#475569]/5 dark:hover:bg-[#94A3B8]/5 font-black text-base flex items-center justify-center gap-3 transition-all active:scale-[0.98] disabled:opacity-70"
+                    className="w-full h-12 rounded-2xl border-2 border-[#475569] dark:border-[#4A6BAD] bg-transparent text-[#475569] dark:text-[#4A6BAD] hover:bg-[#475569]/5 dark:hover:bg-[#4A6BAD]/5 font-black text-base flex items-center justify-center gap-3 transition-all active:scale-[0.98] disabled:opacity-70"
                   >
                     <ArrowRight className="h-4 w-4" />
                     {isLogging ? 'Logging...' : `Log Entry ${selectedRoom}`}

@@ -72,6 +72,17 @@ export function useCollection<T = any>(
     setIsLoading(true);
     setError(null);
 
+    // DEBUG: Logging the query details to identify missing filters or path issues
+    const path: string =
+      memoizedTargetRefOrQuery.type === 'collection'
+        ? (memoizedTargetRefOrQuery as CollectionReference).path
+        : (memoizedTargetRefOrQuery as unknown as InternalQuery)._query?.path?.canonicalString() || 'unknown path';
+    
+    console.log(`[Firestore DEBUG] useCollection initiating request: ${path}`, {
+      query: memoizedTargetRefOrQuery,
+      constraints: (memoizedTargetRefOrQuery as any)?._query?.filters || []
+    });
+
     // Directly use memoizedTargetRefOrQuery as it's assumed to be the final query
     const unsubscribe = onSnapshot(
       memoizedTargetRefOrQuery,

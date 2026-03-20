@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useState } from 'react';
@@ -47,10 +46,10 @@ export default function RoomQrGeneratorPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {LAB_ROOMS.map((room) => (
-          <Card key={room} className="border-none shadow-sm bg-white rounded-[32px] overflow-hidden hover:shadow-md transition-shadow">
+          <Card key={room} className="border-none shadow-sm bg-card dark:bg-[#3D4966] rounded-[32px] overflow-hidden hover:shadow-md transition-shadow">
             <CardHeader className="p-6 pb-0 flex flex-row items-center justify-between">
               <div>
-                <CardTitle className="text-2xl font-black text-slate-900">{room}</CardTitle>
+                <CardTitle className="text-2xl font-black text-slate-900 dark:text-white">{room}</CardTitle>
                 <CardDescription className="text-[10px] font-bold uppercase text-slate-400">
                   Computer Lab
                 </CardDescription>

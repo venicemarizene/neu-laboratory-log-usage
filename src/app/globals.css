@@ -6,7 +6,7 @@
 
 :root {
   --color-page-bg: #F7F8FB;
-  --color-card-bg: #FFFFFF;
+  --color-card-bg: #F4F7FC;
   --color-sidebar-bg: #2B3D6B;
   --color-primary: #3D5C99;
   --color-accent-bg: #EAF0FB;
@@ -23,7 +23,7 @@
   /* shadcn/ui variables mapping */
   --background: 210 20% 98%;
   --foreground: 222 47% 11%;
-  --card: 0 0% 100%;
+  --card: 218 60% 97.3%;
   --card-foreground: 222 47% 11%;
   --popover: 0 0% 100%;
   --popover-foreground: 222 47% 11%;
@@ -104,7 +104,7 @@
 
 @layer components {
   .login-card {
-    @apply bg-white dark:bg-[#3D4966] border-[#CDD5E4] dark:border-[#424F6A] shadow-[0_2px_8px_rgba(30,40,80,0.08)];
+    @apply bg-card dark:bg-[#3D4966] border-[#CDD5E4] dark:border-[#424F6A] shadow-[0_2px_8px_rgba(30,40,80,0.08)];
   }
   .portal-tab-container {
     @apply bg-slate-200/50 dark:bg-[#2A3245] border-transparent dark:border-[#424F6A];

@@ -42,7 +42,7 @@ export default function AdminDashboardLayout({ children }: { children: ReactNode
         <AdminSidebar />
         <div className="flex-1 flex flex-col">
           {/* Top Header synchronized with bottom bar */}
-          <header className="h-16 border-b bg-slate-50 dark:bg-slate-900 flex items-center justify-between px-8 sticky top-0 z-40 transition-colors">
+          <header className="h-16 border-b bg-slate-200 dark:bg-slate-900 flex items-center justify-between px-8 sticky top-0 z-40 transition-colors">
             <div className="flex items-center gap-3">
               <div className="bg-white rounded-full p-0.5 shadow-sm border border-slate-100 flex items-center justify-center">
                 <img

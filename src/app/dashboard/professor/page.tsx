@@ -242,7 +242,7 @@ export default function ProfessorDashboard() {
 
   return (
     <div className="min-h-screen bg-[var(--color-page-bg)] flex flex-col font-body antialiased transition-colors">
-      <header className="h-16 border-b flex items-center justify-between px-6 sm:px-12 sticky top-0 z-50 shadow-sm bg-slate-50 dark:bg-slate-900 transition-colors">
+      <header className="h-16 border-b flex items-center justify-between px-6 sm:px-12 sticky top-0 z-50 shadow-sm bg-slate-200 dark:bg-slate-900 transition-colors">
         <div className="flex items-center gap-3">
           <div className="bg-white rounded-full p-0.5 shadow-sm border border-slate-100 flex items-center justify-center">
             <img

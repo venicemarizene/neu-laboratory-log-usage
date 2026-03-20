@@ -97,7 +97,7 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex flex-col transition-colors">
       {/* Top Navigation Bar synchronized with bottom bar */}
-      <header className="h-16 border-b flex items-center justify-between px-6 sm:px-12 sticky top-0 z-50 shadow-sm bg-slate-50 dark:bg-slate-900 transition-colors">
+      <header className="h-16 border-b flex items-center justify-between px-6 sm:px-12 sticky top-0 z-50 shadow-sm bg-slate-200 dark:bg-slate-900 transition-colors">
         <div className="flex items-center gap-3">
           <div className="bg-white rounded-full p-0.5 shadow-sm border border-slate-100 flex items-center justify-center">
             <img
@@ -201,7 +201,7 @@ export default function LoginPage() {
       </main>
 
       {/* Institutional Footer */}
-      <footer className="h-14 border-t flex flex-col items-center justify-center text-center px-4 bg-slate-50 dark:bg-slate-900 transition-colors shadow-[0_-1px_3px_rgba(0,0,0,0.05)]">
+      <footer className="h-14 border-t flex flex-col items-center justify-center text-center px-4 bg-slate-200 dark:bg-slate-900 transition-colors shadow-[0_-1px_3px_rgba(0,0,0,0.05)]">
         <p className="footer-text text-xs font-bold flex flex-col sm:flex-row items-center gap-2 sm:gap-6 text-slate-500 dark:text-slate-400">
           <span>© 2026 New Era University</span>
           <span className="hidden sm:inline text-slate-300 dark:text-slate-700 font-normal">|</span>

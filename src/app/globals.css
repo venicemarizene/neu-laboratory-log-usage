@@ -59,14 +59,14 @@
   --color-status-blocked-bg: #3A2228;
   --color-status-blocked-text: #C49090;
 
-  /* shadcn/ui variables mapping for dim mode - adjusted primary to be slightly darker */
+  /* shadcn/ui variables mapping for dim mode - adjusted primary to a slightly darker navy blue */
   --background: 222 24% 22%;
   --foreground: 210 40% 96%;
   --card: 222 25% 40%;
   --card-foreground: 210 40% 96%;
   --popover: 222 26% 27%;
   --popover-foreground: 210 40% 96%;
-  --primary: 218 50% 60%;
+  --primary: 221 43% 48%;
   --primary-foreground: 210 40% 98%;
   --secondary: 222 24% 31%;
   --secondary-foreground: 210 40% 98%;

@@ -52,6 +52,11 @@ export default function AdminDashboardLayout({ children }: { children: ReactNode
           title: "Laboratory QR Registry",
           subtitle: "Generate and manage institutional QR identification for physical lab rooms"
         };
+      case '/dashboard/admin/management':
+        return {
+          title: "Room Management",
+          subtitle: "Real-time laboratory occupancy and session monitoring"
+        };
       default:
         return {
           title: "Admin's Portal",

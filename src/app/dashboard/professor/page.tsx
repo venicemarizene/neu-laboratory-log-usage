@@ -107,7 +107,22 @@ function ScannerView({ onScan }: { onScan: (roomId: string) => void }) {
             qrbox: { width: 250, height: 250 },
           },
           (decodedText) => {
-            const foundRoom = LAB_ROOMS.find(r => r === decodedText);
+            let roomId = decodedText;
+            
+            // Handle URL format: extract room parameter if it starts with http
+            if (decodedText.startsWith('http')) {
+              try {
+                const url = new URL(decodedText);
+                const roomParam = url.searchParams.get('room');
+                if (roomParam) {
+                  roomId = roomParam;
+                }
+              } catch (e) {
+                // If URL parsing fails, keep roomId as decodedText
+              }
+            }
+
+            const foundRoom = LAB_ROOMS.find(r => r === roomId);
             if (foundRoom) {
               html5QrCode.stop().then(() => {
                 onScan(foundRoom);
@@ -119,7 +134,7 @@ function ScannerView({ onScan }: { onScan: (roomId: string) => void }) {
               toast({
                 variant: 'destructive',
                 title: 'Invalid QR Code',
-                description: `Room identifier "${decodedText}" is not recognized.`,
+                description: `Room identifier "${roomId}" is not recognized.`,
               });
             }
           },

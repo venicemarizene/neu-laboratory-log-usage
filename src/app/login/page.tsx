@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { ShieldCheck, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -22,11 +22,14 @@ const ADMIN_EMAILS = [
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const auth = useAuth();
   const db = useFirestore();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<'Professor' | 'Admin'>('Professor');
+
+  const roomParam = searchParams.get('room');
 
   const handleSignIn = async () => {
     if (!auth || !db) return;
@@ -79,9 +82,11 @@ export default function LoginPage() {
       if (isAdmin) {
         const adminRoleRef = doc(db, 'admin_roles', user.uid);
         setDocumentNonBlocking(adminRoleRef, { active: true }, { merge: true });
+        router.push('/dashboard/admin');
+      } else {
+        const target = roomParam ? `/dashboard/professor?room=${roomParam}` : '/dashboard/professor';
+        router.push(target);
       }
-
-      router.push(`/dashboard/${isAdmin ? 'admin' : 'professor'}`);
     } catch (error: any) {
       if (error.code !== 'auth/popup-closed-by-user') {
         const contextualError = new FirestorePermissionError({
@@ -96,7 +101,6 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex flex-col transition-colors">
-      {/* Top Navigation Bar synchronized with bottom bar */}
       <header className="h-16 border-b flex items-center justify-between px-6 sm:px-12 sticky top-0 z-50 shadow-sm bg-slate-200 dark:bg-slate-900 transition-colors">
         <div className="flex items-center gap-3">
           <div className="bg-white rounded-full p-0.5 shadow-sm border border-slate-100 flex items-center justify-center">
@@ -111,11 +115,9 @@ export default function LoginPage() {
         <ThemeToggle />
       </header>
 
-      {/* Main Content Area */}
       <main className="flex-1 flex flex-col items-center justify-center p-4 bg-[var(--color-page-bg)]">
         <Card className="w-full max-w-[420px] bg-card dark:bg-[#3D4966] border-none shadow-2xl rounded-[40px] overflow-hidden">
           <CardContent className="p-10 flex flex-col items-center gap-6 text-center">
-            {/* Institution Logo Wrapper */}
             <div className="bg-white p-0.5 rounded-full shadow-sm flex items-center justify-center">
               <img
                 src="/NEU_LOGO.png"
@@ -124,7 +126,6 @@ export default function LoginPage() {
               />
             </div>
 
-            {/* Site Identity */}
             <div className="space-y-1">
               <h2 className="text-2xl font-black text-primary tracking-tight">
                 Institutional Laboratory Management
@@ -142,7 +143,6 @@ export default function LoginPage() {
                   onValueChange={(v) => setActiveTab(v as 'Professor' | 'Admin')}
                   className="w-full"
                 >
-                  {/* Pill Switcher */}
                   <TabsList className="grid grid-cols-2 w-full h-14 bg-slate-100 dark:bg-slate-800 p-1.5 rounded-2xl border-none">
                     <TabsTrigger 
                       value="Professor" 
@@ -163,7 +163,6 @@ export default function LoginPage() {
               </div>
 
               <div className="space-y-6">
-                {/* Google Login Button - Custom colors for light and dim mode */}
                 <Button 
                   onClick={handleSignIn}
                   disabled={isLoading}
@@ -190,7 +189,6 @@ export default function LoginPage() {
                   {isLoading ? "Connecting..." : "Google Login"}
                 </Button>
 
-                {/* Footnote */}
                 <p className="text-center text-[10px] font-bold text-slate-400">
                   An institutional @neu.edu.ph account is required.
                 </p>
@@ -200,7 +198,6 @@ export default function LoginPage() {
         </Card>
       </main>
 
-      {/* Institutional Footer */}
       <footer className="h-14 border-t flex flex-col items-center justify-center text-center px-4 bg-slate-200 dark:bg-slate-900 transition-colors shadow-[0_-1px_3px_rgba(0,0,0,0.05)]">
         <p className="footer-text text-xs font-bold flex flex-col sm:flex-row items-center gap-2 sm:gap-6 text-slate-500 dark:text-slate-400">
           <span>© 2026 New Era University</span>

@@ -32,7 +32,7 @@ import {
   errorEmitter,
   FirestorePermissionError 
 } from '@/firebase';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { doc, query, where, collection, limit, orderBy, updateDoc } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
@@ -46,16 +46,10 @@ import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { format } from 'date-fns';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
-/**
- * Renders a suggestion box for Subject/Class Section.
- * Desktop: Dropdown list
- * Mobile: Scrollable horizontal chips
- */
 const SuggestionBox = ({ items, onSelect }: { items: string[], onSelect: (val: string) => void }) => {
   if (items.length === 0) return null;
   return (
     <div className="w-full">
-      {/* Desktop View */}
       <div className="hidden md:block absolute z-20 w-full top-full mt-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
         {items.map((item, idx) => (
           <button
@@ -71,7 +65,6 @@ const SuggestionBox = ({ items, onSelect }: { items: string[], onSelect: (val: s
           </button>
         ))}
       </div>
-      {/* Mobile View */}
       <div className="md:hidden mt-2">
         <ScrollArea className="w-full whitespace-nowrap">
           <div className="flex gap-2 pb-2">
@@ -180,6 +173,7 @@ export default function ProfessorDashboard() {
   const auth = useAuth();
   const db = useFirestore();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { toast } = useToast();
   
   const [selectedRoom, setSelectedRoom] = useState<string>("");
@@ -203,6 +197,20 @@ export default function ProfessorDashboard() {
   
   const [errors, setErrors] = useState<{subject?: string, classSection?: string, room?: string}>({});
   const [activeInput, setActiveInput] = useState<'subject' | 'classSection' | null>(null);
+
+  useEffect(() => {
+    if (!isUserLoading && user) {
+      const roomParam = searchParams.get('room');
+      if (roomParam && LAB_ROOMS.includes(roomParam as any)) {
+        setScannedRoomId(roomParam);
+        setIsConfirmModalOpen(true);
+        // Clear param from URL after modal opens
+        const url = new URL(window.location.href);
+        url.searchParams.delete('room');
+        window.history.replaceState({}, '', url.pathname + url.search);
+      }
+    }
+  }, [isUserLoading, user, searchParams]);
 
   useEffect(() => {
     let fadeTimer: NodeJS.Timeout;
@@ -614,14 +622,12 @@ export default function ProfessorDashboard() {
                 </Card>
               )}
 
-              {/* Recent Sessions Card */}
               <Card className="w-full border border-[var(--color-border)] shadow-sm rounded-[24px] overflow-hidden bg-[var(--color-card-bg)] p-6">
                 <div className="flex flex-col mb-6">
                   <h3 className="text-[20px] font-bold text-[var(--color-text-primary)]">Recent Sessions</h3>
                   <p className="text-[13px] text-[var(--color-text-tertiary)] font-medium">Your last 5 completed sessions</p>
                 </div>
 
-                {/* Desktop Table View */}
                 <div className="hidden md:block">
                   <div className="rounded-xl overflow-hidden border border-[var(--color-border)]">
                     <Table>
@@ -663,7 +669,6 @@ export default function ProfessorDashboard() {
                   </div>
                 </div>
 
-                {/* Mobile Stacked List View */}
                 <div className="md:hidden space-y-2">
                   {recentSessions.length > 0 ? (
                     recentSessions.map((log) => (
@@ -731,7 +736,6 @@ export default function ProfessorDashboard() {
           )}
         >
           <div className="flex flex-col flex-1 max-sm:p-6 max-sm:pt-0 overflow-y-auto">
-            {/* Drag handle pill at the very top for mobile */}
             <div className="md:hidden w-12 h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full mx-auto mt-4 mb-6" />
             
             <DialogHeader className="sm:mb-8 bg-transparent relative flex flex-row items-center justify-between mb-8">
@@ -780,7 +784,6 @@ export default function ProfessorDashboard() {
                 {activeInput === 'classSection' && <SuggestionBox items={filteredSuggestions} onSelect={(val) => { setClassSection(val); setActiveInput(null); }} />}
               </div>
 
-              {/* Mobile Button - Normal Flow directly after Class Section with 16px gap via mt-4 */}
               <div className="sm:hidden mt-4">
                 <Button 
                   onClick={() => handleLogEntry(scannedRoomId)} 
@@ -792,7 +795,6 @@ export default function ProfessorDashboard() {
             </div>
           </div>
 
-          {/* Desktop Footer Only */}
           <div className="hidden sm:block sm:mt-8">
             <Button 
               onClick={() => handleLogEntry(scannedRoomId)} 

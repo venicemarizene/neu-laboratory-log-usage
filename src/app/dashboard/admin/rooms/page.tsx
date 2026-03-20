@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { LAB_ROOMS } from '@/lib/constants';
@@ -8,6 +8,12 @@ import { QRCodeSVG } from 'qrcode.react';
 import { Download, Monitor } from 'lucide-react';
 
 export default function RoomQrGeneratorPage() {
+  const [origin, setOrigin] = useState("");
+
+  useEffect(() => {
+    setOrigin(window.location.origin);
+  }, []);
+
   const downloadQR = (roomName: string) => {
     const svg = document.getElementById(`qr-${roomName}`);
     if (!svg) return;
@@ -62,7 +68,7 @@ export default function RoomQrGeneratorPage() {
               <div className="bg-white p-4 rounded-3xl border border-slate-100 shadow-inner">
                 <QRCodeSVG
                   id={`qr-${room}`}
-                  value={room}
+                  value={origin ? `${origin}/login?room=${room}` : room}
                   size={160}
                   level="H"
                   includeMargin={true}

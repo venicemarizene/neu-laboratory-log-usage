@@ -148,7 +148,6 @@ export default function ProfessorDashboard() {
 
   const { data: activeSessions } = useCollection(activeSessionQuery);
 
-  // Simplified query for logs to avoid complex index requirements or rule conflicts
   const personalLogsQuery = useMemoFirebase(() => {
     if (!user || !db) return null;
     return query(
@@ -323,133 +322,161 @@ export default function ProfessorDashboard() {
         <ThemeToggle />
       </header>
 
-      <main className="flex-1 flex flex-col items-center justify-start p-6 pt-16">
-        <div className="w-full max-w-md flex flex-col items-center gap-8">
-          <div className="w-full flex flex-col items-center gap-6">
+      <main className="flex-1 flex flex-col items-center justify-start p-6 pt-12 md:pt-16">
+        <div className="w-full max-w-6xl flex flex-col gap-8 md:gap-10">
+          
+          {/* Greeting Section */}
+          <div className="text-center md:text-left space-y-2">
             {activeSession && (
-              <div className="w-full bg-[var(--color-status-active-bg)] border border-transparent text-[var(--color-status-active-text)] px-4 py-3 rounded-xl flex items-center gap-3 animate-in slide-in-from-top-4 shadow-sm">
+              <div className="w-fit mx-auto md:mx-0 bg-[var(--color-status-active-bg)] border border-transparent text-[var(--color-status-active-text)] px-4 py-3 rounded-xl flex items-center gap-3 animate-in slide-in-from-top-4 shadow-sm mb-6">
                 <CheckCircle2 className="h-5 w-5 shrink-0" />
                 <span className="font-bold text-sm">
                   Session verified. Thank you for using room {activeSession.roomId}.
                 </span>
               </div>
             )}
-
-            <div className="text-center space-y-2 w-full">
-              <h1 className="text-3xl font-black text-primary tracking-tight">{greeting}, {firstName}!</h1>
-              <p className="text-base text-[var(--color-text-secondary)] font-bold">
-                {activeSession ? "Current lab session in progress." : "Which room are you using today?"}
-              </p>
-
-              <div className="grid grid-cols-3 gap-2 w-full pt-4">
-                <div className="bg-slate-50 dark:bg-slate-900/40 p-3 rounded-2xl border border-slate-200/50 dark:border-slate-800 flex flex-col items-center justify-center text-center shadow-sm">
-                  <span className="text-[8px] font-black uppercase tracking-tighter text-slate-400 dark:text-slate-500 mb-1 leading-none">Sessions This Month</span>
-                  <span className="text-xs font-black text-primary dark:text-white leading-none mt-1">{sessionsThisMonth}</span>
-                </div>
-                <div className="bg-slate-50 dark:bg-slate-900/40 p-3 rounded-2xl border border-slate-200/50 dark:border-slate-800 flex flex-col items-center justify-center text-center shadow-sm">
-                  <span className="text-[8px] font-black uppercase tracking-tighter text-slate-400 dark:text-slate-500 mb-1 leading-none">Hours Used</span>
-                  <span className="text-xs font-black text-primary dark:text-white leading-none mt-1">{totalHours}h</span>
-                </div>
-                <div className="bg-slate-50 dark:bg-slate-900/40 p-3 rounded-2xl border border-slate-200/50 dark:border-slate-800 flex flex-col items-center justify-center text-center shadow-sm">
-                  <span className="text-[8px] font-black uppercase tracking-tighter text-slate-400 dark:text-slate-500 mb-1 leading-none">Most Used Room</span>
-                  <span className="text-xs font-black text-primary dark:text-white leading-none mt-1">{mostUsedRoom}</span>
-                </div>
-              </div>
-            </div>
+            <h1 className="text-3xl md:text-4xl font-black text-primary tracking-tight">
+              {greeting}, {firstName}!
+            </h1>
+            <p className="text-base text-[var(--color-text-secondary)] font-bold">
+              {activeSession ? "Current lab session in progress." : "Which room are you using today?"}
+            </p>
           </div>
 
-          <div className="w-full flex flex-col items-center gap-4">
-            {!activeSession ? (
-              <Card className="w-full max-w-[360px] border-none shadow-2xl rounded-[32px] overflow-hidden bg-[var(--color-card-bg)]">
-                <CardContent className="p-8 space-y-6">
-                  <Button 
-                    onClick={() => setIsScannerOpen(true)}
-                    className="w-full h-12 rounded-2xl bg-primary dark:bg-[#4A6BAD] hover:opacity-90 text-white font-black text-base flex items-center justify-center gap-3 shadow-lg transition-all active:scale-[0.98] border-none"
-                  >
-                    <QrCode className="h-4 w-4" />
-                    Auto-Log via QR
-                  </Button>
-
-                  <div className="relative flex items-center gap-4 py-2">
-                    <div className="flex-1 h-px bg-[var(--color-border)] opacity-50"></div>
-                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[var(--color-text-tertiary)]">or</span>
-                    <div className="flex-1 h-px bg-[var(--color-border)] opacity-50"></div>
-                  </div>
-
-                  <div className="space-y-3">
-                    <label className="text-[10px] font-black uppercase tracking-[0.2em] text-[var(--color-text-tertiary)] ml-1">
-                      Laboratory Room
-                    </label>
-                    <Select value={selectedRoom} onValueChange={setSelectedRoom}>
-                      <SelectTrigger className="h-12 rounded-2xl bg-[var(--color-accent-bg)] border-none text-base font-black text-[var(--color-text-primary)] px-6 shadow-inner focus:ring-0 transition-colors">
-                        <SelectValue placeholder="Select Room" />
-                      </SelectTrigger>
-                      <SelectContent className="rounded-2xl border-none shadow-xl bg-[var(--color-card-bg)]">
-                        {LAB_ROOMS.map(room => (
-                          <SelectItem key={room} value={room} className="font-bold h-10">
-                            {room}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <Button 
-                    onClick={() => handleLogEntry(selectedRoom)}
-                    disabled={isLogging}
-                    variant="outline"
-                    className="w-full h-12 rounded-2xl border-2 border-[#1E3A8A] dark:border-[#4A6BAD] bg-transparent text-[#1E3A8A] dark:text-white hover:bg-[#1E3A8A]/10 dark:hover:bg-[#4A6BAD]/20 font-black text-base flex items-center justify-center gap-3 transition-all duration-200 active:scale-[0.98] disabled:opacity-70"
-                  >
-                    <ArrowRight className="h-4 w-4" />
-                    {isLogging ? 'Logging...' : selectedRoom ? `Log Entry ${selectedRoom}` : 'Log Entry'}
-                  </Button>
-                </CardContent>
-              </Card>
-            ) : (
-              <Card className="w-full max-w-[360px] border-none shadow-2xl rounded-[32px] overflow-hidden bg-[var(--color-card-bg)]">
-                <CardContent className="p-8 space-y-6">
-                  <div className="text-center space-y-2 py-4">
-                    <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-1.5 rounded-full mb-2">
-                      <Clock className="h-3 w-3" />
-                      <span className="text-[10px] font-black uppercase tracking-widest">Active Usage</span>
-                    </div>
-                    <h2 className="text-5xl font-black text-[var(--color-text-primary)]">{activeSession.roomId}</h2>
-                    <p className="text-xs font-bold text-[var(--color-text-secondary)]">Institutional Session Registered</p>
-                  </div>
-
-                  <Button 
-                    onClick={handleEndSession}
-                    className="w-full h-14 rounded-2xl bg-[var(--color-status-blocked-bg)] text-[var(--color-status-blocked-text)] hover:opacity-90 font-black text-base flex items-center justify-center gap-3 shadow-lg transition-all active:scale-[0.98]"
-                  >
-                    <LogOut className="h-4 w-4" />
-                    End Session
-                  </Button>
-                </CardContent>
-              </Card>
-            )}
-
-            <div className="w-full max-w-[360px] bg-[var(--color-card-bg)] rounded-3xl p-4 shadow-sm flex items-center justify-between border border-[var(--color-border)] transition-colors">
-              <div className="flex items-center gap-3">
-                <Avatar className="h-10 w-10 bg-primary/10 rounded-2xl border-none">
-                  <AvatarFallback className="text-primary font-black text-sm bg-transparent">
-                    {initial}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="flex flex-col">
-                  <p className="font-black text-sm text-[var(--color-text-primary)] leading-none">{fullName}</p>
-                  <Badge variant="secondary" className="bg-transparent p-0 text-[var(--color-text-tertiary)] font-black text-[9px] tracking-wider uppercase border-none">
-                    PROFESSOR
-                  </Badge>
-                </div>
+          {/* Main Content Layout */}
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
+            
+            {/* Stats - Left Col on Desktop | Top row on Mobile */}
+            <div className="md:col-span-4 flex flex-row md:flex-col gap-3 md:gap-6 w-full order-1">
+              {/* Sessions Chip */}
+              <div className="flex-1 md:flex-none bg-[var(--color-card-bg)] p-4 md:p-8 rounded-[2rem] border border-[var(--color-border)] flex flex-col items-center justify-center text-center shadow-sm transition-all hover:shadow-md">
+                <span className="text-[10px] md:text-xs font-black uppercase tracking-widest text-slate-400 mb-2 leading-none">
+                  <span className="hidden md:inline">Sessions This Month</span>
+                  <span className="md:hidden">Sessions</span>
+                </span>
+                <span className="text-xl md:text-4xl font-black text-primary dark:text-white leading-none">
+                  {sessionsThisMonth}
+                </span>
               </div>
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                onClick={handleSignOut}
-                className="text-[var(--color-text-tertiary)] hover:text-destructive hover:bg-destructive/5 rounded-xl"
-              >
-                <LogOut className="h-4 w-4" />
-              </Button>
+
+              {/* Hours Chip */}
+              <div className="flex-1 md:flex-none bg-[var(--color-card-bg)] p-4 md:p-8 rounded-[2rem] border border-[var(--color-border)] flex flex-col items-center justify-center text-center shadow-sm transition-all hover:shadow-md">
+                <span className="text-[10px] md:text-xs font-black uppercase tracking-widest text-slate-400 mb-2 leading-none">
+                  <span className="hidden md:inline">Hours Used</span>
+                  <span className="md:hidden">Hours</span>
+                </span>
+                <span className="text-xl md:text-4xl font-black text-primary dark:text-white leading-none">
+                  {totalHours}h
+                </span>
+              </div>
+
+              {/* Room Chip */}
+              <div className="flex-1 md:flex-none bg-[var(--color-card-bg)] p-4 md:p-8 rounded-[2rem] border border-[var(--color-border)] flex flex-col items-center justify-center text-center shadow-sm transition-all hover:shadow-md">
+                <span className="text-[10px] md:text-xs font-black uppercase tracking-widest text-slate-400 mb-2 leading-none">
+                  <span className="hidden md:inline">Most Used Room</span>
+                  <span className="md:hidden">Top Room</span>
+                </span>
+                <span className="text-xl md:text-4xl font-black text-primary dark:text-white leading-none">
+                  {mostUsedRoom}
+                </span>
+              </div>
+            </div>
+
+            {/* Main Action Card - Right Col on Desktop | Below stats on Mobile */}
+            <div className="md:col-span-8 w-full order-2 flex flex-col gap-8">
+              {!activeSession ? (
+                <Card className="w-full border-none shadow-2xl rounded-[40px] overflow-hidden bg-[var(--color-card-bg)]">
+                  <CardContent className="p-8 md:p-12 space-y-8">
+                    <Button 
+                      onClick={() => setIsScannerOpen(true)}
+                      className="w-full h-16 rounded-[2rem] bg-primary dark:bg-[#4A6BAD] hover:opacity-90 text-white font-black text-lg flex items-center justify-center gap-4 shadow-lg transition-all active:scale-[0.98] border-none"
+                    >
+                      <QrCode className="h-6 w-6" />
+                      Auto-Log via QR
+                    </Button>
+
+                    <div className="relative flex items-center gap-6 py-2">
+                      <div className="flex-1 h-px bg-[var(--color-border)] opacity-50"></div>
+                      <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[var(--color-text-tertiary)] bg-[var(--color-card-bg)] px-2">or</span>
+                      <div className="flex-1 h-px bg-[var(--color-border)] opacity-50"></div>
+                    </div>
+
+                    <div className="space-y-4">
+                      <label className="text-[11px] font-black uppercase tracking-[0.2em] text-[var(--color-text-tertiary)] ml-2">
+                        Institutional Laboratory Unit
+                      </label>
+                      <Select value={selectedRoom} onValueChange={setSelectedRoom}>
+                        <SelectTrigger className="h-14 rounded-[2rem] bg-[var(--color-accent-bg)] border-none text-lg font-black text-[var(--color-text-primary)] px-8 shadow-inner focus:ring-0 transition-colors">
+                          <SelectValue placeholder="Select Room" />
+                        </SelectTrigger>
+                        <SelectContent className="rounded-2xl border-none shadow-xl bg-[var(--color-card-bg)]">
+                          {LAB_ROOMS.map(room => (
+                            <SelectItem key={room} value={room} className="font-bold h-12 text-base">
+                              {room}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <Button 
+                      onClick={() => handleLogEntry(selectedRoom)}
+                      disabled={isLogging}
+                      variant="outline"
+                      className="w-full h-16 rounded-[2rem] border-2 border-[#1E3A8A] dark:border-[#4A6BAD] bg-transparent text-[#1E3A8A] dark:text-white hover:bg-[#1E3A8A]/10 dark:hover:bg-[#4A6BAD]/20 font-black text-lg flex items-center justify-center gap-4 transition-all duration-200 active:scale-[0.98] disabled:opacity-70"
+                    >
+                      <ArrowRight className="h-5 w-5" />
+                      {isLogging ? 'Logging...' : selectedRoom ? `Log Entry ${selectedRoom}` : 'Log Entry'}
+                    </Button>
+                  </CardContent>
+                </Card>
+              ) : (
+                <Card className="w-full border-none shadow-2xl rounded-[40px] overflow-hidden bg-[var(--color-card-bg)]">
+                  <CardContent className="p-8 md:p-16 space-y-10">
+                    <div className="text-center space-y-4">
+                      <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-5 py-2 rounded-full mb-4">
+                        <Clock className="h-4 w-4" />
+                        <span className="text-[11px] font-black uppercase tracking-widest">Active Usage</span>
+                      </div>
+                      <h2 className="text-6xl md:text-8xl font-black text-[var(--color-text-primary)] tracking-tighter">{activeSession.roomId}</h2>
+                      <p className="text-sm font-bold text-[var(--color-text-secondary)]">Institutional Session Registered</p>
+                    </div>
+
+                    <Button 
+                      onClick={handleEndSession}
+                      className="w-full h-16 rounded-[2rem] bg-[var(--color-status-blocked-bg)] text-[var(--color-status-blocked-text)] hover:opacity-90 font-black text-lg flex items-center justify-center gap-4 shadow-lg transition-all active:scale-[0.98]"
+                    >
+                      <LogOut className="h-6 w-6" />
+                      End Session
+                    </Button>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* User Profile Card - Full width below the main grid content */}
+              <div className="w-full bg-[var(--color-card-bg)] rounded-[2.5rem] p-6 md:p-8 shadow-sm flex items-center justify-between border border-[var(--color-border)] transition-colors">
+                <div className="flex items-center gap-4">
+                  <Avatar className="h-12 w-12 bg-primary/10 rounded-2xl border-none">
+                    <AvatarFallback className="text-primary font-black text-base bg-transparent">
+                      {initial}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex flex-col">
+                    <p className="font-black text-base text-[var(--color-text-primary)] leading-none">{fullName}</p>
+                    <Badge variant="secondary" className="bg-transparent p-0 mt-1 text-[var(--color-text-tertiary)] font-black text-[10px] tracking-widest uppercase border-none">
+                      PROFESSOR
+                    </Badge>
+                  </div>
+                </div>
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  onClick={handleSignOut}
+                  className="h-12 w-12 text-[var(--color-text-tertiary)] hover:text-destructive hover:bg-destructive/5 rounded-2xl"
+                >
+                  <LogOut className="h-5 w-5" />
+                </Button>
+              </div>
             </div>
           </div>
         </div>

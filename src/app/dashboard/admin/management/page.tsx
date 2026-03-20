@@ -20,6 +20,8 @@ import { cn } from '@/lib/utils';
 import { useCollection, useFirestore, useMemoFirebase, useUser, useDoc } from '@/firebase';
 import { collection, query, where, doc } from 'firebase/firestore';
 import { LAB_ROOMS } from '@/lib/constants';
+import { SidebarTrigger } from '@/components/ui/sidebar';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 type FilterType = 'All' | 'Occupied' | 'Vacant';
 
@@ -93,10 +95,24 @@ export default function RoomManagementPage() {
     );
   }
 
-  const cardBaseStyle = "border border-[#C5D3E8] shadow-[0_2px_8px_rgba(45,58,107,0.08)] hover:shadow-[0_4px_16px_rgba(45,58,107,0.14)] hover:-translate-y-1 transition-all duration-200 bg-[#F4F7FC] dark:bg-[#3D4966] rounded-[32px] overflow-hidden";
+  const cardBaseStyle = "border border-[#C5D3E8] shadow-[0_2px_8px_rgba(45,58,107,0.08)] hover:shadow-[0_4px_16px_rgba(45,58,107,0.14)] hover:-translate-y-[1px] transition-all duration-200 bg-[#F4F7FC] dark:bg-[#3D4966] rounded-[32px] overflow-hidden relative";
 
   return (
-    <div className="p-8 space-y-8 max-w-[1400px] mx-auto">
+    <div className="px-8 pt-6 pb-8 space-y-8 max-w-[1400px] mx-auto">
+      {/* Header Row */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <SidebarTrigger className="h-9 w-9 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-colors" />
+          <div className="flex flex-col">
+            <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight leading-none">Room Management</h1>
+            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mt-1">
+              Real-time laboratory occupancy and session monitoring
+            </p>
+          </div>
+        </div>
+        <ThemeToggle />
+      </div>
+
       {/* Stat Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card className={cardBaseStyle}>

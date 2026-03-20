@@ -46,6 +46,8 @@ import {
 } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { startOfDay, endOfDay, subWeeks, subMonths, isBefore, format } from 'date-fns';
+import { SidebarTrigger } from '@/components/ui/sidebar';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 const MONTHS = [
   "January", "February", "March", "April", "May", "June",
@@ -88,7 +90,7 @@ export default function AdminDashboard() {
 
   const db = useFirestore();
 
-  // Guard: Verify user role using admin_roles collection to match Security Rules source of truth
+  // Guard: Verify user role
   const adminRoleRef = useMemoFirebase(() => {
     if (!user?.uid || !db) return null;
     return doc(db, 'admin_roles', user.uid);
@@ -97,12 +99,10 @@ export default function AdminDashboard() {
 
   const isAuthorizedAdmin = useMemo(() => {
     if (isAdminRoleLoading) return false;
-    // Authorized if they exist in the admin_roles collection OR are a bootstrap admin
     return !!adminRole || BOOTSTRAP_ADMINS.includes(user?.email || '');
   }, [adminRole, user, isAdminRoleLoading]);
 
   const usersQuery = useMemoFirebase(() => {
-    // ONLY query if the user is explicitly authorized to prevent permission errors
     if (!db || !user || !isAuthorizedAdmin) return null;
     return collection(db, 'user_profiles');
   }, [db, user, isAuthorizedAdmin]);
@@ -117,7 +117,6 @@ export default function AdminDashboard() {
   }, [users]);
 
   const logsQuery = useMemoFirebase(() => {
-    // ONLY query if the user is explicitly authorized to prevent permission errors
     if (!db || !user || !isAuthorizedAdmin) return null;
     
     let q = query(collection(db, 'room_logs'), orderBy('createdAt', 'desc'));
@@ -161,7 +160,6 @@ export default function AdminDashboard() {
     const ctx = canvas.getContext("2d");
     const img = new Image();
     
-    // Scale for better resolution
     const scale = 2;
     const width = svg.clientWidth;
     const height = svg.clientHeight;
@@ -196,7 +194,6 @@ export default function AdminDashboard() {
     );
   }
 
-  // Final check to prevent unauthorized layout from rendering briefly
   if (!isAuthorizedAdmin) return null;
 
   const activeLogsCount = logs?.filter(l => l.status === 'Active').length || 0;
@@ -225,7 +222,6 @@ export default function AdminDashboard() {
   const formatTime = (dateString: string | null) => {
     if (!dateString) return "—";
     const date = new Date(dateString);
-    // Standardized institutional format: "Mar 20 · 11:03 PM"
     return format(date, "MMM d '·' h:mm a");
   };
 
@@ -234,19 +230,13 @@ export default function AdminDashboard() {
     const startTime = new Date(start).getTime();
     const endTime = new Date(end).getTime();
     const diffMs = endTime - startTime;
-    
-    // Defensive check: Handle negative values or zero (clock drift or error)
     if (diffMs <= 0) return "—";
-
-    // Show seconds if less than a minute
     if (diffMs < 60000) {
       const seconds = Math.floor(diffMs / 1000);
       return `${seconds}s`;
     }
-
     const diffMins = Math.floor(diffMs / 60000);
     if (diffMins < 60) return `${diffMins}m`;
-    
     const hours = Math.floor(diffMins / 60);
     const remainingMins = diffMins % 60;
     return `${hours}h ${remainingMins}m`;
@@ -255,10 +245,7 @@ export default function AdminDashboard() {
   const handleApplyRange = () => {
     const fromDate = new Date(parseInt(customFrom.year), parseInt(customFrom.month), parseInt(customFrom.day));
     const toDate = new Date(parseInt(customTo.year), parseInt(customTo.month), parseInt(customTo.day));
-
-    if (isBefore(toDate, fromDate)) {
-      return;
-    }
+    if (isBefore(toDate, fromDate)) return;
     setFilterLabel('Custom Range');
     setIsFilterOpen(false);
   };
@@ -276,23 +263,38 @@ export default function AdminDashboard() {
     setIsFilterOpen(false);
   };
 
-  const cardBaseStyle = "border border-[#C5D3E8] shadow-[0_2px_8px_rgba(45,58,107,0.08)] hover:shadow-[0_4px_16px_rgba(45,58,107,0.14)] hover:-translate-y-1 transition-all duration-200 bg-[#F4F7FC] dark:bg-[#3D4966] rounded-[32px] overflow-hidden relative";
+  const cardBaseStyle = "border border-[#C5D3E8] shadow-[0_2px_8px_rgba(45,58,107,0.08)] hover:shadow-[0_4px_16px_rgba(45,58,107,0.14)] hover:-translate-y-[1px] transition-all duration-200 bg-[#F4F7FC] dark:bg-[#3D4966] rounded-[32px] overflow-hidden relative";
 
   return (
-    <div className="p-8 space-y-8 max-w-[1400px] mx-auto">
+    <div className="px-8 pt-6 pb-8 space-y-8 max-w-[1400px] mx-auto">
+      {/* Header Row */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <SidebarTrigger className="h-9 w-9 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-colors" />
+          <div className="flex flex-col">
+            <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight leading-none">Laboratory Analytics</h1>
+            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mt-1">
+              NEU COMPUTER LABORATORY MANAGEMENT
+            </p>
+          </div>
+        </div>
+        <ThemeToggle />
+      </div>
+
+      {/* Stat Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className={cn(cardBaseStyle, "bg-primary text-white border-none shadow-xl")}>
-          <div className="absolute top-6 right-6 opacity-20">
+        <Card className={cardBaseStyle}>
+          <div className="absolute top-6 right-6 opacity-20 text-primary">
             <Waves size={32} />
           </div>
           <CardHeader className="pb-2">
-            <CardTitle className="text-xs font-black uppercase tracking-widest text-white/60">
+            <CardTitle className="text-xs font-black uppercase tracking-widest text-slate-400">
               Active Logs Filtered
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-5xl font-black mb-1">{activeLogsCount}</div>
-            <p className="text-[10px] font-bold text-white/60">Current viewing window</p>
+            <div className="text-4xl font-black text-slate-900 dark:text-white mb-1">{activeLogsCount}</div>
+            <p className="text-[10px] font-bold text-slate-300">Current viewing window</p>
           </CardContent>
         </Card>
 

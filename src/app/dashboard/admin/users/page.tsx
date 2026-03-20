@@ -30,6 +30,8 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
+import { SidebarTrigger } from '@/components/ui/sidebar';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 const BOOTSTRAP_ADMINS = [
   'venicemarizene.linga@neu.edu.ph',
@@ -42,7 +44,7 @@ export default function UserManagementPage() {
   const [mounted, setMounted] = useState(false);
   const db = useFirestore();
 
-  // Guard: Verify user role before executing administrative queries
+  // Guard: Verify user role
   const adminRoleRef = useMemoFirebase(() => {
     if (!user?.uid || !db) return null;
     return doc(db, 'admin_roles', user.uid);
@@ -97,10 +99,24 @@ export default function UserManagementPage() {
 
   if (!isAuthorizedAdmin) return null;
 
-  const cardStyle = "border border-[#C5D3E8] shadow-[0_2px_8px_rgba(45,58,107,0.08)] hover:shadow-[0_4px_16px_rgba(45,58,107,0.14)] hover:-translate-y-1 transition-all duration-200 bg-[#F4F7FC] dark:bg-[#3D4966] rounded-[32px] overflow-hidden";
+  const cardStyle = "border border-[#C5D3E8] shadow-[0_2px_8px_rgba(45,58,107,0.08)] hover:shadow-[0_4px_16px_rgba(45,58,107,0.14)] hover:-translate-y-[1px] transition-all duration-200 bg-[#F4F7FC] dark:bg-[#3D4966] rounded-[32px] overflow-hidden";
 
   return (
-    <div className="p-8 space-y-8 max-w-[1400px] mx-auto">
+    <div className="px-8 pt-6 pb-8 space-y-8 max-w-[1400px] mx-auto">
+      {/* Header Row */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <SidebarTrigger className="h-9 w-9 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-colors" />
+          <div className="flex flex-col">
+            <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight leading-none">Professor Directory</h1>
+            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mt-1">
+              Institutional account management and laboratory access control
+            </p>
+          </div>
+        </div>
+        <ThemeToggle />
+      </div>
+
       <Card className={cardStyle}>
         <CardHeader className="p-8 border-b border-[#C5D3E8] dark:border-slate-800">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -120,8 +136,8 @@ export default function UserManagementPage() {
             <TableHeader className="bg-slate-50/50 dark:bg-slate-900/50">
               <TableRow className="border-b border-[#C5D3E8] dark:border-slate-800 hover:bg-transparent">
                 <TableHead className="px-8 h-12 text-[10px] font-black uppercase tracking-widest text-slate-900 dark:text-white">Professor</TableHead>
-                <TableHead className="h-12 text-[10px] font-black uppercase tracking-widest text-slate-900 dark:text-white">Role</TableHead>
-                <TableHead className="h-12 text-[10px] font-black uppercase tracking-widest text-slate-900 dark:text-white">Status</TableHead>
+                <TableHead className="h-12 text-[10px] font-black uppercase tracking-widest text-slate-900 dark:text-white text-center">Role</TableHead>
+                <TableHead className="h-12 text-[10px] font-black uppercase tracking-widest text-slate-900 dark:text-white text-center">Status</TableHead>
                 <TableHead className="px-8 h-12 text-[10px] font-black uppercase tracking-widest text-slate-900 dark:text-white text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>

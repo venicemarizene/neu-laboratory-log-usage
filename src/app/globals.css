@@ -47,7 +47,7 @@
   --color-page-bg: #2A3245;
   --color-card-bg: #3D4966;
   --color-sidebar-bg: #232D42;
-  --color-primary: #94B4EB;
+  --color-primary: #7AA0E0;
   --color-accent-bg: #2A3A5A;
   --color-accent-border: #3A5080;
   --color-text-primary: #E2E8F4;
@@ -66,7 +66,7 @@
   --card-foreground: 210 40% 96%;
   --popover: 222 26% 27%;
   --popover-foreground: 210 40% 96%;
-  --primary: 218 65% 75%;
+  --primary: 218 55% 68%;
   --primary-foreground: 210 40% 98%;
   --secondary: 222 24% 31%;
   --secondary-foreground: 210 40% 98%;
@@ -78,7 +78,7 @@
   --destructive-foreground: 210 40% 98%;
   --border: 220 23% 34%;
   --input: 220 23% 34%;
-  --ring: 218 65% 75%;
+  --ring: 218 55% 68%;
 }
 
 @layer base {
@@ -116,6 +116,6 @@
     @apply bg-white dark:bg-[#5578B8] text-primary dark:text-white shadow-sm;
   }
   .google-login-btn {
-    @apply bg-primary dark:bg-[#5578B8] text-white hover:bg-primary/90 dark:hover:bg-[#4A6BAD];
+    @apply bg-primary dark:bg-[#4A6BAD] text-white hover:bg-primary/90 dark:hover:bg-[#4A6BAD]/90;
   }
 }

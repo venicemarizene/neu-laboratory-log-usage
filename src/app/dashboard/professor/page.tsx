@@ -127,7 +127,6 @@ export default function ProfessorDashboard() {
   const [showSuccess, setShowSuccess] = useState(false);
   const [isFading, setIsFading] = useState(false);
 
-  // Success message fade-out logic
   useEffect(() => {
     let fadeTimer: NodeJS.Timeout;
     let hideTimer: NodeJS.Timeout;
@@ -387,22 +386,18 @@ export default function ProfessorDashboard() {
       <main className="flex-1 flex flex-col items-center justify-start p-6 pt-12 md:pt-16">
         <div className="w-full max-w-6xl flex flex-col gap-8 md:gap-10">
           
-          {/* Mobile-only Greeting at the very top */}
-          <div className="md:hidden w-full mb-8">
+          <div className="md:hidden w-full space-y-8">
             <GreetingContent />
           </div>
 
-          {/* Main Content Layout Grid */}
           <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start relative">
             
-            {/* Stats Column - Left (Stack on Desktop | Row on Mobile) */}
             <div className="md:col-span-4 flex flex-col gap-4 w-full md:border-r md:border-[var(--color-border)] md:pr-10">
-              <label className="text-[13px] font-black uppercase tracking-[0.2em] text-[var(--color-text-tertiary)] ml-2 mb-2">
+              <label className="text-[13px] font-black uppercase tracking-[0.2em] text-white ml-2 mb-2">
                 Usage Statistics
               </label>
               
               <div className="flex flex-row md:flex-col gap-3 md:gap-6 w-full mb-8">
-                {/* Sessions Chip */}
                 <div className="flex-1 md:flex-none bg-[var(--color-card-bg)] p-4 md:p-8 rounded-[2rem] border border-[var(--color-border)] flex flex-col items-center justify-center text-center shadow-sm transition-all hover:shadow-md">
                   <span className="text-[10px] md:text-xs font-black uppercase tracking-widest text-slate-400 mb-2 leading-none">
                     <span className="hidden md:inline">Sessions This Month</span>
@@ -413,7 +408,6 @@ export default function ProfessorDashboard() {
                   </span>
                 </div>
 
-                {/* Hours Chip */}
                 <div className="flex-1 md:flex-none bg-[var(--color-card-bg)] p-4 md:p-8 rounded-[2rem] border border-[var(--color-border)] flex flex-col items-center justify-center text-center shadow-sm transition-all hover:shadow-md">
                   <span className="text-[10px] md:text-xs font-black uppercase tracking-widest text-slate-400 mb-2 leading-none">
                     <span className="hidden md:inline">Hours Used</span>
@@ -424,7 +418,6 @@ export default function ProfessorDashboard() {
                   </span>
                 </div>
 
-                {/* Room Chip */}
                 <div className="flex-1 md:flex-none bg-[var(--color-card-bg)] p-4 md:p-8 rounded-[2rem] border border-[var(--color-border)] flex flex-col items-center justify-center text-center shadow-sm transition-all hover:shadow-md">
                   <span className="text-[10px] md:text-xs font-black uppercase tracking-widest text-slate-400 mb-2 leading-none">
                     <span className="hidden md:inline">Most Used Room</span>
@@ -436,18 +429,15 @@ export default function ProfessorDashboard() {
                 </div>
               </div>
 
-              {/* Professor Profile - Desktop Position */}
               <div className="hidden md:block mt-auto pt-4">
                 <UserProfileCard />
               </div>
             </div>
 
-            {/* Main Action Card Column - Right */}
             <div className="md:col-span-8 w-full flex flex-col gap-8">
               {!activeSession ? (
                 <Card className="w-full border-none shadow-2xl rounded-[40px] overflow-hidden bg-[var(--color-card-bg)]">
                   <CardContent className="p-8 md:p-12 space-y-8">
-                    {/* Greeting integrated into action card for desktop, hidden on mobile */}
                     <div className="hidden md:block mb-8">
                       <GreetingContent />
                       <Separator className="bg-[var(--color-border)] opacity-50 -mt-2" />
@@ -499,17 +489,15 @@ export default function ProfessorDashboard() {
               ) : (
                 <Card className="w-full border-none shadow-2xl rounded-[40px] overflow-hidden bg-[var(--color-card-bg)]">
                   <CardContent className="p-8 md:p-16 space-y-10 text-center">
-                    {/* Desktop Greeting Header */}
                     <div className="hidden md:block mb-10 text-left">
                       <GreetingContent />
                       <Separator className="bg-[var(--color-border)] opacity-50 mt-8" />
                     </div>
 
                     <div className="flex flex-col items-center gap-6">
-                      {/* Success message integrated into session card with fade-out */}
                       {showSuccess && (
                         <div className={cn(
-                          "inline-flex bg-[var(--color-status-active-bg)] border border-transparent text-[var(--color-status-active-text)] px-4 py-3 rounded-xl items-center gap-3 shadow-sm transition-opacity duration-500",
+                          "bg-[var(--color-status-active-bg)] border border-transparent text-[var(--color-status-active-text)] px-4 py-3 rounded-xl flex items-center gap-3 shadow-sm transition-opacity duration-500",
                           isFading ? "opacity-0" : "opacity-100"
                         )}>
                           <CheckCircle2 className="h-5 w-5 shrink-0" />
@@ -534,7 +522,7 @@ export default function ProfessorDashboard() {
                       className={cn(
                         "w-full h-16 rounded-[2rem] font-black text-lg flex items-center justify-center gap-4 shadow-lg transition-all active:scale-[0.98] border-none",
                         "bg-[var(--color-status-blocked-bg)] text-[var(--color-status-blocked-text)] hover:bg-[#DC2626] hover:text-white",
-                        "dark:bg-[var(--color-status-blocked-bg)] dark:text-white dark:hover:bg-[#5C7FBF] dark:hover:text-white"
+                        "dark:bg-red-950/40 dark:text-white dark:hover:bg-[#5C7FBF] dark:hover:text-white"
                       )}
                     >
                       <LogOut className="h-6 w-6" />
@@ -544,7 +532,6 @@ export default function ProfessorDashboard() {
                 </Card>
               )}
 
-              {/* Professor Profile - Mobile Position */}
               <div className="md:hidden w-full mt-4">
                 <UserProfileCard />
               </div>

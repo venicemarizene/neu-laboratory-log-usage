@@ -260,21 +260,24 @@ export default function ProfessorDashboard() {
         <ThemeToggle />
       </header>
 
-      <main className="flex-1 flex flex-col items-center justify-center p-6 space-y-8">
-        {activeSession && (
-          <div className="w-full max-w-md bg-[var(--color-status-active-bg)] border border-transparent text-[var(--color-status-active-text)] px-4 py-3 rounded-xl flex items-center gap-3 animate-in slide-in-from-top-4 shadow-sm">
-            <CheckCircle2 className="h-5 w-5 shrink-0" />
-            <span className="font-bold text-sm">
-              Session verified. Thank you for using room {activeSession.roomId}.
-            </span>
-          </div>
-        )}
+      <main className="flex-1 flex flex-col items-center justify-start p-6 pt-16 sm:pt-24 space-y-8">
+        {/* Welcome Section Centered Container */}
+        <div className="w-full max-w-md flex flex-col items-center space-y-8">
+          {activeSession && (
+            <div className="w-full bg-[var(--color-status-active-bg)] border border-transparent text-[var(--color-status-active-text)] px-4 py-3 rounded-xl flex items-center gap-3 animate-in slide-in-from-top-4 shadow-sm">
+              <CheckCircle2 className="h-5 w-5 shrink-0" />
+              <span className="font-bold text-sm">
+                Session verified. Thank you for using room {activeSession.roomId}.
+              </span>
+            </div>
+          )}
 
-        <div className="text-center space-y-2">
-          <h1 className="text-3xl font-black text-[var(--color-text-primary)] tracking-tight">Welcome back, {firstName}!</h1>
-          <p className="text-base text-[var(--color-text-secondary)] font-bold">
-            {activeSession ? "Current lab session in progress." : "Which room are you using today?"}
-          </p>
+          <div className="text-center space-y-2">
+            <h1 className="text-3xl font-black text-[var(--color-text-primary)] tracking-tight">Welcome back, {firstName}!</h1>
+            <p className="text-base text-[var(--color-text-secondary)] font-bold">
+              {activeSession ? "Current lab session in progress." : "Which room are you using today?"}
+            </p>
+          </div>
         </div>
 
         {!activeSession ? (

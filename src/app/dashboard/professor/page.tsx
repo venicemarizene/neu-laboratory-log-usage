@@ -47,7 +47,7 @@ const SuggestionBox = ({ items, onSelect }: { items: string[], onSelect: (val: s
   return (
     <div className="w-full">
       {/* Desktop View */}
-      <div className="hidden md:block absolute z-20 w-full top-full mt-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-xl overflow-hidden">
+      <div className="hidden md:block absolute z-20 w-full top-full mt-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
         {items.map((item, idx) => (
           <button
             key={idx}
@@ -231,7 +231,7 @@ export default function ProfessorDashboard() {
 
   const { data: activeSessions } = useCollection(activeSessionQuery);
 
-  // QUERY: Personal History - FILTERED BY professorId
+  // QUERY: Personal History - FILTERED BY professorId for Suggestions and Stats
   const personalLogsQuery = useMemoFirebase(() => {
     if (!user?.uid || !db) return null;
     return query(
@@ -597,11 +597,21 @@ export default function ProfessorDashboard() {
       </Dialog>
 
       <Dialog open={isConfirmModalOpen} onOpenChange={setIsConfirmModalOpen}>
-        <DialogContent className="sm:max-w-md p-0 overflow-hidden rounded-[32px] border-none bg-[var(--color-card-bg)]">
-          <DialogHeader className="p-6 bg-[var(--color-card-bg)] border-b border-[var(--color-border)] relative">
+        <DialogContent 
+          className={cn(
+            "p-0 overflow-hidden border-none bg-[var(--color-card-bg)]",
+            "sm:max-w-[420px] sm:rounded-[14px] sm:p-8", // Desktop styling
+            "max-sm:fixed max-sm:bottom-0 max-sm:left-0 max-sm:right-0 max-sm:max-w-none max-sm:translate-x-0 max-sm:translate-y-0 max-sm:h-[65vh] max-sm:rounded-t-[32px] max-sm:flex max-sm:flex-col" // Mobile bottom sheet styling
+          )}
+        >
+          {/* Mobile Drag Handle */}
+          <div className="md:hidden w-12 h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full mx-auto mt-4 shrink-0" />
+
+          <DialogHeader className="p-6 sm:p-0 sm:mb-8 bg-transparent border-b sm:border-none border-[var(--color-border)] relative flex flex-row items-center justify-between">
             <DialogTitle className="text-xl font-black text-[var(--color-text-primary)] tracking-tight">Confirm Laboratory Session</DialogTitle>
           </DialogHeader>
-          <div className="p-8 space-y-8">
+
+          <div className="flex-1 overflow-y-auto p-6 sm:p-0 space-y-8 pb-32 sm:pb-0">
             <div className="flex items-center gap-3 bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 p-4 rounded-2xl">
               <CheckCircle2 className="h-6 w-6" />
               <span className="font-black text-lg">Room {scannedRoomId} detected</span>
@@ -617,7 +627,11 @@ export default function ProfessorDashboard() {
                   onFocus={() => setActiveInput('subject')}
                   onBlur={() => setTimeout(() => setActiveInput(null), 200)}
                   onChange={(e) => { setSubject(e.target.value); setErrors(prev => ({...prev, subject: ""})); }}
-                  className={cn("h-14 rounded-[2rem] bg-[var(--color-accent-bg)] border-none text-lg font-black text-[var(--color-text-primary)] px-8 shadow-inner", errors.subject && "ring-2 ring-red-500")} 
+                  className={cn(
+                    "rounded-[2rem] bg-[var(--color-accent-bg)] border-none text-lg font-black text-[var(--color-text-primary)] px-8 shadow-inner focus:ring-primary", 
+                    "h-14 max-sm:min-h-[48px]",
+                    errors.subject && "ring-2 ring-red-500"
+                  )} 
                 />
                 {errors.subject && <p className="text-red-500 text-[12px] font-bold ml-4 mt-1">{errors.subject}</p>}
                 {activeInput === 'subject' && <SuggestionBox items={filteredSuggestions} onSelect={(val) => { setSubject(val); setActiveInput(null); }} />}
@@ -632,14 +646,23 @@ export default function ProfessorDashboard() {
                   onFocus={() => setActiveInput('classSection')}
                   onBlur={() => setTimeout(() => setActiveInput(null), 200)}
                   onChange={(e) => { setClassSection(e.target.value); setErrors(prev => ({...prev, classSection: ""})); }}
-                  className={cn("h-14 rounded-[2rem] bg-[var(--color-accent-bg)] border-none text-lg font-black text-[var(--color-text-primary)] px-8 shadow-inner", errors.classSection && "ring-2 ring-red-500")} 
+                  className={cn(
+                    "rounded-[2rem] bg-[var(--color-accent-bg)] border-none text-lg font-black text-[var(--color-text-primary)] px-8 shadow-inner focus:ring-primary",
+                    "h-14 max-sm:min-h-[48px]",
+                    errors.classSection && "ring-2 ring-red-500"
+                  )} 
                 />
                 {errors.classSection && <p className="text-red-500 text-[12px] font-bold ml-4 mt-1">{errors.classSection}</p>}
                 {activeInput === 'classSection' && <SuggestionBox items={filteredSuggestions} onSelect={(val) => { setClassSection(val); setActiveInput(null); }} />}
               </div>
             </div>
+          </div>
 
-            <Button onClick={() => handleLogEntry(scannedRoomId)} className="w-full h-16 rounded-[2rem] bg-primary text-white font-black text-lg flex items-center justify-center gap-4 shadow-lg transition-all active:scale-[0.98] border-none">
+          <div className="max-sm:fixed max-sm:bottom-0 max-sm:left-0 max-sm:right-0 max-sm:p-6 max-sm:bg-[var(--color-card-bg)] max-sm:border-t max-sm:border-[var(--color-border)]">
+            <Button 
+              onClick={() => handleLogEntry(scannedRoomId)} 
+              className="w-full h-16 rounded-[2rem] bg-primary text-white font-black text-lg flex items-center justify-center gap-4 shadow-lg transition-all active:scale-[0.98] border-none"
+            >
               <Check className="h-6 w-6" /> Confirm Session
             </Button>
           </div>
@@ -648,3 +671,4 @@ export default function ProfessorDashboard() {
     </div>
   );
 }
+

@@ -126,14 +126,12 @@ export default function ProfessorDashboard() {
       return useUser();
   }
 
-  // Security guard: Redirect if not authenticated
   useEffect(() => {
     if (!isUserLoading && !user) {
       router.push('/login');
     }
   }, [user, isUserLoading, router]);
 
-  // Reactive query for finding an active session
   const activeSessionQuery = useMemoFirebase(() => {
     if (!user || !db) return null;
     return query(
@@ -146,7 +144,6 @@ export default function ProfessorDashboard() {
 
   const { data: activeSessions } = useCollection(activeSessionQuery);
 
-  // Synchronize state with reactive query result
   useEffect(() => {
     if (activeSessions && activeSessions.length > 0) {
       setActiveSession({ id: activeSessions[0].id, roomId: activeSessions[0].roomId });
@@ -245,7 +242,6 @@ export default function ProfessorDashboard() {
 
   return (
     <div className="min-h-screen bg-[var(--color-page-bg)] flex flex-col font-body antialiased transition-colors">
-      {/* Top Navigation Bar synchronized with bottom bar */}
       <header className="h-16 border-b flex items-center justify-between px-6 sm:px-12 sticky top-0 z-50 shadow-sm bg-slate-50 dark:bg-slate-900 transition-colors">
         <div className="flex items-center gap-3">
           <div className="bg-white rounded-full p-0.5 shadow-sm border border-slate-100 flex items-center justify-center">
@@ -260,8 +256,7 @@ export default function ProfessorDashboard() {
         <ThemeToggle />
       </header>
 
-      <main className="flex-1 flex flex-col items-center justify-start p-6 pt-16 sm:pt-24 space-y-8">
-        {/* Welcome Section Centered Container */}
+      <main className="flex-1 flex flex-col items-center justify-start p-6 pt-16 space-y-8">
         <div className="w-full max-w-md flex flex-col items-center space-y-8">
           {activeSession && (
             <div className="w-full bg-[var(--color-status-active-bg)] border border-transparent text-[var(--color-status-active-text)] px-4 py-3 rounded-xl flex items-center gap-3 animate-in slide-in-from-top-4 shadow-sm">
@@ -314,7 +309,7 @@ export default function ProfessorDashboard() {
                 <Button 
                   onClick={() => handleLogEntry(selectedRoom)}
                   disabled={isLogging}
-                  className="w-full h-12 rounded-2xl bg-[var(--color-primary)] hover:opacity-90 text-white font-black text-base flex items-center justify-center gap-3 shadow-lg transition-all active:scale-[0.98] disabled:opacity-70"
+                  className="w-full h-12 rounded-2xl bg-[#3D5C99] dark:bg-[#3D6DB5] hover:bg-[#3D5C99]/90 dark:hover:bg-[#2F5A9E] text-white font-black text-base flex items-center justify-center gap-3 shadow-lg transition-all active:scale-[0.98] disabled:opacity-70"
                 >
                   <ArrowRight className="h-4 w-4" />
                   {isLogging ? 'Logging...' : `Log Entry ${selectedRoom}`}

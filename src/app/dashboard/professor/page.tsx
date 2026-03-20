@@ -280,6 +280,15 @@ export default function ProfessorDashboard() {
             {!activeSession ? (
               <Card className="w-full max-w-[360px] border-none shadow-2xl rounded-[32px] overflow-hidden bg-[var(--color-card-bg)]">
                 <CardContent className="p-8 space-y-6">
+                  {/* Reordered items as requested: Auto-Log → Select Room → Log Entry */}
+                  <Button 
+                    onClick={() => setIsScannerOpen(true)}
+                    className="w-full h-12 rounded-2xl bg-[#3B82F6] dark:bg-[#4A6BAD] hover:opacity-90 text-white font-black text-base flex items-center justify-center gap-3 shadow-lg transition-all active:scale-[0.98] border-none"
+                  >
+                    <QrCode className="h-4 w-4" />
+                    Auto-Log via QR
+                  </Button>
+
                   <div className="space-y-3">
                     <label className="text-[10px] font-black uppercase tracking-[0.2em] text-[var(--color-text-tertiary)] ml-1">
                       Laboratory Room
@@ -298,24 +307,14 @@ export default function ProfessorDashboard() {
                     </Select>
                   </div>
 
-                  <div className="space-y-3">
-                    <Button 
-                      onClick={() => setIsScannerOpen(true)}
-                      className="w-full h-12 rounded-2xl bg-[#3B82F6] dark:bg-[#4A6BAD] hover:opacity-90 text-white font-black text-base flex items-center justify-center gap-3 shadow-lg transition-all active:scale-[0.98] border-none"
-                    >
-                      <QrCode className="h-4 w-4" />
-                      Auto-Log via QR
-                    </Button>
-
-                    <Button 
-                      onClick={() => handleLogEntry(selectedRoom)}
-                      disabled={isLogging}
-                      className="w-full h-12 rounded-2xl bg-[#3D5C99] dark:bg-[#3D6DB5] hover:bg-[#3D5C99]/90 dark:hover:bg-[#2F5A9E] text-white font-black text-base flex items-center justify-center gap-3 shadow-lg transition-all active:scale-[0.98] disabled:opacity-70 border-none"
-                    >
-                      <ArrowRight className="h-4 w-4" />
-                      {isLogging ? 'Logging...' : `Log Entry ${selectedRoom}`}
-                    </Button>
-                  </div>
+                  <Button 
+                    onClick={() => handleLogEntry(selectedRoom)}
+                    disabled={isLogging}
+                    className="w-full h-12 rounded-2xl bg-[#3D5C99] dark:bg-[#3D6DB5] hover:bg-[#3D5C99]/90 dark:hover:bg-[#2F5A9E] text-white font-black text-base flex items-center justify-center gap-3 shadow-lg transition-all active:scale-[0.98] disabled:opacity-70 border-none"
+                  >
+                    <ArrowRight className="h-4 w-4" />
+                    {isLogging ? 'Logging...' : `Log Entry ${selectedRoom}`}
+                  </Button>
                 </CardContent>
               </Card>
             ) : (

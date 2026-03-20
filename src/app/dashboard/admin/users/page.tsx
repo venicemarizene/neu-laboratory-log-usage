@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useState, useEffect, useMemo } from 'react';
@@ -144,8 +143,8 @@ export default function UserManagementPage() {
             <TableBody>
               {filteredUsers.map((user) => (
                 <TableRow key={user.id} className="border-b border-[#C5D3E8] dark:border-slate-800 hover:bg-slate-50/30 dark:hover:bg-slate-800/30 transition-colors h-20">
-                  <TableCell className="px-8 text-center">
-                    <div className="flex flex-col items-center">
+                  <TableCell className="px-8 text-left">
+                    <div className="flex flex-col items-start">
                       <span className="font-bold text-slate-800 dark:text-slate-200">{user.name}</span>
                       <span className="text-[11px] text-slate-400 font-medium">{user.email}</span>
                     </div>

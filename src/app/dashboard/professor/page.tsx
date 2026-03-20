@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useState, useEffect, useRef, useMemo } from 'react';
@@ -43,6 +44,8 @@ import { setDocumentNonBlocking, updateDocumentNonBlocking } from '@/firebase/no
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { cn } from '@/lib/utils';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
+import { format } from 'date-fns';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 /**
  * Renders a suggestion box for Subject/Class Section.
@@ -254,6 +257,13 @@ export default function ProfessorDashboard() {
 
   const { data: personalLogs } = useCollection(personalLogsQuery);
 
+  const recentSessions = useMemo(() => {
+    if (!personalLogs) return [];
+    return personalLogs
+      .filter(log => log.status === 'Completed')
+      .slice(0, 5);
+  }, [personalLogs]);
+
   useEffect(() => {
     let interval: any;
     if (activeSession?.startTime) {
@@ -419,6 +429,22 @@ export default function ProfessorDashboard() {
         requestResourceData: { status: 'Completed' }
       }));
     }
+  };
+
+  const calculateDuration = (start: string, end?: string) => {
+    if (!start || !end) return "—";
+    const diffMs = new Date(end).getTime() - new Date(start).getTime();
+    if (diffMs <= 0) return "—";
+
+    if (diffMs < 60000) {
+      return `${Math.floor(diffMs / 1000)}s`;
+    }
+    const diffMins = Math.floor(diffMs / 60000);
+    if (diffMins < 60) return `${diffMins}m`;
+
+    const h = Math.floor(diffMins / 60);
+    const m = diffMins % 60;
+    return `${h}h ${m}m`;
   };
 
   const fullName = user?.displayName || 'Professor';
@@ -604,6 +630,93 @@ export default function ProfessorDashboard() {
                   </CardContent>
                 </Card>
               )}
+
+              {/* Recent Sessions Card */}
+              <Card className="w-full border border-[var(--color-border)] shadow-sm rounded-[24px] overflow-hidden bg-[var(--color-card-bg)] p-6">
+                <div className="flex items-center justify-between mb-6">
+                  <h3 className="text-base font-semibold text-[var(--color-text-primary)]">Recent Sessions</h3>
+                </div>
+
+                {/* Desktop Table View */}
+                <div className="hidden md:block">
+                  <div className="rounded-xl overflow-hidden border border-[var(--color-border)]">
+                    <Table>
+                      <TableHeader className="bg-[var(--color-accent-bg)] border-none">
+                        <TableRow className="hover:bg-transparent border-none">
+                          <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-[var(--color-text-secondary)] h-10">Room</TableHead>
+                          <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-[var(--color-text-secondary)] h-10">Subject</TableHead>
+                          <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-[var(--color-text-secondary)] h-10">Class Section</TableHead>
+                          <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-[var(--color-text-secondary)] h-10">Date</TableHead>
+                          <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-[var(--color-text-secondary)] h-10">Duration</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {recentSessions.length > 0 ? (
+                          recentSessions.map((log, index) => (
+                            <TableRow 
+                              key={log.id} 
+                              className={cn(
+                                "border-b border-[var(--color-border)] last:border-none h-14",
+                                index % 2 === 0 ? "bg-[var(--color-card-bg)]" : "bg-[var(--color-page-bg)]"
+                              )}
+                            >
+                              <TableCell className="font-black text-primary text-sm">{log.roomId}</TableCell>
+                              <TableCell className="text-sm font-medium text-[var(--color-text-secondary)]">{log.subject || "—"}</TableCell>
+                              <TableCell className="text-sm font-medium text-[var(--color-text-secondary)]">{log.classSection || "—"}</TableCell>
+                              <TableCell className="text-xs font-bold text-[var(--color-text-secondary)]">
+                                {log.startTime ? format(new Date(log.startTime), "MMM d '·' h:mm a") : "—"}
+                              </TableCell>
+                              <TableCell className="text-xs font-bold text-[var(--color-text-secondary)]">
+                                {calculateDuration(log.startTime, log.endTime)}
+                              </TableCell>
+                            </TableRow>
+                          ))
+                        ) : (
+                          <TableRow>
+                            <TableCell colSpan={5} className="h-32 text-center text-sm font-medium text-[var(--color-text-tertiary)] italic">
+                              No sessions recorded yet.
+                            </TableCell>
+                          </TableRow>
+                        )}
+                      </TableBody>
+                    </Table>
+                  </div>
+                </div>
+
+                {/* Mobile Stacked List View */}
+                <div className="md:hidden space-y-2">
+                  {recentSessions.length > 0 ? (
+                    recentSessions.map((log) => (
+                      <div 
+                        key={log.id} 
+                        className="bg-[var(--color-card-bg)] rounded-[16px] border border-[var(--color-border)] p-4 flex items-center justify-between gap-4"
+                      >
+                        <div className="flex items-center gap-3 shrink-0">
+                          <Badge className="bg-primary/10 text-primary border-none font-black text-xs px-3 h-8 flex items-center justify-center rounded-xl min-w-[54px]">
+                            {log.roomId}
+                          </Badge>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-bold text-[var(--color-text-primary)] truncate">{log.subject || "—"}</p>
+                          <p className="text-[11px] font-medium text-[var(--color-text-tertiary)] truncate">{log.classSection || "—"}</p>
+                        </div>
+                        <div className="text-right shrink-0">
+                          <p className="text-[10px] font-bold text-[var(--color-text-secondary)]">
+                            {log.startTime ? format(new Date(log.startTime), "MMM d") : "—"}
+                          </p>
+                          <p className="text-[10px] font-medium text-[var(--color-text-tertiary)]">
+                            {calculateDuration(log.startTime, log.endTime)}
+                          </p>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="h-32 flex items-center justify-center text-sm font-medium text-[var(--color-text-tertiary)] italic bg-[var(--color-accent-bg)]/30 rounded-2xl">
+                      No sessions recorded yet.
+                    </div>
+                  )}
+                </div>
+              </Card>
             </div>
           </div>
 

@@ -152,17 +152,8 @@ export default function RoomManagementPage() {
         </Card>
       </div>
 
-      {/* Filters */}
-      <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-        <div className="relative w-full md:w-80">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-          <Input 
-            placeholder="Search room or faculty..." 
-            className="pl-10 h-11 rounded-xl bg-background border-[#C5D3E8] dark:border-slate-700 text-xs font-bold shadow-sm focus-visible:ring-primary"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
+      {/* Filters Row */}
+      <div className="flex justify-end">
         <div className="flex bg-slate-100 dark:bg-slate-900 p-1 rounded-xl w-full md:w-auto border border-[#C5D3E8] dark:border-slate-800">
           {(['All', 'Occupied', 'Vacant'] as FilterType[]).map((f) => (
             <Button
@@ -183,10 +174,20 @@ export default function RoomManagementPage() {
 
       {/* Main Two-Column Layout */}
       <div className="grid grid-cols-1 md:grid-cols-12 gap-8 h-[600px]">
-        {/* Left Column: List */}
-        <Card className={cn(cardBaseStyle, "md:col-span-5 flex flex-col hover:translate-y-0")}>
+        {/* Left Column: List + Search Unified Card */}
+        <Card className="md:col-span-5 flex flex-col bg-[#F4F7FC] dark:bg-[#3D4966] border border-[#C5D3E8] dark:border-slate-800 rounded-[12px] overflow-hidden p-4 shadow-[0_2px_8px_rgba(45,58,107,0.08)] transition-all">
+          <div className="relative mb-4">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+            <Input 
+              placeholder="Search room or faculty..." 
+              className="pl-10 h-11 rounded-xl bg-background border-[#C5D3E8] dark:border-slate-700 text-xs font-bold shadow-sm focus-visible:ring-primary"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+          
           <ScrollArea className="flex-1">
-            <div className="p-4 space-y-1">
+            <div className="space-y-1 pr-2">
               {filteredRooms.map((roomId) => {
                 const occupancy = roomOccupancy[roomId];
                 const isActive = selectedRoomId === roomId;
@@ -198,7 +199,7 @@ export default function RoomManagementPage() {
                       "w-full flex items-center justify-between p-4 rounded-2xl transition-all duration-200 group",
                       isActive 
                         ? "bg-primary text-white shadow-lg shadow-primary/20" 
-                        : "text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/50"
+                        : "text-slate-600 dark:text-slate-300 hover:bg-white/50 dark:hover:bg-slate-800/50"
                     )}
                   >
                     <div className="flex items-center gap-4">

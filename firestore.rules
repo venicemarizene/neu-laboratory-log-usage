@@ -70,10 +70,11 @@ service cloud.firestore {
      * Prioritize ownership check to allow professors to query their own sessions.
      */
     match /room_logs/{logId} {
-      allow get, list: if isSignedIn() && (
+      // Use 'read' to cover both 'get' and 'list' with a consistent ownership check
+      allow read: if isSignedIn() && (
         isAdmin() || 
-        resource.data.professorId == request.auth.uid ||
-        resource.data.uid == request.auth.uid
+        (resource != null && resource.data.professorId == request.auth.uid) ||
+        (resource == null && request.query.limit <= 100) // Allow list query initiation
       );
       allow create: if isSignedIn() && request.resource.data.professorId == request.auth.uid;
       allow update: if isSignedIn() && (

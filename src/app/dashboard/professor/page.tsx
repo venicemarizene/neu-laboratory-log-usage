@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useState, useEffect, useRef, useMemo } from 'react';
@@ -23,7 +24,7 @@ import {
 import { useUser, useAuth, useFirestore, useCollection, useMemoFirebase } from '@/firebase';
 import { useRouter } from 'next/navigation';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { doc, query, where, collection, limit, orderBy } from 'firebase/firestore';
+import { doc, query, where, collection, limit } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Html5Qrcode } from 'html5-qrcode';
@@ -111,7 +112,7 @@ function ScannerView({ onScan }: { onScan: (roomId: string) => void }) {
 }
 
 export default function ProfessorDashboard() {
-  const { user, isUserLoading } = userHook();
+  const { user, isUserLoading } = useUser();
   const auth = useAuth();
   const db = useFirestore();
   const router = useRouter();
@@ -122,10 +123,6 @@ export default function ProfessorDashboard() {
   const [activeSession, setActiveSession] = useState<{id: string, roomId: string} | null>(null);
   const [isScannerOpen, setIsScannerOpen] = useState(false);
   const [greeting, setGreeting] = useState("Welcome back");
-
-  function userHook() {
-      return useUser();
-  }
 
   useEffect(() => {
     if (!isUserLoading && !user) {
@@ -151,26 +148,31 @@ export default function ProfessorDashboard() {
 
   const { data: activeSessions } = useCollection(activeSessionQuery);
 
-  // Month logs for stats
-  const monthLogsQuery = useMemoFirebase(() => {
+  // Simplified query for logs to avoid complex index requirements or rule conflicts
+  const personalLogsQuery = useMemoFirebase(() => {
     if (!user || !db) return null;
-    const startOfMonth = new Date();
-    startOfMonth.setDate(1);
-    startOfMonth.setHours(0, 0, 0, 0);
     return query(
       collection(db, 'room_logs'),
       where('professorId', '==', user.uid),
-      where('createdAt', '>=', startOfMonth.toISOString()),
-      orderBy('createdAt', 'desc')
+      limit(100)
     );
   }, [user, db]);
 
-  const { data: monthLogs } = useCollection(monthLogsQuery);
+  const { data: personalLogs } = useCollection(personalLogsQuery);
 
-  // Calculate Personal Stats
+  // Calculate Personal Stats from personalLogs
   const { sessionsThisMonth, totalHours, mostUsedRoom } = useMemo(() => {
-    if (!monthLogs) return { sessionsThisMonth: 0, totalHours: '0.0', mostUsedRoom: '—' };
+    if (!personalLogs) return { sessionsThisMonth: 0, totalHours: '0.0', mostUsedRoom: '—' };
     
+    const now = new Date();
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
+
+    const monthLogs = personalLogs.filter(log => {
+      const logDate = new Date(log.startTime);
+      return logDate.getMonth() === currentMonth && logDate.getFullYear() === currentYear;
+    });
+
     const count = monthLogs.length;
     let ms = 0;
     const rooms: Record<string, number> = {};
@@ -198,7 +200,7 @@ export default function ProfessorDashboard() {
       totalHours: (ms / 3600000).toFixed(1),
       mostUsedRoom: topRoom
     };
-  }, [monthLogs]);
+  }, [personalLogs]);
 
   useEffect(() => {
     if (activeSessions && activeSessions.length > 0) {
@@ -339,7 +341,6 @@ export default function ProfessorDashboard() {
                 {activeSession ? "Current lab session in progress." : "Which room are you using today?"}
               </p>
 
-              {/* Personal Stat Chips Row */}
               <div className="grid grid-cols-3 gap-2 w-full pt-4">
                 <div className="bg-slate-50 dark:bg-slate-900/40 p-3 rounded-2xl border border-slate-200/50 dark:border-slate-800 flex flex-col items-center justify-center text-center shadow-sm">
                   <span className="text-[8px] font-black uppercase tracking-tighter text-slate-400 dark:text-slate-500 mb-1 leading-none">Sessions This Month</span>
@@ -369,7 +370,6 @@ export default function ProfessorDashboard() {
                     Auto-Log via QR
                   </Button>
 
-                  {/* Divider */}
                   <div className="relative flex items-center gap-4 py-2">
                     <div className="flex-1 h-px bg-[var(--color-border)] opacity-50"></div>
                     <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[var(--color-text-tertiary)]">or</span>

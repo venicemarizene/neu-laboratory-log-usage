@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useState, useEffect, useMemo } from 'react';
@@ -30,8 +31,8 @@ import {
   TableRow 
 } from '@/components/ui/table';
 import { Input } from '@/components/ui/input';
-import { useCollection, useFirestore, useMemoFirebase, useUser } from '@/firebase';
-import { collection, query, orderBy, limit, where } from 'firebase/firestore';
+import { useCollection, useFirestore, useMemoFirebase, useUser, useDoc } from '@/firebase';
+import { collection, query, orderBy, limit, where, doc } from 'firebase/firestore';
 import { LAB_ROOMS } from '@/lib/constants';
 import { cn } from '@/lib/utils';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -80,10 +81,18 @@ export default function AdminDashboard() {
 
   const db = useFirestore();
 
+  // Guard: Verify user role before executing administrative queries
+  const profileRef = useMemoFirebase(() => {
+    if (!user || !db) return null;
+    return doc(db, 'user_profiles', user.uid);
+  }, [user, db]);
+  const { data: profile } = useDoc(profileRef);
+  const isAdmin = profile?.role === 'Admin';
+
   const usersQuery = useMemoFirebase(() => {
-    if (!db || !user) return null;
+    if (!db || !user || !isAdmin) return null;
     return collection(db, 'user_profiles');
-  }, [db, user]);
+  }, [db, user, isAdmin]);
   const { data: users } = useCollection(usersQuery as any);
 
   // Create a lookup map for names to handle legacy logs or missing fields
@@ -96,7 +105,7 @@ export default function AdminDashboard() {
   }, [users]);
 
   const logsQuery = useMemoFirebase(() => {
-    if (!db || !user) return null;
+    if (!db || !user || !isAdmin) return null;
     let q = query(collection(db, 'room_logs'), orderBy('createdAt', 'desc'));
 
     const today = new Date();
@@ -119,7 +128,7 @@ export default function AdminDashboard() {
     }
 
     return query(q, limit(100));
-  }, [db, user, filterLabel, customFrom, customTo]);
+  }, [db, user, filterLabel, customFrom, customTo, isAdmin]);
   
   const { data: logs } = useCollection(logsQuery as any);
 
@@ -127,7 +136,7 @@ export default function AdminDashboard() {
     setMounted(true);
   }, []);
 
-  if (!mounted || !user) return null;
+  if (!mounted || !user || !isAdmin) return null;
 
   const activeLogsCount = logs?.filter(l => l.status === 'Active').length || 0;
   const uniqueFacultyCount = new Set(logs?.map(l => l.professorId)).size || 0;

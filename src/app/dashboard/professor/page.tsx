@@ -134,13 +134,15 @@ export default function ProfessorDashboard() {
     let hideTimer: NodeJS.Timeout;
 
     if (showSuccess) {
+      // Show for 4 seconds, then start fade
       fadeTimer = setTimeout(() => {
         setIsFading(true);
+        // Fade for 0.5 seconds, then remove from DOM
         hideTimer = setTimeout(() => {
           setShowSuccess(false);
           setIsFading(false);
-        }, 500); // Wait for transition duration
-      }, 4000); // Show for 4 seconds
+        }, 500); 
+      }, 4000);
     }
 
     return () => {
@@ -307,7 +309,7 @@ export default function ProfessorDashboard() {
     updateDocumentNonBlocking(logRef, updateData);
     
     setActiveSession(null);
-    setShowSuccess(false); // Clear any pending success message on session end
+    setShowSuccess(false); 
     await auth.signOut();
     router.push('/login');
 
@@ -509,7 +511,7 @@ export default function ProfessorDashboard() {
                     </div>
 
                     <div className="space-y-4">
-                      {/* Success message integrated into session card */}
+                      {/* Success message integrated into session card with fade-out */}
                       {showSuccess && (
                         <div className={cn(
                           "inline-flex mx-auto bg-[var(--color-status-active-bg)] border border-transparent text-[var(--color-status-active-text)] px-4 py-3 rounded-xl items-center gap-3 shadow-sm transition-opacity duration-500",

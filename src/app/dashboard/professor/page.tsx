@@ -627,10 +627,10 @@ export default function ProfessorDashboard() {
                     <Table>
                       <TableHeader className="bg-[var(--color-accent-bg)] border-none">
                         <TableRow className="hover:bg-transparent border-none">
-                          <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-[var(--color-text-secondary)] h-10">Room</TableHead>
-                          <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-[var(--color-text-secondary)] h-10 flex-1">Subject</TableHead>
-                          <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-[var(--color-text-secondary)] h-10">Class Section</TableHead>
-                          <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-[var(--color-text-secondary)] h-10">Date</TableHead>
+                          <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-[var(--color-text-secondary)] h-10 text-center">Room</TableHead>
+                          <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-[var(--color-text-secondary)] h-10 flex-1 text-center">Subject</TableHead>
+                          <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-[var(--color-text-secondary)] h-10 text-center">Class Section</TableHead>
+                          <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-[var(--color-text-secondary)] h-10 text-center">Date</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
@@ -643,10 +643,10 @@ export default function ProfessorDashboard() {
                                 index % 2 === 0 ? "bg-[var(--color-card-bg)]" : "bg-[var(--color-page-bg)]"
                               )}
                             >
-                              <TableCell className="font-black text-primary text-sm">{log.roomId}</TableCell>
-                              <TableCell className="text-sm font-medium text-[var(--color-text-secondary)]">{log.subject || "—"}</TableCell>
-                              <TableCell className="text-sm font-medium text-[var(--color-text-secondary)]">{log.classSection || "—"}</TableCell>
-                              <TableCell className="text-xs font-bold text-[var(--color-text-secondary)]">
+                              <TableCell className="font-black text-primary text-sm text-center">{log.roomId}</TableCell>
+                              <TableCell className="text-sm font-medium text-[var(--color-text-secondary)] text-center">{log.subject || "—"}</TableCell>
+                              <TableCell className="text-sm font-medium text-[var(--color-text-secondary)] text-center">{log.classSection || "—"}</TableCell>
+                              <TableCell className="text-xs font-bold text-[var(--color-text-secondary)] text-center">
                                 {log.startTime ? format(new Date(log.startTime), "MMM d '·' h:mm a") : "—"}
                               </TableCell>
                             </TableRow>

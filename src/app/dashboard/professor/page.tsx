@@ -373,6 +373,11 @@ export default function ProfessorDashboard() {
             </div>
           )}
 
+          {/* Mobile-only Greeting at the very top */}
+          <div className="md:hidden w-full">
+            <GreetingContent />
+          </div>
+
           {/* Main Content Layout Grid */}
           <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start relative">
             
@@ -428,9 +433,11 @@ export default function ProfessorDashboard() {
               {!activeSession ? (
                 <Card className="w-full border-none shadow-2xl rounded-[40px] overflow-hidden bg-[var(--color-card-bg)]">
                   <CardContent className="p-8 md:p-12 space-y-8">
-                    {/* Greeting integrated into action card */}
-                    <GreetingContent />
-                    <Separator className="bg-[var(--color-border)] opacity-50 -mt-2 mb-8" />
+                    {/* Greeting integrated into action card for desktop, hidden on mobile */}
+                    <div className="hidden md:block">
+                      <GreetingContent />
+                      <Separator className="bg-[var(--color-border)] opacity-50 -mt-2 mb-8" />
+                    </div>
 
                     <Button 
                       onClick={() => setIsScannerOpen(true)}
@@ -478,9 +485,11 @@ export default function ProfessorDashboard() {
               ) : (
                 <Card className="w-full border-none shadow-2xl rounded-[40px] overflow-hidden bg-[var(--color-card-bg)]">
                   <CardContent className="p-8 md:p-16 space-y-10 text-center">
-                    {/* Greeting integrated into action card */}
-                    <GreetingContent />
-                    <Separator className="bg-[var(--color-border)] opacity-50 -mt-2 mb-10" />
+                    {/* Greeting integrated into action card for desktop, hidden on mobile */}
+                    <div className="hidden md:block">
+                      <GreetingContent />
+                      <Separator className="bg-[var(--color-border)] opacity-50 -mt-2 mb-10" />
+                    </div>
 
                     <div className="space-y-4">
                       <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-5 py-2 rounded-full mb-4">

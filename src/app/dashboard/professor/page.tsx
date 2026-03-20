@@ -625,21 +625,23 @@ export default function ProfessorDashboard() {
             "max-sm:fixed max-sm:bottom-0 max-sm:left-0 max-sm:right-0 max-sm:max-w-none max-sm:translate-x-0 max-sm:translate-y-0 max-sm:h-[85vh] max-sm:rounded-t-[32px] max-sm:flex max-sm:flex-col" // Mobile bottom sheet styling
           )}
         >
-          {/* Mobile Drag Handle */}
-          <div className="md:hidden w-12 h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full mx-auto mt-4 shrink-0" />
+          {/* FIXED HEADER: Drag Handle + DialogHeader */}
+          <div className="shrink-0">
+            {/* Mobile Drag Handle */}
+            <div className="md:hidden w-12 h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full mx-auto mt-4 mb-2" />
+            <DialogHeader className="p-6 sm:p-0 sm:mb-8 bg-transparent border-b sm:border-none border-[var(--color-border)] relative flex flex-row items-center justify-between">
+              <DialogTitle className="text-xl font-black text-[var(--color-text-primary)] tracking-tight">Confirm Laboratory Session</DialogTitle>
+            </DialogHeader>
+          </div>
 
-          <DialogHeader className="p-6 sm:p-0 sm:mb-8 bg-transparent border-b sm:border-none border-[var(--color-border)] relative flex flex-row items-center justify-between shrink-0">
-            <DialogTitle className="text-xl font-black text-[var(--color-text-primary)] tracking-tight">Confirm Laboratory Session</DialogTitle>
-          </DialogHeader>
-
-          {/* Scrollable Content Area */}
+          {/* SCROLLABLE MIDDLE SECTION */}
           <div className="flex-1 overflow-y-auto p-6 sm:p-0 space-y-8">
             <div className="flex items-center gap-3 bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 p-4 rounded-2xl">
               <CheckCircle2 className="h-6 w-6" />
               <span className="font-black text-lg">Room {scannedRoomId} detected</span>
             </div>
 
-            <div className="space-y-6 pb-20 sm:pb-0">
+            <div className="space-y-6 pb-12 sm:pb-0">
               {/* Subject Input with Suggestions */}
               <div className="relative space-y-4">
                 <label className="text-[11px] font-black uppercase tracking-[0.2em] text-[var(--color-text-tertiary)] ml-2">Subject</label>
@@ -680,8 +682,8 @@ export default function ProfessorDashboard() {
             </div>
           </div>
 
-          {/* Pinned Action Bar for Mobile */}
-          <div className="max-sm:sticky max-sm:bottom-0 max-sm:left-0 max-sm:right-0 p-6 sm:p-0 sm:mt-8 bg-[var(--color-card-bg)] border-t sm:border-none border-[var(--color-border)] shrink-0 z-10">
+          {/* FIXED FOOTER: Confirm Session Button */}
+          <div className="shrink-0 p-6 sm:p-0 sm:mt-8 bg-[var(--color-card-bg)] border-t sm:border-none border-[var(--color-border)] z-10">
             <Button 
               onClick={() => handleLogEntry(scannedRoomId)} 
               className="w-full h-16 rounded-[2rem] bg-primary text-white font-black text-lg flex items-center justify-center gap-4 shadow-lg transition-all active:scale-[0.98] border-none"

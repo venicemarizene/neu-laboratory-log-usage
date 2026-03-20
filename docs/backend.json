@@ -1,3 +1,4 @@
+
 {
   "entities": {
     "UserProfile": {
@@ -108,6 +109,14 @@
         "roomId": {
           "type": "string",
           "description": "Reference to the unique identifier of the Room entity that was used in this session."
+        },
+        "subject": {
+          "type": "string",
+          "description": "The academic subject or course being taught during this lab session."
+        },
+        "classSection": {
+          "type": "string",
+          "description": "The specific class section or group of students using the lab."
         },
         "startTime": {
           "type": "string",

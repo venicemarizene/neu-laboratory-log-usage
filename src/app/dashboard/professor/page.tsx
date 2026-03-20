@@ -5,6 +5,7 @@ import { useState, useEffect, useRef, useMemo } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
 import { 
   LogOut,
   QrCode,
@@ -24,15 +25,15 @@ import {
 import { useUser, useAuth, useFirestore, useCollection, useMemoFirebase } from '@/firebase';
 import { useRouter } from 'next/navigation';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { doc, query, where, collection, limit } from 'firebase/firestore';
+import { doc, query, where, collection, limit, orderBy } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Html5Qrcode } from 'html5-qrcode';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { setDocumentNonBlocking, updateDocumentNonBlocking } from '@/firebase/non-blocking-updates';
 import { ThemeToggle } from '@/components/ThemeToggle';
-import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 
 function ScannerView({ onScan }: { onScan: (roomId: string) => void }) {
   const { toast } = useToast();
@@ -121,12 +122,18 @@ export default function ProfessorDashboard() {
   const { toast } = useToast();
   
   const [selectedRoom, setSelectedRoom] = useState<string>("");
+  const [subject, setSubject] = useState<string>("");
+  const [classSection, setClassSection] = useState<string>("");
   const [isLogging, setIsLogging] = useState(false);
   const [activeSession, setActiveSession] = useState<{id: string, roomId: string} | null>(null);
   const [isScannerOpen, setIsScannerOpen] = useState(false);
   const [greeting, setGreeting] = useState("Welcome back");
   const [showSuccess, setShowSuccess] = useState(false);
   const [isFading, setIsFading] = useState(false);
+  
+  // Validation and Suggestions state
+  const [errors, setErrors] = useState<{subject?: string, classSection?: string, room?: string}>({});
+  const [activeInput, setActiveInput] = useState<'subject' | 'classSection' | null>(null);
 
   useEffect(() => {
     let fadeTimer: NodeJS.Timeout;
@@ -176,11 +183,41 @@ export default function ProfessorDashboard() {
     return query(
       collection(db, 'room_logs'),
       where('professorId', '==', user.uid),
+      orderBy('startTime', 'desc'),
       limit(100)
     );
   }, [user, db]);
 
   const { data: personalLogs } = useCollection(personalLogsQuery);
+
+  // Derive unique last 5 suggestions
+  const suggestions = useMemo(() => {
+    if (!personalLogs) return { subjects: [], classSections: [] };
+    
+    const subjectsSet = new Set<string>();
+    const sectionsSet = new Set<string>();
+    
+    for (const log of personalLogs) {
+      if (log.subject && subjectsSet.size < 5) subjectsSet.add(log.subject);
+      if (log.classSection && sectionsSet.size < 5) sectionsSet.add(log.classSection);
+      if (subjectsSet.size === 5 && sectionsSet.size === 5) break;
+    }
+    
+    return {
+      subjects: Array.from(subjectsSet),
+      classSections: Array.from(sectionsSet)
+    };
+  }, [personalLogs]);
+
+  const filteredSuggestions = useMemo(() => {
+    if (activeInput === 'subject') {
+      return suggestions.subjects.filter(s => s.toLowerCase().includes(subject.toLowerCase()));
+    }
+    if (activeInput === 'classSection') {
+      return suggestions.classSections.filter(s => s.toLowerCase().includes(classSection.toLowerCase()));
+    }
+    return [];
+  }, [activeInput, suggestions, subject, classSection]);
 
   const { sessionsThisMonth, totalHours, mostUsedRoom } = useMemo(() => {
     if (!personalLogs) return { sessionsThisMonth: 0, totalHours: '0.0', mostUsedRoom: '—' };
@@ -246,16 +283,17 @@ export default function ProfessorDashboard() {
   };
 
   const handleLogEntry = (roomId: string) => {
-    if (!user || !db || isLogging || !roomId) {
-      if (!roomId) {
-        toast({
-          variant: 'destructive',
-          title: 'Room Required',
-          description: 'Please select a laboratory room before logging an entry.',
-        });
-      }
+    const newErrors: {subject?: string, classSection?: string, room?: string} = {};
+    if (!roomId) newErrors.room = "Room is required";
+    if (!subject.trim()) newErrors.subject = "This field is required.";
+    if (!classSection.trim()) newErrors.classSection = "This field is required.";
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
       return;
     }
+
+    if (!user || !db || isLogging) return;
 
     if (activeSession) {
       toast({
@@ -277,6 +315,8 @@ export default function ProfessorDashboard() {
       professorId: user.uid,
       professorName: user.displayName || 'Professor',
       roomId: roomId,
+      subject: subject.trim(),
+      classSection: classSection.trim(),
       startTime: now,
       status: 'Active',
       createdAt: now,
@@ -289,6 +329,11 @@ export default function ProfessorDashboard() {
     setShowSuccess(true);
     setIsFading(false);
     setIsLogging(false);
+    
+    // Reset form
+    setSubject("");
+    setClassSection("");
+    setSelectedRoom("");
   };
 
   const handleEndSession = async () => {
@@ -367,6 +412,51 @@ export default function ProfessorDashboard() {
       </Button>
     </div>
   );
+
+  const SuggestionBox = ({ type, items, onSelect }: { type: 'subject' | 'classSection', items: string[], onSelect: (val: string) => void }) => {
+    if (items.length === 0) return null;
+    return (
+      <div className="w-full">
+        {/* Desktop Suggestion List */}
+        <div className="hidden md:block absolute z-20 w-full top-full mt-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-xl overflow-hidden">
+          {items.map((item, idx) => (
+            <button
+              key={idx}
+              type="button"
+              onMouseDown={(e) => {
+                e.preventDefault(); // Prevent blur before selection
+                onSelect(item);
+              }}
+              className="w-full text-left px-6 py-3 text-sm font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors border-b last:border-none border-slate-50 dark:border-slate-800"
+            >
+              {item}
+            </button>
+          ))}
+        </div>
+        {/* Mobile Suggestion Chips */}
+        <div className="md:hidden mt-2">
+          <ScrollArea className="w-full whitespace-nowrap">
+            <div className="flex gap-2 pb-2">
+              {items.map((item, idx) => (
+                <button
+                  key={idx}
+                  type="button"
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    onSelect(item);
+                  }}
+                  className="inline-flex items-center px-4 h-9 bg-slate-100 dark:bg-slate-800 rounded-full text-xs font-black text-primary dark:text-blue-400 border border-slate-200 dark:border-slate-700 transition-all active:scale-95"
+                >
+                  {item}
+                </button>
+              ))}
+            </div>
+            <ScrollBar orientation="horizontal" />
+          </ScrollArea>
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div className="min-h-screen bg-[var(--color-page-bg)] flex flex-col font-body antialiased transition-colors">
@@ -452,7 +542,6 @@ export default function ProfessorDashboard() {
               {!activeSession ? (
                 <Card className="w-full border-none shadow-2xl rounded-[40px] overflow-hidden bg-[var(--color-card-bg)]">
                   <CardContent className="p-8 md:p-12 space-y-8">
-                    {/* Internal greeting removed for desktop as it's now outside */}
                     <div className="space-y-8">
                       <Button 
                         onClick={() => setIsScannerOpen(true)}
@@ -468,22 +557,95 @@ export default function ProfessorDashboard() {
                         <div className="flex-1 h-px bg-[var(--color-border)] opacity-50"></div>
                       </div>
 
-                      <div className="space-y-4">
-                        <label className="text-[11px] font-black uppercase tracking-[0.2em] text-[var(--color-text-tertiary)] ml-2">
-                          Institutional Laboratory Unit
-                        </label>
-                        <Select value={selectedRoom} onValueChange={setSelectedRoom}>
-                          <SelectTrigger className="h-14 rounded-[2rem] bg-[var(--color-accent-bg)] border-none text-lg font-black text-[var(--color-text-primary)] px-8 shadow-inner focus:ring-0 transition-colors">
-                            <SelectValue placeholder="Select Room" />
-                          </SelectTrigger>
-                          <SelectContent className="rounded-2xl border-none shadow-xl bg-[var(--color-card-bg)]">
-                            {LAB_ROOMS.map(room => (
-                              <SelectItem key={room} value={room} className="font-bold h-12 text-base">
-                                {room}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                      <div className="space-y-6">
+                        {/* Room Selection */}
+                        <div className="space-y-4">
+                          <label className="text-[11px] font-black uppercase tracking-[0.2em] text-[var(--color-text-tertiary)] ml-2">
+                            Institutional Laboratory Unit
+                          </label>
+                          <Select value={selectedRoom} onValueChange={(v) => {
+                            setSelectedRoom(v);
+                            setErrors(prev => ({...prev, room: ""}));
+                          }}>
+                            <SelectTrigger className={cn(
+                              "h-14 md:h-14 rounded-[2rem] bg-[var(--color-accent-bg)] border-none text-lg font-black text-[var(--color-text-primary)] px-8 shadow-inner focus:ring-0 transition-colors",
+                              errors.room && "ring-2 ring-red-500"
+                            )}>
+                              <SelectValue placeholder="Select Room" />
+                            </SelectTrigger>
+                            <SelectContent className="rounded-2xl border-none shadow-xl bg-[var(--color-card-bg)]">
+                              {LAB_ROOMS.map(room => (
+                                <SelectItem key={room} value={room} className="font-bold h-12 text-base">
+                                  {room}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+
+                        {/* Subject Input */}
+                        <div className="relative space-y-4">
+                          <label className="text-[11px] font-black uppercase tracking-[0.2em] text-[var(--color-text-tertiary)] ml-2">
+                            Subject
+                          </label>
+                          <Input
+                            placeholder="e.g. Data Structures"
+                            value={subject}
+                            onFocus={() => setActiveInput('subject')}
+                            onBlur={() => setTimeout(() => setActiveInput(null), 200)}
+                            onChange={(e) => {
+                              setSubject(e.target.value);
+                              if (errors.subject) setErrors(prev => ({...prev, subject: ""}));
+                            }}
+                            className={cn(
+                              "h-14 md:h-14 rounded-[2rem] bg-[var(--color-accent-bg)] border-none text-lg font-black text-[var(--color-text-primary)] px-8 shadow-inner transition-colors min-h-[48px]",
+                              errors.subject && "ring-2 ring-red-500"
+                            )}
+                          />
+                          {errors.subject && <p className="text-red-500 text-[12px] font-bold ml-4 mt-1">{errors.subject}</p>}
+                          {activeInput === 'subject' && (
+                            <SuggestionBox 
+                              type="subject" 
+                              items={filteredSuggestions} 
+                              onSelect={(val) => {
+                                setSubject(val);
+                                setActiveInput(null);
+                              }} 
+                            />
+                          )}
+                        </div>
+
+                        {/* Class Section Input */}
+                        <div className="relative space-y-4">
+                          <label className="text-[11px] font-black uppercase tracking-[0.2em] text-[var(--color-text-tertiary)] ml-2">
+                            Class Section
+                          </label>
+                          <Input
+                            placeholder="e.g. BSIT 2-1"
+                            value={classSection}
+                            onFocus={() => setActiveInput('classSection')}
+                            onBlur={() => setTimeout(() => setActiveInput(null), 200)}
+                            onChange={(e) => {
+                              setClassSection(e.target.value);
+                              if (errors.classSection) setErrors(prev => ({...prev, classSection: ""}));
+                            }}
+                            className={cn(
+                              "h-14 md:h-14 rounded-[2rem] bg-[var(--color-accent-bg)] border-none text-lg font-black text-[var(--color-text-primary)] px-8 shadow-inner transition-colors min-h-[48px]",
+                              errors.classSection && "ring-2 ring-red-500"
+                            )}
+                          />
+                          {errors.classSection && <p className="text-red-500 text-[12px] font-bold ml-4 mt-1">{errors.classSection}</p>}
+                          {activeInput === 'classSection' && (
+                            <SuggestionBox 
+                              type="classSection" 
+                              items={filteredSuggestions} 
+                              onSelect={(val) => {
+                                setClassSection(val);
+                                setActiveInput(null);
+                              }} 
+                            />
+                          )}
+                        </div>
                       </div>
 
                       <Button 
@@ -502,7 +664,7 @@ export default function ProfessorDashboard() {
                 <Card className="w-full border-none shadow-2xl rounded-[40px] overflow-hidden bg-[var(--color-card-bg)]">
                   <CardContent className="p-8 md:p-16 space-y-10 text-center flex flex-col items-center">
                     
-                    {/* Success Message - Positioned at the very top inside the card */}
+                    {/* Success Message */}
                     {showSuccess && (
                       <div className={cn(
                         "bg-[var(--color-status-active-bg)] border border-transparent text-[var(--color-status-active-text)] px-4 py-3 rounded-xl flex items-center gap-3 shadow-sm transition-opacity duration-500 w-full max-w-md mx-auto mb-6",
@@ -545,7 +707,7 @@ export default function ProfessorDashboard() {
 
           {/* Mobile User Profile Card - Always at bottom */}
           <div className="md:hidden w-full mt-4">
-            <UserProfileCard />
+            UserProfileCard()
           </div>
         </div>
       </main>

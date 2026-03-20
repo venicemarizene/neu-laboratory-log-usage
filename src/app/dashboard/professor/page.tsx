@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useState, useEffect, useRef, useMemo } from 'react';
@@ -505,11 +504,11 @@ export default function ProfessorDashboard() {
                       <GreetingContent />
                     </div>
 
-                    <div className="space-y-4">
+                    <div className="flex flex-col items-center gap-6">
                       {/* Success message integrated into session card with fade-out */}
                       {showSuccess && (
                         <div className={cn(
-                          "inline-flex mx-auto bg-[var(--color-status-active-bg)] border border-transparent text-[var(--color-status-active-text)] px-4 py-3 rounded-xl items-center gap-3 shadow-sm transition-opacity duration-500",
+                          "inline-flex bg-[var(--color-status-active-bg)] border border-transparent text-[var(--color-status-active-text)] px-4 py-3 rounded-xl items-center gap-3 shadow-sm transition-opacity duration-500",
                           isFading ? "opacity-0" : "opacity-100"
                         )}>
                           <CheckCircle2 className="h-5 w-5 shrink-0" />
@@ -519,11 +518,14 @@ export default function ProfessorDashboard() {
                         </div>
                       )}
 
-                      <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-5 py-2 rounded-full mb-4">
+                      <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-5 py-2 rounded-full">
                         <Clock className="h-4 w-4" />
                         <span className="text-[11px] font-black uppercase tracking-widest">Active Usage</span>
                       </div>
-                      <h2 className="text-6xl md:text-8xl font-black text-[var(--color-text-primary)] tracking-tighter">{activeSession.roomId}</h2>
+                      
+                      <h2 className="text-6xl md:text-8xl font-black text-[var(--color-text-primary)] tracking-tighter">
+                        {activeSession.roomId}
+                      </h2>
                     </div>
 
                     <Button 

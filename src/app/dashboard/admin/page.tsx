@@ -402,7 +402,7 @@ export default function AdminDashboard() {
                               {DAYS.map(d => <SelectItem key={d} value={d} className="text-[10px] font-bold">{d}</SelectItem>)}
                             </SelectContent>
                           </Select>
-                          <Select value={customFrom.year} onValueChange={(v) => setCustomFrom(prev, year: v}))}>
+                          <Select value={customFrom.year} onValueChange={(v) => setCustomFrom(prev => ({...prev, year: v}))}>
                             <SelectTrigger className="h-9 rounded-lg text-[10px] font-bold border-slate-200 dark:border-slate-700">
                               <SelectValue placeholder="Year" />
                             </SelectTrigger>
@@ -432,7 +432,7 @@ export default function AdminDashboard() {
                               {DAYS.map(d => <SelectItem key={d} value={d} className="text-[10px] font-bold">{d}</SelectItem>)}
                             </SelectContent>
                           </Select>
-                          <Select value={customTo.year} onValueChange={(v) => setCustomTo(prev, year: v}))}>
+                          <Select value={customTo.year} onValueChange={(v) => setCustomTo(prev => ({...prev, year: v}))}>
                             <SelectTrigger className="h-9 rounded-lg text-[10px] font-bold border-slate-200 dark:border-slate-700">
                               <SelectValue placeholder="Year" />
                             </SelectTrigger>

@@ -593,26 +593,27 @@ export default function ProfessorDashboard() {
         <DialogContent 
           className={cn(
             "p-0 overflow-hidden border-none bg-[var(--color-card-bg)] flex flex-col",
+            // Desktop specific layout
             "sm:max-w-[420px] sm:rounded-[14px] sm:p-8 sm:h-auto sm:max-h-[85vh]",
-            "max-sm:fixed max-sm:bottom-0 max-sm:left-0 max-sm:right-0 max-sm:max-w-none max-sm:translate-x-0 max-sm:translate-y-0 max-sm:h-[92dvh] max-sm:rounded-t-[32px]"
+            // Mobile full-screen layout
+            "max-sm:fixed max-sm:inset-0 max-sm:h-[100dvh] max-sm:w-[100vw] max-sm:max-w-none max-sm:rounded-none max-sm:translate-x-0 max-sm:translate-y-0 max-sm:justify-between"
           )}
         >
-          {/* Section 1: Fixed Header */}
-          <div className="shrink-0 z-20">
-            <div className="md:hidden w-12 h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full mx-auto mt-4 mb-2" />
-            <DialogHeader className="p-6 sm:p-0 sm:mb-8 bg-transparent border-b sm:border-none border-[var(--color-border)] relative flex flex-row items-center justify-between">
+          {/* Header & Inputs Area */}
+          <div className="flex flex-col flex-1 max-sm:p-4 max-sm:pt-0">
+            {/* Drag handle pill at the very top for mobile */}
+            <div className="md:hidden w-12 h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full mx-auto mt-4 mb-6" />
+            
+            <DialogHeader className="sm:mb-8 bg-transparent relative flex flex-row items-center justify-between mb-8">
               <DialogTitle className="text-xl font-black text-[var(--color-text-primary)] tracking-tight">Confirm Laboratory Session</DialogTitle>
             </DialogHeader>
-          </div>
 
-          {/* Section 2: Scrollable Middle Content */}
-          <div className="flex-1 overflow-y-auto p-6 sm:p-0 space-y-8 max-sm:pb-[100px]">
-            <div className="flex items-center gap-3 bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 p-4 rounded-2xl">
-              <CheckCircle2 className="h-6 w-6" />
-              <span className="font-black text-lg">Room {scannedRoomId} detected</span>
-            </div>
+            <div className="space-y-6 sm:space-y-8">
+              <div className="flex items-center gap-3 bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 p-4 rounded-2xl">
+                <CheckCircle2 className="h-6 w-6" />
+                <span className="font-black text-lg">Room {scannedRoomId} detected</span>
+              </div>
 
-            <div className="space-y-6">
               <div className="relative space-y-4">
                 <label className="text-[11px] font-black uppercase tracking-[0.2em] text-[var(--color-text-tertiary)] ml-2">Subject</label>
                 <Input 
@@ -651,11 +652,8 @@ export default function ProfessorDashboard() {
             </div>
           </div>
 
-          {/* Section 3: Fixed Footer */}
-          <div className={cn(
-            "shrink-0 p-6 sm:p-0 sm:mt-8 bg-[var(--color-card-bg)] border-t sm:border-none border-[var(--color-border)] z-10",
-            "max-sm:fixed max-sm:bottom-0 max-sm:left-0 max-sm:right-0 max-sm:bg-[var(--color-card-bg)] max-sm:p-4 max-sm:z-50"
-          )}>
+          {/* Footer Area with Pinned Button */}
+          <div className="p-4 sm:p-0 sm:mt-8">
             <Button 
               onClick={() => handleLogEntry(scannedRoomId)} 
               className="w-full h-16 rounded-[2rem] bg-primary text-white font-black text-lg flex items-center justify-center gap-4 shadow-lg transition-all active:scale-[0.98] border-none"

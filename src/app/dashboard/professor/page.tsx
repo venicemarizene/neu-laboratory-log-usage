@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useState, useEffect, useRef, useMemo } from 'react';
@@ -392,7 +393,11 @@ export default function ProfessorDashboard() {
 
           <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start relative">
             
-            <div className="md:col-span-4 flex flex-col gap-4 w-full md:border-r md:border-[var(--color-border)] md:pr-10">
+            {/* Left Column (Stats) */}
+            <div className={cn(
+              "md:col-span-4 flex flex-col gap-4 w-full md:border-r md:border-[var(--color-border)] md:pr-10",
+              activeSession ? "order-2 md:order-1" : "order-1 md:order-1"
+            )}>
               <label className="text-[13px] font-black uppercase tracking-[0.2em] text-slate-700 dark:text-white text-center w-full mb-2">
                 Usage Statistics
               </label>
@@ -434,7 +439,11 @@ export default function ProfessorDashboard() {
               </div>
             </div>
 
-            <div className="md:col-span-8 w-full flex flex-col gap-8">
+            {/* Right Column (Action/Session Cards) */}
+            <div className={cn(
+              "md:col-span-8 w-full flex flex-col gap-8",
+              activeSession ? "order-1 md:order-2" : "order-2 md:order-2"
+            )}>
               {!activeSession ? (
                 <Card className="w-full border-none shadow-2xl rounded-[40px] overflow-hidden bg-[var(--color-card-bg)]">
                   <CardContent className="p-8 md:p-12 space-y-8">
@@ -531,11 +540,12 @@ export default function ProfessorDashboard() {
                   </CardContent>
                 </Card>
               )}
-
-              <div className="md:hidden w-full mt-4">
-                <UserProfileCard />
-              </div>
             </div>
+          </div>
+
+          {/* Mobile User Profile Card - Always at bottom */}
+          <div className="md:hidden w-full mt-4">
+            <UserProfileCard />
           </div>
         </div>
       </main>

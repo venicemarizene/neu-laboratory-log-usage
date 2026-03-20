@@ -276,10 +276,12 @@ export default function AdminDashboard() {
     setIsFilterOpen(false);
   };
 
+  const cardBaseStyle = "border border-[#C5D3E8] shadow-[0_2px_8px_rgba(45,58,107,0.08)] hover:shadow-[0_4px_16px_rgba(45,58,107,0.14)] hover:-translate-y-1 transition-all duration-200 bg-[#F4F7FC] dark:bg-[#3D4966] rounded-[32px] overflow-hidden relative";
+
   return (
     <div className="p-8 space-y-8 max-w-[1400px] mx-auto">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className="border-none shadow-xl bg-primary text-white rounded-[32px] overflow-hidden relative">
+        <Card className={cn(cardBaseStyle, "bg-primary text-white border-none shadow-xl")}>
           <div className="absolute top-6 right-6 opacity-20">
             <Waves size={32} />
           </div>
@@ -294,7 +296,7 @@ export default function AdminDashboard() {
           </CardContent>
         </Card>
 
-        <Card className="border-none shadow-sm bg-card dark:bg-[#3D4966] rounded-[32px] overflow-hidden relative">
+        <Card className={cardBaseStyle}>
           <div className="absolute top-6 right-6 opacity-10 text-primary">
             <Users size={24} />
           </div>
@@ -309,7 +311,7 @@ export default function AdminDashboard() {
           </CardContent>
         </Card>
 
-        <Card className="border-none shadow-sm bg-card dark:bg-[#3D4966] rounded-[32px] overflow-hidden relative">
+        <Card className={cardBaseStyle}>
           <div className="absolute top-6 right-6 opacity-20 text-destructive">
             <Waves size={24} />
           </div>
@@ -325,7 +327,7 @@ export default function AdminDashboard() {
         </Card>
       </div>
 
-      <Card className="border-none shadow-sm bg-card dark:bg-[#3D4966] rounded-[32px] p-8">
+      <Card className={cn(cardBaseStyle, "p-8")}>
         <div className="mb-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div>
             <h2 className="text-lg font-black text-slate-900 dark:text-white">Computer Laboratory Distribution</h2>
@@ -335,7 +337,7 @@ export default function AdminDashboard() {
             variant="outline" 
             size="sm" 
             onClick={downloadChart}
-            className="rounded-xl font-bold gap-2 text-xs border-slate-200 dark:border-slate-700"
+            className="rounded-xl font-bold gap-2 text-xs border-[#C5D3E8] dark:border-slate-700"
           >
             <Download className="h-3.5 w-3.5" />
             Download Chart
@@ -344,7 +346,7 @@ export default function AdminDashboard() {
         <div className="h-[300px] w-full" ref={chartRef}>
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={labDistributionData} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#C5D3E8" />
               <XAxis 
                 dataKey="name" 
                 axisLine={false} 
@@ -357,8 +359,8 @@ export default function AdminDashboard() {
                 tick={{ fill: '#94a3b8', fontSize: 10, fontWeight: 700 }}
               />
               <Tooltip 
-                cursor={{ fill: 'rgba(255,255,255,0.05)' }}
-                contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
+                cursor={{ fill: 'rgba(45, 58, 107, 0.05)' }}
+                contentStyle={{ borderRadius: '16px', border: '1px solid #C5D3E8', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
               />
               <Bar dataKey="usage" radius={[4, 4, 0, 0]} barSize={24}>
                 {labDistributionData.map((entry, index) => (
@@ -370,8 +372,8 @@ export default function AdminDashboard() {
         </div>
       </Card>
 
-      <Card className="border-none shadow-sm bg-card dark:bg-[#3D4966] rounded-[32px] overflow-hidden">
-        <CardHeader className="p-8 border-b border-slate-50 dark:border-slate-800 flex flex-col md:flex-row items-center justify-between gap-4">
+      <Card className={cn(cardBaseStyle, "overflow-hidden")}>
+        <CardHeader className="p-8 border-b border-[#C5D3E8] dark:border-slate-800 flex flex-col md:flex-row items-center justify-between gap-4">
           <div>
             <h2 className="text-lg font-black text-slate-900 dark:text-white">Activity Logs</h2>
             <p className="text-xs font-bold text-slate-400">Search and filter institutional usage</p>
@@ -381,7 +383,7 @@ export default function AdminDashboard() {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
               <Input 
                 placeholder="Search faculty, lab, or subject..." 
-                className="pl-9 h-11 w-full md:w-64 rounded-xl bg-background border-slate-200 dark:border-slate-700 text-xs font-bold shadow-sm focus-visible:ring-primary"
+                className="pl-9 h-11 w-full md:w-64 rounded-xl bg-background border-[#C5D3E8] dark:border-slate-700 text-xs font-bold shadow-sm focus-visible:ring-primary"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -389,7 +391,7 @@ export default function AdminDashboard() {
             
             <Popover open={isFilterOpen} onOpenChange={setIsFilterOpen}>
               <PopoverTrigger asChild>
-                <div className="bg-background border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white h-11 px-4 rounded-xl flex items-center gap-2 font-bold cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors shadow-sm">
+                <div className="bg-background border border-[#C5D3E8] dark:border-slate-700 text-slate-900 dark:text-white h-11 px-4 rounded-xl flex items-center gap-2 font-bold cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors shadow-sm">
                   <CalendarIcon size={14} className="text-slate-400" />
                   <span className="text-xs">
                     {filterLabel === 'Custom Range' 
@@ -399,9 +401,9 @@ export default function AdminDashboard() {
                   <ChevronDown size={14} className="text-slate-400 ml-1" />
                 </div>
               </PopoverTrigger>
-              <PopoverContent align="end" className="w-[320px] sm:w-[500px] p-0 border-none shadow-2xl rounded-2xl overflow-hidden flex flex-col bg-card">
+              <PopoverContent align="end" className="w-[320px] sm:w-[500px] p-0 border border-[#C5D3E8] shadow-2xl rounded-2xl overflow-hidden flex flex-col bg-card">
                 <div className="flex flex-col md:flex-row">
-                  <div className="p-3 border-r border-slate-50 dark:border-slate-800 min-w-[160px] bg-slate-50/30 dark:bg-slate-900/30">
+                  <div className="p-3 border-r border-[#C5D3E8] dark:border-slate-800 min-w-[160px] bg-slate-50/30 dark:bg-slate-900/30">
                     <div className="space-y-1">
                       {['Daily Logs', 'Weekly Logs', 'Monthly Logs', 'All Logs'].map((option) => (
                         <Button
@@ -440,7 +442,7 @@ export default function AdminDashboard() {
                         <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Start Date</label>
                         <div className="grid grid-cols-3 gap-2">
                           <Select value={customFrom.month} onValueChange={(v) => setCustomFrom(prev => ({...prev, month: v}))}>
-                            <SelectTrigger className="h-9 rounded-lg text-[10px] font-bold border-slate-200 dark:border-slate-700">
+                            <SelectTrigger className="h-9 rounded-lg text-[10px] font-bold border-[#C5D3E8] dark:border-slate-700">
                               <SelectValue placeholder="Month" />
                             </SelectTrigger>
                             <SelectContent>
@@ -448,7 +450,7 @@ export default function AdminDashboard() {
                             </SelectContent>
                           </Select>
                           <Select value={customFrom.day} onValueChange={(v) => setCustomFrom(prev => ({...prev, day: v}))}>
-                            <SelectTrigger className="h-9 rounded-lg text-[10px] font-bold border-slate-200 dark:border-slate-700">
+                            <SelectTrigger className="h-9 rounded-lg text-[10px] font-bold border-[#C5D3E8] dark:border-slate-700">
                               <SelectValue placeholder="Day" />
                             </SelectTrigger>
                             <SelectContent>
@@ -456,7 +458,7 @@ export default function AdminDashboard() {
                             </SelectContent>
                           </Select>
                           <Select value={customFrom.year} onValueChange={(v) => setCustomFrom(prev => ({...prev, year: v}))}>
-                            <SelectTrigger className="h-9 rounded-lg text-[10px] font-bold border-slate-200 dark:border-slate-700">
+                            <SelectTrigger className="h-9 rounded-lg text-[10px] font-bold border-[#C5D3E8] dark:border-slate-700">
                               <SelectValue placeholder="Year" />
                             </SelectTrigger>
                             <SelectContent>
@@ -470,7 +472,7 @@ export default function AdminDashboard() {
                         <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">End Date</label>
                         <div className="grid grid-cols-3 gap-2">
                           <Select value={customTo.month} onValueChange={(v) => setCustomTo(prev => ({...prev, month: v}))}>
-                            <SelectTrigger className="h-9 rounded-lg text-[10px] font-bold border-slate-200 dark:border-slate-700">
+                            <SelectTrigger className="h-9 rounded-lg text-[10px] font-bold border-[#C5D3E8] dark:border-slate-700">
                               <SelectValue placeholder="Month" />
                             </SelectTrigger>
                             <SelectContent>
@@ -478,7 +480,7 @@ export default function AdminDashboard() {
                             </SelectContent>
                           </Select>
                           <Select value={customTo.day} onValueChange={(v) => setCustomTo(prev => ({...prev, day: v}))}>
-                            <SelectTrigger className="h-9 rounded-lg text-[10px] font-bold border-slate-200 dark:border-slate-700">
+                            <SelectTrigger className="h-9 rounded-lg text-[10px] font-bold border-[#C5D3E8] dark:border-slate-700">
                               <SelectValue placeholder="Day" />
                             </SelectTrigger>
                             <SelectContent>
@@ -486,7 +488,7 @@ export default function AdminDashboard() {
                             </SelectContent>
                           </Select>
                           <Select value={customTo.year} onValueChange={(v) => setCustomTo(prev => ({...prev, year: v}))}>
-                            <SelectTrigger className="h-9 rounded-lg text-[10px] font-bold border-slate-200 dark:border-slate-700">
+                            <SelectTrigger className="h-9 rounded-lg text-[10px] font-bold border-[#C5D3E8] dark:border-slate-700">
                               <SelectValue placeholder="Year" />
                             </SelectTrigger>
                             <SelectContent>
@@ -523,7 +525,7 @@ export default function AdminDashboard() {
         <CardContent className="p-0">
           <Table>
             <TableHeader className="bg-slate-50/50 dark:bg-slate-900/50">
-              <TableRow className="border-none hover:bg-transparent">
+              <TableRow className="border-b border-[#C5D3E8] dark:border-slate-800 hover:bg-transparent">
                 <TableHead className="px-8 h-12 text-[10px] font-black uppercase tracking-widest text-slate-900 dark:text-white">Professor</TableHead>
                 <TableHead className="hidden md:table-cell h-12 text-[10px] font-black uppercase tracking-widest text-slate-900 dark:text-white">Subject</TableHead>
                 <TableHead className="hidden md:table-cell h-12 text-[10px] font-black uppercase tracking-widest text-slate-900 dark:text-white">Class Section</TableHead>
@@ -536,7 +538,7 @@ export default function AdminDashboard() {
             </TableHeader>
             <TableBody>
               {filteredLogs.map((log) => (
-                <TableRow key={log.id} className="border-slate-50 dark:border-slate-800 hover:bg-slate-50/30 dark:hover:bg-slate-800/30 transition-colors h-16">
+                <TableRow key={log.id} className="border-b border-[#C5D3E8] dark:border-slate-800 hover:bg-slate-50/30 dark:hover:bg-slate-800/30 transition-colors h-16">
                   <TableCell className="px-8">
                     <div className="flex flex-col">
                       <span className="font-bold text-sm text-slate-800 dark:text-slate-200">
@@ -555,7 +557,7 @@ export default function AdminDashboard() {
                     </span>
                   </TableCell>
                   <TableCell className="text-center">
-                    <Badge variant="outline" className="rounded-full bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 px-3 py-0.5 text-[9px] font-black uppercase">
+                    <Badge variant="outline" className="rounded-full bg-slate-50 dark:bg-slate-900 border-[#C5D3E8] dark:border-slate-700 text-slate-600 dark:text-slate-400 px-3 py-0.5 text-[9px] font-black uppercase">
                       {log.roomId}
                     </Badge>
                   </TableCell>

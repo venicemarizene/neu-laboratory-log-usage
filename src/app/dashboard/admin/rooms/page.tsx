@@ -72,13 +72,13 @@ export default function RoomQrGeneratorPage() {
   return (
     <div className="flex h-[calc(100vh-80px)] overflow-hidden bg-slate-50/50 dark:bg-slate-950/50">
       {/* Left Panel: Sidebar List */}
-      <div className="w-80 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col">
-        <div className="p-6 border-b border-slate-100 dark:border-slate-800">
+      <div className="w-80 border-r border-[#C5D3E8] dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col">
+        <div className="p-6 border-b border-[#C5D3E8] dark:border-slate-800">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
             <Input 
               placeholder="Filter rooms..." 
-              className="pl-10 h-10 rounded-xl bg-slate-50 dark:bg-slate-800 border-none text-xs font-bold focus-visible:ring-primary"
+              className="pl-10 h-10 rounded-xl bg-slate-50 dark:bg-slate-800 border-[#C5D3E8] dark:border-slate-700 text-xs font-bold focus-visible:ring-primary"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -113,7 +113,7 @@ export default function RoomQrGeneratorPage() {
 
       {/* Right Panel: Preview Area */}
       <div className="flex-1 p-8 md:p-12 overflow-auto flex items-center justify-center">
-        <Card className="max-w-2xl w-full border-none shadow-2xl bg-white dark:bg-slate-900 rounded-[40px] overflow-hidden">
+        <Card className="max-w-2xl w-full border border-[#C5D3E8] shadow-[0_2px_8px_rgba(45,58,107,0.08)] hover:shadow-[0_4px_16px_rgba(45,58,107,0.14)] hover:-translate-y-1 transition-all duration-200 bg-[#F4F7FC] dark:bg-slate-900 rounded-[40px] overflow-hidden">
           <CardContent className="p-12 flex flex-col items-center gap-10">
             <div className="text-center space-y-2">
               <h3 className="text-4xl font-black text-slate-900 dark:text-white tracking-tighter">
@@ -143,7 +143,7 @@ export default function RoomQrGeneratorPage() {
               <Button 
                 onClick={() => openView(selectedRoom)}
                 variant="outline"
-                className="flex-1 h-14 rounded-2xl font-black text-sm gap-3 border-2 border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all active:scale-95"
+                className="flex-1 h-14 rounded-2xl font-black text-sm gap-3 border-2 border-[#C5D3E8] dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all active:scale-95"
               >
                 <Maximize2 className="h-5 w-5" />
                 View Full
@@ -157,7 +157,7 @@ export default function RoomQrGeneratorPage() {
               </Button>
             </div>
 
-            <div className="bg-slate-50 dark:bg-slate-800/50 p-6 rounded-3xl w-full border border-slate-100 dark:border-slate-800">
+            <div className="bg-slate-50 dark:bg-slate-800/50 p-6 rounded-3xl w-full border border-[#C5D3E8] dark:border-slate-800">
               <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Encoded Destination</p>
               <code className="text-[11px] font-bold text-primary break-all">
                 https://neu-laboratory-log-usage.vercel.app/login?room={selectedRoom}

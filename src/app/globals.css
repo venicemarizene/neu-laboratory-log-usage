@@ -17,8 +17,8 @@
   --color-border: #DDE3EE;
   --color-status-active-bg: #E4F2EC;
   --color-status-active-text: #2A5C47;
-  --color-status-blocked-bg: #FAEBEB;
-  --color-status-blocked-text: #7A2D2D;
+  --color-status-blocked-bg: #FEE2E2;
+  --color-status-blocked-text: #991B1B;
 
   /* shadcn/ui variables mapping */
   --background: 210 20% 98%;
@@ -56,8 +56,8 @@
   --color-border: #424F6A;
   --color-status-active-bg: #233A30;
   --color-status-active-text: #82C4A0;
-  --color-status-blocked-bg: #3A2228;
-  --color-status-blocked-text: #C49090;
+  --color-status-blocked-bg: #7F1D1D;
+  --color-status-blocked-text: #FFFFFF;
 
   /* shadcn/ui variables mapping for dim mode - updated to Deep Steel Blue #4A90D9 */
   --background: 222 24% 22%;

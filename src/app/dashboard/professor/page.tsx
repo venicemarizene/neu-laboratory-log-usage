@@ -305,8 +305,7 @@ export default function ProfessorDashboard() {
                   <div className="space-y-3">
                     <Button 
                       onClick={() => setIsScannerOpen(true)}
-                      variant="outline"
-                      className="w-full h-12 rounded-2xl bg-[var(--color-accent-bg)] border-none hover:opacity-80 text-[var(--color-text-secondary)] font-bold text-sm flex items-center justify-center gap-3 transition-all"
+                      className="w-full h-12 rounded-2xl bg-[#1E293B] dark:bg-[#334155] hover:opacity-90 text-white font-black text-base flex items-center justify-center gap-3 shadow-lg transition-all active:scale-[0.98]"
                     >
                       <QrCode className="h-4 w-4" />
                       Auto-Log via QR

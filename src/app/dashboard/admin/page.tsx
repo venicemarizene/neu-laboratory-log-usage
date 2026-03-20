@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useState, useEffect, useMemo } from 'react';
@@ -199,9 +198,19 @@ export default function AdminDashboard() {
     const startTime = new Date(start).getTime();
     const endTime = new Date(end).getTime();
     const diffMs = endTime - startTime;
-    const diffMins = Math.floor(diffMs / 60000);
     
+    // Fixed: Handle negative values or zero (clock drift or error)
+    if (diffMs <= 0) return "—";
+
+    // Fixed: Show seconds if less than a minute
+    if (diffMs < 60000) {
+      const seconds = Math.floor(diffMs / 1000);
+      return `${seconds}s`;
+    }
+
+    const diffMins = Math.floor(diffMs / 60000);
     if (diffMins < 60) return `${diffMins}m`;
+    
     const hours = Math.floor(diffMins / 60);
     const remainingMins = diffMins % 60;
     return `${hours}h ${remainingMins}m`;

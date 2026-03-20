@@ -430,22 +430,6 @@ export default function ProfessorDashboard() {
     }
   };
 
-  const calculateDuration = (start: string, end?: string) => {
-    if (!start || !end) return "—";
-    const diffMs = new Date(end).getTime() - new Date(start).getTime();
-    if (diffMs <= 0) return "—";
-
-    if (diffMs < 60000) {
-      return `${Math.floor(diffMs / 1000)}s`;
-    }
-    const diffMins = Math.floor(diffMs / 60000);
-    if (diffMins < 60) return `${diffMins}m`;
-
-    const h = Math.floor(diffMins / 60);
-    const m = diffMins % 60;
-    return `${h}h ${m}m`;
-  };
-
   const fullName = user?.displayName || 'Professor';
   const firstName = fullName.split(' ')[0];
   const initial = firstName.charAt(0).toUpperCase();
@@ -644,10 +628,9 @@ export default function ProfessorDashboard() {
                       <TableHeader className="bg-[var(--color-accent-bg)] border-none">
                         <TableRow className="hover:bg-transparent border-none">
                           <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-[var(--color-text-secondary)] h-10">Room</TableHead>
-                          <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-[var(--color-text-secondary)] h-10">Subject</TableHead>
+                          <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-[var(--color-text-secondary)] h-10 flex-1">Subject</TableHead>
                           <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-[var(--color-text-secondary)] h-10">Class Section</TableHead>
                           <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-[var(--color-text-secondary)] h-10">Date</TableHead>
-                          <TableHead className="text-[11px] font-semibold uppercase tracking-wider text-[var(--color-text-secondary)] h-10">Duration</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
@@ -666,14 +649,11 @@ export default function ProfessorDashboard() {
                               <TableCell className="text-xs font-bold text-[var(--color-text-secondary)]">
                                 {log.startTime ? format(new Date(log.startTime), "MMM d '·' h:mm a") : "—"}
                               </TableCell>
-                              <TableCell className="text-xs font-bold text-[var(--color-text-secondary)]">
-                                {calculateDuration(log.startTime, log.endTime)}
-                              </TableCell>
                             </TableRow>
                           ))
                         ) : (
                           <TableRow>
-                            <TableCell colSpan={5} className="h-32 text-center text-sm font-medium text-[var(--color-text-tertiary)] italic">
+                            <TableCell colSpan={4} className="h-32 text-center text-sm font-medium text-[var(--color-text-tertiary)] italic">
                               No sessions recorded yet.
                             </TableCell>
                           </TableRow>
@@ -703,9 +683,6 @@ export default function ProfessorDashboard() {
                         <div className="text-right shrink-0">
                           <p className="text-[10px] font-bold text-[var(--color-text-secondary)]">
                             {log.startTime ? format(new Date(log.startTime), "MMM d") : "—"}
-                          </p>
-                          <p className="text-[10px] font-medium text-[var(--color-text-tertiary)]">
-                            {calculateDuration(log.startTime, log.endTime)}
                           </p>
                         </div>
                       </div>

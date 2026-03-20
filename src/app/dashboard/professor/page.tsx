@@ -633,8 +633,8 @@ export default function ProfessorDashboard() {
               {/* Recent Sessions Card */}
               <Card className="w-full border border-[var(--color-border)] shadow-sm rounded-[24px] overflow-hidden bg-[var(--color-card-bg)] p-6">
                 <div className="flex flex-col mb-6">
-                  <h3 className="text-base font-semibold text-[var(--color-text-primary)]">Recent Sessions</h3>
-                  <p className="text-[11px] text-[var(--color-text-tertiary)] font-medium">Your last 5 completed sessions</p>
+                  <h3 className="text-[20px] font-bold text-[var(--color-text-primary)]">Recent Sessions</h3>
+                  <p className="text-[13px] text-[var(--color-text-tertiary)] font-medium">Your last 5 completed sessions</p>
                 </div>
 
                 {/* Desktop Table View */}

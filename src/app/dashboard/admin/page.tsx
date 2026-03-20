@@ -1,6 +1,7 @@
+
 "use client"
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { 
@@ -9,7 +10,8 @@ import {
   Calendar as CalendarIcon,
   Waves,
   ChevronDown,
-  Check
+  Check,
+  Download
 } from 'lucide-react';
 import { 
   BarChart, 
@@ -70,6 +72,7 @@ export default function AdminDashboard() {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterLabel, setFilterLabel] = useState('All Logs');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const chartRef = useRef<HTMLDivElement>(null);
   
   const now = new Date();
   const [customFrom, setCustomFrom] = useState<CustomDate>({
@@ -146,6 +149,41 @@ export default function AdminDashboard() {
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  const downloadChart = () => {
+    if (!chartRef.current) return;
+    
+    const svg = chartRef.current.querySelector('svg');
+    if (!svg) return;
+
+    const svgData = new XMLSerializer().serializeToString(svg);
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+    const img = new Image();
+    
+    // Scale for better resolution
+    const scale = 2;
+    const width = svg.clientWidth;
+    const height = svg.clientHeight;
+
+    img.onload = () => {
+      canvas.width = width * scale;
+      canvas.height = height * scale;
+      if (ctx) {
+        ctx.fillStyle = "white";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.scale(scale, scale);
+        ctx.drawImage(img, 0, 0);
+        const pngFile = canvas.toDataURL("image/png");
+        const downloadLink = document.createElement("a");
+        downloadLink.download = `NEU_Lab_Usage_Chart_${format(new Date(), 'yyyy-MM-dd')}.png`;
+        downloadLink.href = pngFile;
+        downloadLink.click();
+      }
+    };
+    
+    img.src = "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(svgData)));
+  };
 
   if (!mounted || !user || isAdminRoleLoading) {
     return (
@@ -240,8 +278,8 @@ export default function AdminDashboard() {
 
   return (
     <div className="p-8 space-y-8 max-w-[1400px] mx-auto">
-      <header className="space-y-1">
-        <h1 className="text-3xl font-black text-slate-900 tracking-tight">Laboratory Analytics</h1>
+      <header className="space-y-1 bg-transparent">
+        <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">Laboratory Analytics</h1>
         <p className="text-xs font-black uppercase tracking-widest text-slate-400">
           NEU COMPUTER LABORATORY MANAGEMENT
         </p>
@@ -295,11 +333,22 @@ export default function AdminDashboard() {
       </div>
 
       <Card className="border-none shadow-sm bg-card dark:bg-[#3D4966] rounded-[32px] p-8">
-        <div className="mb-8">
-          <h2 className="text-lg font-black text-slate-900 dark:text-white">Computer Laboratory Distribution</h2>
-          <p className="text-xs font-bold text-slate-400">Visual frequency of usage across M101-M111</p>
+        <div className="mb-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          <div>
+            <h2 className="text-lg font-black text-slate-900 dark:text-white">Computer Laboratory Distribution</h2>
+            <p className="text-xs font-bold text-slate-400">Visual frequency of usage across M101-M111</p>
+          </div>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={downloadChart}
+            className="rounded-xl font-bold gap-2 text-xs border-slate-200 dark:border-slate-700"
+          >
+            <Download className="h-3.5 w-3.5" />
+            Download Chart
+          </Button>
         </div>
-        <div className="h-[300px] w-full">
+        <div className="h-[300px] w-full" ref={chartRef}>
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={labDistributionData} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
@@ -405,7 +454,7 @@ export default function AdminDashboard() {
                               {MONTHS.map((m, i) => <SelectItem key={m} value={i.toString()} className="text-[10px] font-bold">{m}</SelectItem>)}
                             </SelectContent>
                           </Select>
-                          <Select value={customFrom.day} onValueChange={(v) => setCustomFrom(prev => ({...prev, day: v}))}>
+                          <Select value={customFrom.day} onValueChange={(v) => setCustomFrom(prev, day: v}))}>
                             <SelectTrigger className="h-9 rounded-lg text-[10px] font-bold border-slate-200 dark:border-slate-700">
                               <SelectValue placeholder="Day" />
                             </SelectTrigger>
@@ -413,7 +462,7 @@ export default function AdminDashboard() {
                               {DAYS.map(d => <SelectItem key={d} value={d} className="text-[10px] font-bold">{d}</SelectItem>)}
                             </SelectContent>
                           </Select>
-                          <Select value={customFrom.year} onValueChange={(v) => setCustomFrom(prev => ({...prev, year: v}))}>
+                          <Select value={customFrom.year} onValueChange={(v) => setCustomFrom(prev, year: v}))}>
                             <SelectTrigger className="h-9 rounded-lg text-[10px] font-bold border-slate-200 dark:border-slate-700">
                               <SelectValue placeholder="Year" />
                             </SelectTrigger>
@@ -427,7 +476,7 @@ export default function AdminDashboard() {
                       <div className="space-y-2">
                         <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">End Date</label>
                         <div className="grid grid-cols-3 gap-2">
-                          <Select value={customTo.month} onValueChange={(v) => setCustomTo(prev => ({...prev, month: v}))}>
+                          <Select value={customTo.month} onValueChange={(v) => setCustomTo(prev, month: v}))}>
                             <SelectTrigger className="h-9 rounded-lg text-[10px] font-bold border-slate-200 dark:border-slate-700">
                               <SelectValue placeholder="Month" />
                             </SelectTrigger>
@@ -435,7 +484,7 @@ export default function AdminDashboard() {
                               {MONTHS.map((m, i) => <SelectItem key={m} value={i.toString()} className="text-[10px] font-bold">{m}</SelectItem>)}
                             </SelectContent>
                           </Select>
-                          <Select value={customTo.day} onValueChange={(v) => setCustomTo(prev => ({...prev, day: v}))}>
+                          <Select value={customTo.day} onValueChange={(v) => setCustomTo(prev, day: v}))}>
                             <SelectTrigger className="h-9 rounded-lg text-[10px] font-bold border-slate-200 dark:border-slate-700">
                               <SelectValue placeholder="Day" />
                             </SelectTrigger>
@@ -443,7 +492,7 @@ export default function AdminDashboard() {
                               {DAYS.map(d => <SelectItem key={d} value={d} className="text-[10px] font-bold">{d}</SelectItem>)}
                             </SelectContent>
                           </Select>
-                          <Select value={customTo.year} onValueChange={(v) => setCustomTo(prev => ({...prev, year: v}))}>
+                          <Select value={customTo.year} onValueChange={(v) => setCustomTo(prev, year: v}))}>
                             <SelectTrigger className="h-9 rounded-lg text-[10px] font-bold border-slate-200 dark:border-slate-700">
                               <SelectValue placeholder="Year" />
                             </SelectTrigger>

@@ -56,7 +56,10 @@ export default function AdminDashboardLayout({ children }: { children: ReactNode
         <div className="flex-1 flex flex-col relative overflow-hidden">
           {/* Dashboard Controls: Repositioned Toggle and Theme Toggle */}
           <div className="flex items-center justify-between px-6 py-4 bg-transparent shrink-0">
-            <SidebarTrigger className="h-9 w-9 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-colors" />
+            <div className="flex items-center gap-4">
+              <SidebarTrigger className="h-9 w-9 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-colors" />
+              <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">Admin's Portal</h1>
+            </div>
             <ThemeToggle />
           </div>
           

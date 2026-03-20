@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useEffect, useRef, useMemo, Suspense } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -168,7 +168,7 @@ function ScannerView({ onScan }: { onScan: (roomId: string) => void }) {
   );
 }
 
-export default function ProfessorDashboard() {
+function ProfessorDashboardContent() {
   const { user, isUserLoading } = useUser();
   const auth = useAuth();
   const db = useFirestore();
@@ -607,8 +607,8 @@ export default function ProfessorDashboard() {
                       <div className="flex flex-col items-center gap-4 md:gap-6">
                         <h2 className="text-6xl md:text-8xl font-black text-[var(--color-text-primary)] tracking-tighter">{activeSession.roomId}</h2>
                         <div className="flex flex-col items-center gap-1">
-                          <p className="text-[16px] md:text-[18px] font-semibold text-[var(--color-text-secondary)] leading-tight text-center">{activeSession.subject || '—'}</p>
-                          <p className="text-[13px] md:text-[15px] font-medium text-[var(--color-text-tertiary)] leading-tight text-center">{activeSession.classSection || '—'}</p>
+                          <p className="text-[18px] font-semibold text-[var(--color-text-secondary)] leading-tight text-center">{activeSession.subject || '—'}</p>
+                          <p className="text-[15px] font-medium text-[var(--color-text-tertiary)] leading-tight text-center">{activeSession.classSection || '—'}</p>
                         </div>
                       </div>
                       <div className="text-[20px] md:text-[22px] font-semibold text-primary">
@@ -806,5 +806,20 @@ export default function ProfessorDashboard() {
         </DialogContent>
       </Dialog>
     </div>
+  );
+}
+
+export default function ProfessorDashboard() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-[#F7F8FB] dark:bg-[#2A3245]">
+        <div className="animate-pulse flex flex-col items-center gap-4">
+          <div className="h-12 w-12 bg-primary/20 rounded-full" />
+          <div className="h-4 w-24 bg-muted rounded" />
+        </div>
+      </div>
+    }>
+      <ProfessorDashboardContent />
+    </Suspense>
   );
 }

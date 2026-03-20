@@ -31,6 +31,7 @@ import { Html5Qrcode } from 'html5-qrcode';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { setDocumentNonBlocking, updateDocumentNonBlocking } from '@/firebase/non-blocking-updates';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import { Separator } from '@/components/ui/separator';
 
 function ScannerView({ onScan }: { onScan: (roomId: string) => void }) {
   const { toast } = useToast();
@@ -306,6 +307,43 @@ export default function ProfessorDashboard() {
 
   if (!user) return null;
 
+  const GreetingContent = () => (
+    <div className="text-left space-y-2 mb-8">
+      <h1 className="text-2xl md:text-3xl font-black text-primary tracking-tight">
+        {greeting}, {firstName}!
+      </h1>
+      <p className="text-sm text-[var(--color-text-secondary)] font-bold">
+        {activeSession ? "Current lab session in progress." : "Which room are you using today?"}
+      </p>
+    </div>
+  );
+
+  const UserProfileCard = () => (
+    <div className="w-full bg-[var(--color-card-bg)] rounded-[2.5rem] p-6 md:p-8 shadow-sm flex items-center justify-between border border-[var(--color-border)] transition-colors">
+      <div className="flex items-center gap-4">
+        <Avatar className="h-12 w-12 bg-primary/10 rounded-2xl border-none">
+          <AvatarFallback className="text-primary font-black text-base bg-transparent">
+            {initial}
+          </AvatarFallback>
+        </Avatar>
+        <div className="flex flex-col">
+          <p className="font-black text-base text-[var(--color-text-primary)] leading-none">{fullName}</p>
+          <Badge variant="secondary" className="bg-transparent p-0 mt-1 text-[var(--color-text-tertiary)] font-black text-[10px] tracking-widest uppercase border-none">
+            PROFESSOR
+          </Badge>
+        </div>
+      </div>
+      <Button 
+        variant="ghost" 
+        size="icon" 
+        onClick={handleSignOut}
+        className="h-12 w-12 text-[var(--color-text-tertiary)] hover:text-destructive hover:bg-destructive/5 rounded-2xl"
+      >
+        <LogOut className="h-5 w-5" />
+      </Button>
+    </div>
+  );
+
   return (
     <div className="min-h-screen bg-[var(--color-page-bg)] flex flex-col font-body antialiased transition-colors">
       <header className="h-16 border-b flex items-center justify-between px-6 sm:px-12 sticky top-0 z-50 shadow-sm bg-slate-200 dark:bg-slate-900 transition-colors">
@@ -325,68 +363,75 @@ export default function ProfessorDashboard() {
       <main className="flex-1 flex flex-col items-center justify-start p-6 pt-12 md:pt-16">
         <div className="w-full max-w-6xl flex flex-col gap-8 md:gap-10">
           
-          {/* Greeting Section */}
-          <div className="text-center md:text-left space-y-2">
-            {activeSession && (
-              <div className="w-fit mx-auto md:mx-0 bg-[var(--color-status-active-bg)] border border-transparent text-[var(--color-status-active-text)] px-4 py-3 rounded-xl flex items-center gap-3 animate-in slide-in-from-top-4 shadow-sm mb-6">
-                <CheckCircle2 className="h-5 w-5 shrink-0" />
-                <span className="font-bold text-sm">
-                  Session verified. Thank you for using room {activeSession.roomId}.
-                </span>
-              </div>
-            )}
-            <h1 className="text-3xl md:text-4xl font-black text-primary tracking-tight">
-              {greeting}, {firstName}!
-            </h1>
-            <p className="text-base text-[var(--color-text-secondary)] font-bold">
-              {activeSession ? "Current lab session in progress." : "Which room are you using today?"}
-            </p>
-          </div>
+          {/* Global Alert Area */}
+          {activeSession && (
+            <div className="w-fit mx-auto md:mx-0 bg-[var(--color-status-active-bg)] border border-transparent text-[var(--color-status-active-text)] px-4 py-3 rounded-xl flex items-center gap-3 animate-in slide-in-from-top-4 shadow-sm">
+              <CheckCircle2 className="h-5 w-5 shrink-0" />
+              <span className="font-bold text-sm">
+                Session verified. Thank you for using room {activeSession.roomId}.
+              </span>
+            </div>
+          )}
 
-          {/* Main Content Layout */}
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
+          {/* Main Content Layout Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start relative">
             
-            {/* Stats - Left Col on Desktop | Top row on Mobile */}
-            <div className="md:col-span-4 flex flex-row md:flex-col gap-3 md:gap-6 w-full order-1">
-              {/* Sessions Chip */}
-              <div className="flex-1 md:flex-none bg-[var(--color-card-bg)] p-4 md:p-8 rounded-[2rem] border border-[var(--color-border)] flex flex-col items-center justify-center text-center shadow-sm transition-all hover:shadow-md">
-                <span className="text-[10px] md:text-xs font-black uppercase tracking-widest text-slate-400 mb-2 leading-none">
-                  <span className="hidden md:inline">Sessions This Month</span>
-                  <span className="md:hidden">Sessions</span>
-                </span>
-                <span className="text-xl md:text-4xl font-black text-primary dark:text-white leading-none">
-                  {sessionsThisMonth}
-                </span>
+            {/* Stats Column - Left (Stack on Desktop | Row on Mobile) */}
+            <div className="md:col-span-4 flex flex-col gap-4 w-full md:border-r md:border-[var(--color-border)] md:pr-10">
+              <label className="text-[11px] font-black uppercase tracking-[0.2em] text-[var(--color-text-tertiary)] ml-2 mb-2">
+                Usage Statistics
+              </label>
+              
+              <div className="flex flex-row md:flex-col gap-3 md:gap-6 w-full mb-8">
+                {/* Sessions Chip */}
+                <div className="flex-1 md:flex-none bg-[var(--color-card-bg)] p-4 md:p-8 rounded-[2rem] border border-[var(--color-border)] flex flex-col items-center justify-center text-center shadow-sm transition-all hover:shadow-md">
+                  <span className="text-[10px] md:text-xs font-black uppercase tracking-widest text-slate-400 mb-2 leading-none">
+                    <span className="hidden md:inline">Sessions This Month</span>
+                    <span className="md:hidden">Sessions</span>
+                  </span>
+                  <span className="text-xl md:text-4xl font-black text-primary dark:text-white leading-none">
+                    {sessionsThisMonth}
+                  </span>
+                </div>
+
+                {/* Hours Chip */}
+                <div className="flex-1 md:flex-none bg-[var(--color-card-bg)] p-4 md:p-8 rounded-[2rem] border border-[var(--color-border)] flex flex-col items-center justify-center text-center shadow-sm transition-all hover:shadow-md">
+                  <span className="text-[10px] md:text-xs font-black uppercase tracking-widest text-slate-400 mb-2 leading-none">
+                    <span className="hidden md:inline">Hours Used</span>
+                    <span className="md:hidden">Hours</span>
+                  </span>
+                  <span className="text-xl md:text-4xl font-black text-primary dark:text-white leading-none">
+                    {totalHours}h
+                  </span>
+                </div>
+
+                {/* Room Chip */}
+                <div className="flex-1 md:flex-none bg-[var(--color-card-bg)] p-4 md:p-8 rounded-[2rem] border border-[var(--color-border)] flex flex-col items-center justify-center text-center shadow-sm transition-all hover:shadow-md">
+                  <span className="text-[10px] md:text-xs font-black uppercase tracking-widest text-slate-400 mb-2 leading-none">
+                    <span className="hidden md:inline">Most Used Room</span>
+                    <span className="md:hidden">Top Room</span>
+                  </span>
+                  <span className="text-xl md:text-4xl font-black text-primary dark:text-white leading-none">
+                    {mostUsedRoom}
+                  </span>
+                </div>
               </div>
 
-              {/* Hours Chip */}
-              <div className="flex-1 md:flex-none bg-[var(--color-card-bg)] p-4 md:p-8 rounded-[2rem] border border-[var(--color-border)] flex flex-col items-center justify-center text-center shadow-sm transition-all hover:shadow-md">
-                <span className="text-[10px] md:text-xs font-black uppercase tracking-widest text-slate-400 mb-2 leading-none">
-                  <span className="hidden md:inline">Hours Used</span>
-                  <span className="md:hidden">Hours</span>
-                </span>
-                <span className="text-xl md:text-4xl font-black text-primary dark:text-white leading-none">
-                  {totalHours}h
-                </span>
-              </div>
-
-              {/* Room Chip */}
-              <div className="flex-1 md:flex-none bg-[var(--color-card-bg)] p-4 md:p-8 rounded-[2rem] border border-[var(--color-border)] flex flex-col items-center justify-center text-center shadow-sm transition-all hover:shadow-md">
-                <span className="text-[10px] md:text-xs font-black uppercase tracking-widest text-slate-400 mb-2 leading-none">
-                  <span className="hidden md:inline">Most Used Room</span>
-                  <span className="md:hidden">Top Room</span>
-                </span>
-                <span className="text-xl md:text-4xl font-black text-primary dark:text-white leading-none">
-                  {mostUsedRoom}
-                </span>
+              {/* Professor Profile - Desktop Position */}
+              <div className="hidden md:block mt-auto pt-4">
+                <UserProfileCard />
               </div>
             </div>
 
-            {/* Main Action Card - Right Col on Desktop | Below stats on Mobile */}
-            <div className="md:col-span-8 w-full order-2 flex flex-col gap-8">
+            {/* Main Action Card Column - Right */}
+            <div className="md:col-span-8 w-full flex flex-col gap-8">
               {!activeSession ? (
                 <Card className="w-full border-none shadow-2xl rounded-[40px] overflow-hidden bg-[var(--color-card-bg)]">
                   <CardContent className="p-8 md:p-12 space-y-8">
+                    {/* Greeting integrated into action card */}
+                    <GreetingContent />
+                    <Separator className="bg-[var(--color-border)] opacity-50 -mt-2 mb-8" />
+
                     <Button 
                       onClick={() => setIsScannerOpen(true)}
                       className="w-full h-16 rounded-[2rem] bg-primary dark:bg-[#4A6BAD] hover:opacity-90 text-white font-black text-lg flex items-center justify-center gap-4 shadow-lg transition-all active:scale-[0.98] border-none"
@@ -432,8 +477,12 @@ export default function ProfessorDashboard() {
                 </Card>
               ) : (
                 <Card className="w-full border-none shadow-2xl rounded-[40px] overflow-hidden bg-[var(--color-card-bg)]">
-                  <CardContent className="p-8 md:p-16 space-y-10">
-                    <div className="text-center space-y-4">
+                  <CardContent className="p-8 md:p-16 space-y-10 text-center">
+                    {/* Greeting integrated into action card */}
+                    <GreetingContent />
+                    <Separator className="bg-[var(--color-border)] opacity-50 -mt-2 mb-10" />
+
+                    <div className="space-y-4">
                       <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-5 py-2 rounded-full mb-4">
                         <Clock className="h-4 w-4" />
                         <span className="text-[11px] font-black uppercase tracking-widest">Active Usage</span>
@@ -453,29 +502,9 @@ export default function ProfessorDashboard() {
                 </Card>
               )}
 
-              {/* User Profile Card - Full width below the main grid content */}
-              <div className="w-full bg-[var(--color-card-bg)] rounded-[2.5rem] p-6 md:p-8 shadow-sm flex items-center justify-between border border-[var(--color-border)] transition-colors">
-                <div className="flex items-center gap-4">
-                  <Avatar className="h-12 w-12 bg-primary/10 rounded-2xl border-none">
-                    <AvatarFallback className="text-primary font-black text-base bg-transparent">
-                      {initial}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="flex flex-col">
-                    <p className="font-black text-base text-[var(--color-text-primary)] leading-none">{fullName}</p>
-                    <Badge variant="secondary" className="bg-transparent p-0 mt-1 text-[var(--color-text-tertiary)] font-black text-[10px] tracking-widest uppercase border-none">
-                      PROFESSOR
-                    </Badge>
-                  </div>
-                </div>
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  onClick={handleSignOut}
-                  className="h-12 w-12 text-[var(--color-text-tertiary)] hover:text-destructive hover:bg-destructive/5 rounded-2xl"
-                >
-                  <LogOut className="h-5 w-5" />
-                </Button>
+              {/* Professor Profile - Mobile Position */}
+              <div className="md:hidden w-full mt-4">
+                <UserProfileCard />
               </div>
             </div>
           </div>

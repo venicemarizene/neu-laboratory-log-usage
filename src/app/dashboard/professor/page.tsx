@@ -393,7 +393,7 @@ export default function ProfessorDashboard() {
           <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start relative">
             
             <div className="md:col-span-4 flex flex-col gap-4 w-full md:border-r md:border-[var(--color-border)] md:pr-10">
-              <label className="text-[13px] font-black uppercase tracking-[0.2em] text-white ml-2 mb-2">
+              <label className="text-[13px] font-black uppercase tracking-[0.2em] text-slate-700 dark:text-white text-center w-full mb-2">
                 Usage Statistics
               </label>
               

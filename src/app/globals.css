@@ -116,6 +116,6 @@
     @apply bg-white dark:bg-[#5578B8] text-primary dark:text-white shadow-sm;
   }
   .google-login-btn {
-    @apply bg-primary dark:bg-[#1E40AF] text-white hover:bg-primary/90 dark:hover:bg-[#1E40AF]/90;
+    @apply bg-primary dark:bg-[#4A6BAD] text-white hover:bg-primary/90 dark:hover:bg-[#4A6BAD]/90;
   }
 }

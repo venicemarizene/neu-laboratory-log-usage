@@ -454,7 +454,7 @@ export default function AdminDashboard() {
                               {MONTHS.map((m, i) => <SelectItem key={m} value={i.toString()} className="text-[10px] font-bold">{m}</SelectItem>)}
                             </SelectContent>
                           </Select>
-                          <Select value={customFrom.day} onValueChange={(v) => setCustomFrom(prev, day: v}))}>
+                          <Select value={customFrom.day} onValueChange={(v) => setCustomFrom(prev => ({...prev, day: v}))}>
                             <SelectTrigger className="h-9 rounded-lg text-[10px] font-bold border-slate-200 dark:border-slate-700">
                               <SelectValue placeholder="Day" />
                             </SelectTrigger>
@@ -462,7 +462,7 @@ export default function AdminDashboard() {
                               {DAYS.map(d => <SelectItem key={d} value={d} className="text-[10px] font-bold">{d}</SelectItem>)}
                             </SelectContent>
                           </Select>
-                          <Select value={customFrom.year} onValueChange={(v) => setCustomFrom(prev, year: v}))}>
+                          <Select value={customFrom.year} onValueChange={(v) => setCustomFrom(prev => ({...prev, year: v}))}>
                             <SelectTrigger className="h-9 rounded-lg text-[10px] font-bold border-slate-200 dark:border-slate-700">
                               <SelectValue placeholder="Year" />
                             </SelectTrigger>
@@ -476,7 +476,7 @@ export default function AdminDashboard() {
                       <div className="space-y-2">
                         <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">End Date</label>
                         <div className="grid grid-cols-3 gap-2">
-                          <Select value={customTo.month} onValueChange={(v) => setCustomTo(prev, month: v}))}>
+                          <Select value={customTo.month} onValueChange={(v) => setCustomTo(prev => ({...prev, month: v}))}>
                             <SelectTrigger className="h-9 rounded-lg text-[10px] font-bold border-slate-200 dark:border-slate-700">
                               <SelectValue placeholder="Month" />
                             </SelectTrigger>
@@ -484,7 +484,7 @@ export default function AdminDashboard() {
                               {MONTHS.map((m, i) => <SelectItem key={m} value={i.toString()} className="text-[10px] font-bold">{m}</SelectItem>)}
                             </SelectContent>
                           </Select>
-                          <Select value={customTo.day} onValueChange={(v) => setCustomTo(prev, day: v}))}>
+                          <Select value={customTo.day} onValueChange={(v) => setCustomTo(prev => ({...prev, day: v}))}>
                             <SelectTrigger className="h-9 rounded-lg text-[10px] font-bold border-slate-200 dark:border-slate-700">
                               <SelectValue placeholder="Day" />
                             </SelectTrigger>
@@ -492,7 +492,7 @@ export default function AdminDashboard() {
                               {DAYS.map(d => <SelectItem key={d} value={d} className="text-[10px] font-bold">{d}</SelectItem>)}
                             </SelectContent>
                           </Select>
-                          <Select value={customTo.year} onValueChange={(v) => setCustomTo(prev, year: v}))}>
+                          <Select value={customTo.year} onValueChange={(v) => setCustomTo(prev => ({...prev, year: v}))}>
                             <SelectTrigger className="h-9 rounded-lg text-[10px] font-bold border-slate-200 dark:border-slate-700">
                               <SelectValue placeholder="Year" />
                             </SelectTrigger>

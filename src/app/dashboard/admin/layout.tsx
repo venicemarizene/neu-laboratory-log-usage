@@ -2,11 +2,10 @@
 "use client"
 
 import { ReactNode, useEffect } from 'react';
-import { SidebarProvider } from '@/components/ui/sidebar';
+import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { AdminSidebar } from '@/components/layout/AdminSidebar';
 import { useUser, useFirestore, useMemoFirebase, useDoc } from '@/firebase';
 import { useRouter } from 'next/navigation';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { doc } from 'firebase/firestore';
 
@@ -50,41 +49,17 @@ export default function AdminDashboardLayout({ children }: { children: ReactNode
     return null;
   }
 
-  const fullName = user.displayName || 'Administrator';
-  const initial = fullName.charAt(0).toUpperCase();
-
   return (
     <SidebarProvider>
       <div className="flex min-h-screen w-full bg-[#F8FAFC] dark:bg-slate-950 transition-colors">
         <AdminSidebar />
-        <div className="flex-1 flex flex-col">
-          {/* Top Header synchronized with bottom bar */}
-          <header className="h-16 border-b bg-slate-200 dark:bg-slate-900 flex items-center justify-between px-8 sticky top-0 z-40 transition-colors">
-            <div className="flex items-center gap-3">
-              <div className="bg-white rounded-full p-0.5 shadow-sm border border-slate-100 flex items-center justify-center">
-                <img
-                  src="/NEU_LOGO.png"
-                  alt="New Era University Logo"
-                  style={{ width: '34px', height: '34px', objectFit: 'contain' }}
-                />
-              </div>
-              <span className="text-sm font-black text-primary uppercase tracking-widest">New Era University</span>
-            </div>
-            <div className="flex items-center gap-6">
-              <ThemeToggle />
-              <div className="flex items-center gap-4">
-                <div className="text-right hidden sm:block">
-                  <p className="text-sm font-black text-slate-900 dark:text-white leading-none">{fullName}</p>
-                  <p className="text-[10px] text-slate-400 font-bold mt-1">{user.email}</p>
-                </div>
-                <Avatar className="h-10 w-10 bg-primary/10 border-none">
-                  <AvatarFallback className="text-primary font-black text-sm">
-                    {initial}
-                  </AvatarFallback>
-                </Avatar>
-              </div>
-            </div>
-          </header>
+        <div className="flex-1 flex flex-col relative overflow-hidden">
+          {/* Dashboard Controls: Repositioned Toggle and Theme Toggle */}
+          <div className="flex items-center justify-between px-6 py-4 bg-transparent shrink-0">
+            <SidebarTrigger className="h-9 w-9 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-colors" />
+            <ThemeToggle />
+          </div>
+          
           <main className="flex-1 overflow-auto bg-slate-50/50 dark:bg-slate-950/50">
             {children}
           </main>

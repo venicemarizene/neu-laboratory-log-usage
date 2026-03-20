@@ -1,3 +1,4 @@
+
 "use client"
 
 import Link from 'next/link';
@@ -19,11 +20,12 @@ import {
   SidebarMenuButton,
   SidebarFooter
 } from '@/components/ui/sidebar';
-import { useAuth } from '@/firebase';
+import { useAuth, useUser } from '@/firebase';
 
 export function AdminSidebar() {
   const pathname = usePathname();
   const auth = useAuth();
+  const { user } = useUser();
   const router = useRouter();
 
   const handleSignOut = async () => {
@@ -80,6 +82,18 @@ export function AdminSidebar() {
       </SidebarContent>
 
       <SidebarFooter className="p-6 space-y-4">
+        {/* Administrator Profile Information */}
+        {user && (
+          <div className="px-4 py-2 border-b border-white/10 mb-2">
+            <p className="text-sm font-black text-white leading-none truncate">
+              {user.displayName || 'Administrator'}
+            </p>
+            <p className="text-[10px] text-white/60 font-bold mt-1 truncate">
+              {user.email}
+            </p>
+          </div>
+        )}
+
         <div className="flex items-center gap-3 px-4 py-2 rounded-xl bg-white/5 border border-white/10">
           <ShieldCheck className="h-4 w-4 text-white/60" />
           <span className="text-[10px] font-black uppercase tracking-widest text-white/60">

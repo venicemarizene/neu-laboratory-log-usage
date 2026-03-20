@@ -48,7 +48,7 @@ export function AdminSidebar() {
               src="/NEU_LOGO.png"
               alt="New Era University Logo"
               className="rounded-full"
-              style={{ width: '46px', height: '46px', objectFit: 'contain' }}
+              style={{ width: '48px', height: '48px', objectFit: 'contain' }}
             />
           </div>
           <span className="font-black text-xl tracking-tight text-white leading-tight">New Era University</span>
@@ -65,9 +65,9 @@ export function AdminSidebar() {
                   asChild 
                   isActive={isActive}
                   className={cn(
-                    "h-12 rounded-lg font-bold transition-all px-6 border-l-[3px]",
+                    "h-12 rounded-lg font-bold transition-all px-6 border-l-[5px]",
                     isActive 
-                      ? "bg-white/20 text-white border-white" 
+                      ? "bg-white/20 text-white border-white shadow-sm" 
                       : "text-white/60 hover:bg-white/10 hover:text-white border-transparent"
                   )}
                 >

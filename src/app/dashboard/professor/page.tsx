@@ -32,6 +32,7 @@ import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { setDocumentNonBlocking, updateDocumentNonBlocking } from '@/firebase/non-blocking-updates';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { Separator } from '@/components/ui/separator';
+import { cn } from '@/lib/utils';
 
 function ScannerView({ onScan }: { onScan: (roomId: string) => void }) {
   const { toast } = useToast();
@@ -124,6 +125,29 @@ export default function ProfessorDashboard() {
   const [activeSession, setActiveSession] = useState<{id: string, roomId: string} | null>(null);
   const [isScannerOpen, setIsScannerOpen] = useState(false);
   const [greeting, setGreeting] = useState("Welcome back");
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [isFading, setIsFading] = useState(false);
+
+  // Success message fade-out logic
+  useEffect(() => {
+    let fadeTimer: NodeJS.Timeout;
+    let hideTimer: NodeJS.Timeout;
+
+    if (showSuccess) {
+      fadeTimer = setTimeout(() => {
+        setIsFading(true);
+        hideTimer = setTimeout(() => {
+          setShowSuccess(false);
+          setIsFading(false);
+        }, 500); // Wait for transition duration
+      }, 4000); // Show for 4 seconds
+    }
+
+    return () => {
+      clearTimeout(fadeTimer);
+      clearTimeout(hideTimer);
+    };
+  }, [showSuccess]);
 
   useEffect(() => {
     if (!isUserLoading && !user) {
@@ -265,6 +289,8 @@ export default function ProfessorDashboard() {
     setDocumentNonBlocking(logRef, logData, { merge: true });
     
     setActiveSession({ id: logId, roomId: roomId });
+    setShowSuccess(true);
+    setIsFading(false);
     setIsLogging(false);
   };
 
@@ -281,6 +307,7 @@ export default function ProfessorDashboard() {
     updateDocumentNonBlocking(logRef, updateData);
     
     setActiveSession(null);
+    setShowSuccess(false); // Clear any pending success message on session end
     await auth.signOut();
     router.push('/login');
 
@@ -363,16 +390,6 @@ export default function ProfessorDashboard() {
       <main className="flex-1 flex flex-col items-center justify-start p-6 pt-12 md:pt-16">
         <div className="w-full max-w-6xl flex flex-col gap-8 md:gap-10">
           
-          {/* Global Alert Area */}
-          {activeSession && (
-            <div className="w-fit mx-auto md:mx-0 bg-[var(--color-status-active-bg)] border border-transparent text-[var(--color-status-active-text)] px-4 py-3 rounded-xl flex items-center gap-3 animate-in slide-in-from-top-4 shadow-sm">
-              <CheckCircle2 className="h-5 w-5 shrink-0" />
-              <span className="font-bold text-sm">
-                Session verified. Thank you for using room {activeSession.roomId}.
-              </span>
-            </div>
-          )}
-
           {/* Mobile-only Greeting at the very top */}
           <div className="md:hidden w-full">
             <GreetingContent />
@@ -485,13 +502,26 @@ export default function ProfessorDashboard() {
               ) : (
                 <Card className="w-full border-none shadow-2xl rounded-[40px] overflow-hidden bg-[var(--color-card-bg)]">
                   <CardContent className="p-8 md:p-16 space-y-10 text-center">
-                    {/* Greeting integrated into action card for desktop, hidden on mobile */}
+                    {/* Desktop Greeting Header */}
                     <div className="hidden md:block">
                       <GreetingContent />
                       <Separator className="bg-[var(--color-border)] opacity-50 -mt-2 mb-10" />
                     </div>
 
                     <div className="space-y-4">
+                      {/* Success message integrated into session card */}
+                      {showSuccess && (
+                        <div className={cn(
+                          "inline-flex mx-auto bg-[var(--color-status-active-bg)] border border-transparent text-[var(--color-status-active-text)] px-4 py-3 rounded-xl items-center gap-3 shadow-sm transition-opacity duration-500",
+                          isFading ? "opacity-0" : "opacity-100"
+                        )}>
+                          <CheckCircle2 className="h-5 w-5 shrink-0" />
+                          <span className="font-bold text-sm">
+                            Session verified. Thank you for using room {activeSession.roomId}.
+                          </span>
+                        </div>
+                      )}
+
                       <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-5 py-2 rounded-full mb-4">
                         <Clock className="h-4 w-4" />
                         <span className="text-[11px] font-black uppercase tracking-widest">Active Usage</span>

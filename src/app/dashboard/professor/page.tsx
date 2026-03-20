@@ -398,7 +398,7 @@ export default function ProfessorDashboard() {
               "md:col-span-4 flex flex-col gap-4 w-full md:border-r md:border-[var(--color-border)] md:pr-10",
               activeSession ? "order-2 md:order-1" : "order-1 md:order-1"
             )}>
-              <label className="text-[13px] font-black uppercase tracking-[0.2em] text-slate-700 dark:text-white text-center w-full mb-2">
+              <label className="text-[13px] font-black uppercase tracking-[0.2em] text-slate-800 dark:text-white text-center w-full mb-2">
                 Usage Statistics
               </label>
               
@@ -444,78 +444,78 @@ export default function ProfessorDashboard() {
               "md:col-span-8 w-full flex flex-col gap-8",
               activeSession ? "order-1 md:order-2" : "order-2 md:order-2"
             )}>
+              {/* Desktop Greeting Section - Outside the card */}
+              <div className="hidden md:block mb-2">
+                <GreetingContent />
+              </div>
+
               {!activeSession ? (
                 <Card className="w-full border-none shadow-2xl rounded-[40px] overflow-hidden bg-[var(--color-card-bg)]">
                   <CardContent className="p-8 md:p-12 space-y-8">
-                    <div className="hidden md:block mb-8">
-                      <GreetingContent />
-                      <Separator className="bg-[var(--color-border)] opacity-50 -mt-2" />
+                    {/* Internal greeting removed for desktop as it's now outside */}
+                    <div className="space-y-8">
+                      <Button 
+                        onClick={() => setIsScannerOpen(true)}
+                        className="w-full h-16 rounded-[2rem] bg-primary dark:bg-[#4A6BAD] hover:opacity-90 text-white font-black text-lg flex items-center justify-center gap-4 shadow-lg transition-all active:scale-[0.98] border-none"
+                      >
+                        <QrCode className="h-6 w-6" />
+                        Auto-Log via QR
+                      </Button>
+
+                      <div className="relative flex items-center gap-6 py-2">
+                        <div className="flex-1 h-px bg-[var(--color-border)] opacity-50"></div>
+                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[var(--color-text-tertiary)] bg-[var(--color-card-bg)] px-2">or</span>
+                        <div className="flex-1 h-px bg-[var(--color-border)] opacity-50"></div>
+                      </div>
+
+                      <div className="space-y-4">
+                        <label className="text-[11px] font-black uppercase tracking-[0.2em] text-[var(--color-text-tertiary)] ml-2">
+                          Institutional Laboratory Unit
+                        </label>
+                        <Select value={selectedRoom} onValueChange={setSelectedRoom}>
+                          <SelectTrigger className="h-14 rounded-[2rem] bg-[var(--color-accent-bg)] border-none text-lg font-black text-[var(--color-text-primary)] px-8 shadow-inner focus:ring-0 transition-colors">
+                            <SelectValue placeholder="Select Room" />
+                          </SelectTrigger>
+                          <SelectContent className="rounded-2xl border-none shadow-xl bg-[var(--color-card-bg)]">
+                            {LAB_ROOMS.map(room => (
+                              <SelectItem key={room} value={room} className="font-bold h-12 text-base">
+                                {room}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <Button 
+                        onClick={() => handleLogEntry(selectedRoom)}
+                        disabled={isLogging}
+                        variant="outline"
+                        className="w-full h-16 rounded-[2rem] border-2 border-[#1E3A8A] dark:border-[#4A6BAD] bg-transparent text-[#1E3A8A] dark:text-white hover:bg-[#1E3A8A]/10 dark:hover:bg-[#4A6BAD]/20 font-black text-lg flex items-center justify-center gap-4 transition-all duration-200 active:scale-[0.98] disabled:opacity-70"
+                      >
+                        <ArrowRight className="h-5 w-5" />
+                        {isLogging ? 'Logging...' : selectedRoom ? `Log Entry ${selectedRoom}` : 'Log Entry'}
+                      </Button>
                     </div>
-
-                    <Button 
-                      onClick={() => setIsScannerOpen(true)}
-                      className="w-full h-16 rounded-[2rem] bg-primary dark:bg-[#4A6BAD] hover:opacity-90 text-white font-black text-lg flex items-center justify-center gap-4 shadow-lg transition-all active:scale-[0.98] border-none"
-                    >
-                      <QrCode className="h-6 w-6" />
-                      Auto-Log via QR
-                    </Button>
-
-                    <div className="relative flex items-center gap-6 py-2">
-                      <div className="flex-1 h-px bg-[var(--color-border)] opacity-50"></div>
-                      <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[var(--color-text-tertiary)] bg-[var(--color-card-bg)] px-2">or</span>
-                      <div className="flex-1 h-px bg-[var(--color-border)] opacity-50"></div>
-                    </div>
-
-                    <div className="space-y-4">
-                      <label className="text-[11px] font-black uppercase tracking-[0.2em] text-[var(--color-text-tertiary)] ml-2">
-                        Institutional Laboratory Unit
-                      </label>
-                      <Select value={selectedRoom} onValueChange={setSelectedRoom}>
-                        <SelectTrigger className="h-14 rounded-[2rem] bg-[var(--color-accent-bg)] border-none text-lg font-black text-[var(--color-text-primary)] px-8 shadow-inner focus:ring-0 transition-colors">
-                          <SelectValue placeholder="Select Room" />
-                        </SelectTrigger>
-                        <SelectContent className="rounded-2xl border-none shadow-xl bg-[var(--color-card-bg)]">
-                          {LAB_ROOMS.map(room => (
-                            <SelectItem key={room} value={room} className="font-bold h-12 text-base">
-                              {room}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <Button 
-                      onClick={() => handleLogEntry(selectedRoom)}
-                      disabled={isLogging}
-                      variant="outline"
-                      className="w-full h-16 rounded-[2rem] border-2 border-[#1E3A8A] dark:border-[#4A6BAD] bg-transparent text-[#1E3A8A] dark:text-white hover:bg-[#1E3A8A]/10 dark:hover:bg-[#4A6BAD]/20 font-black text-lg flex items-center justify-center gap-4 transition-all duration-200 active:scale-[0.98] disabled:opacity-70"
-                    >
-                      <ArrowRight className="h-5 w-5" />
-                      {isLogging ? 'Logging...' : selectedRoom ? `Log Entry ${selectedRoom}` : 'Log Entry'}
-                    </Button>
                   </CardContent>
                 </Card>
               ) : (
                 <Card className="w-full border-none shadow-2xl rounded-[40px] overflow-hidden bg-[var(--color-card-bg)]">
-                  <CardContent className="p-8 md:p-16 space-y-10 text-center">
-                    <div className="hidden md:block mb-10 text-left">
-                      <GreetingContent />
-                      <Separator className="bg-[var(--color-border)] opacity-50 mt-8" />
-                    </div>
+                  <CardContent className="p-8 md:p-16 space-y-10 text-center flex flex-col items-center">
+                    
+                    {/* Success Message - Positioned at the very top inside the card */}
+                    {showSuccess && (
+                      <div className={cn(
+                        "bg-[var(--color-status-active-bg)] border border-transparent text-[var(--color-status-active-text)] px-4 py-3 rounded-xl flex items-center gap-3 shadow-sm transition-opacity duration-500 w-full max-w-md mx-auto mb-6",
+                        isFading ? "opacity-0" : "opacity-100"
+                      )}>
+                        <CheckCircle2 className="h-5 w-5 shrink-0" />
+                        <span className="font-bold text-sm">
+                          Session verified. Thank you for using room {activeSession.roomId}.
+                        </span>
+                      </div>
+                    )}
 
                     <div className="flex flex-col items-center gap-6">
-                      {showSuccess && (
-                        <div className={cn(
-                          "bg-[var(--color-status-active-bg)] border border-transparent text-[var(--color-status-active-text)] px-4 py-3 rounded-xl flex items-center gap-3 shadow-sm transition-opacity duration-500",
-                          isFading ? "opacity-0" : "opacity-100"
-                        )}>
-                          <CheckCircle2 className="h-5 w-5 shrink-0" />
-                          <span className="font-bold text-sm">
-                            Session verified. Thank you for using room {activeSession.roomId}.
-                          </span>
-                        </div>
-                      )}
-
                       <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-5 py-2 rounded-full">
                         <Clock className="h-4 w-4" />
                         <span className="text-[11px] font-black uppercase tracking-widest">Active Usage</span>
@@ -530,8 +530,8 @@ export default function ProfessorDashboard() {
                       onClick={handleEndSession}
                       className={cn(
                         "w-full h-16 rounded-[2rem] font-black text-lg flex items-center justify-center gap-4 shadow-lg transition-all active:scale-[0.98] border-none",
-                        "bg-[var(--color-status-blocked-bg)] text-[var(--color-status-blocked-text)] hover:bg-[#DC2626] hover:text-white",
-                        "dark:bg-red-950/40 dark:text-white dark:hover:bg-[#5C7FBF] dark:hover:text-white"
+                        "bg-[#FEE2E2] text-[#991B1B] hover:bg-[#DC2626] hover:text-white",
+                        "dark:bg-red-950/40 dark:text-white dark:hover:bg-[#3D5C99]/30 dark:hover:text-white"
                       )}
                     >
                       <LogOut className="h-6 w-6" />

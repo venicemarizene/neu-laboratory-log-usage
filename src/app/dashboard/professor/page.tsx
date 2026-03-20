@@ -430,11 +430,9 @@ export default function ProfessorDashboard() {
 
       <main className="flex-1 flex flex-col items-center justify-start p-6 pt-12 md:pt-16">
         <div className="w-full max-w-6xl flex flex-col gap-8 md:gap-10">
-          {!activeSession && (
-            <div className="md:hidden w-full space-y-8">
-              <GreetingContent />
-            </div>
-          )}
+          <div className="md:hidden w-full space-y-4">
+            <GreetingContent />
+          </div>
 
           <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start relative">
             <div className={cn(
@@ -470,16 +468,9 @@ export default function ProfessorDashboard() {
               "md:col-span-8 w-full flex flex-col gap-8",
               activeSession ? "order-1 md:order-2" : "order-3 md:order-2"
             )}>
-              {/* Standalone Greeting Section for Desktop Alignment */}
               <div className="hidden md:block">
                 <GreetingContent />
               </div>
-
-              {activeSession && (
-                <div className="md:hidden w-full space-y-4">
-                  <GreetingContent />
-                </div>
-              )}
 
               {!activeSession ? (
                 <Card className="w-full border-none shadow-2xl rounded-[40px] overflow-hidden bg-[var(--color-card-bg)]">

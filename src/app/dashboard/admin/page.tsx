@@ -175,9 +175,13 @@ export default function AdminDashboard() {
     const searchLower = searchTerm.toLowerCase();
     const profNameFromMap = userNameMap[log.professorId] || '';
     const profName = (log.professorName || profNameFromMap || log.professorId || '').toLowerCase();
+    const subject = (log.subject || '').toLowerCase();
+    const classSection = (log.classSection || '').toLowerCase();
     return (
       profName.includes(searchLower) || 
-      log.roomId?.toLowerCase().includes(searchLower)
+      log.roomId?.toLowerCase().includes(searchLower) ||
+      subject.includes(searchLower) ||
+      classSection.includes(searchLower)
     );
   }) || [];
 
@@ -327,7 +331,7 @@ export default function AdminDashboard() {
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
               <Input 
-                placeholder="Search faculty or lab..." 
+                placeholder="Search faculty, lab, or subject..." 
                 className="pl-9 h-11 w-full md:w-64 rounded-xl bg-background border-slate-200 dark:border-slate-700 text-xs font-bold shadow-sm focus-visible:ring-primary"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -472,6 +476,8 @@ export default function AdminDashboard() {
             <TableHeader className="bg-slate-50/50 dark:bg-slate-900/50">
               <TableRow className="border-none hover:bg-transparent">
                 <TableHead className="px-8 h-12 text-[10px] font-black uppercase tracking-widest text-slate-900 dark:text-white">Professor</TableHead>
+                <TableHead className="hidden md:table-cell h-12 text-[10px] font-black uppercase tracking-widest text-slate-900 dark:text-white">Subject</TableHead>
+                <TableHead className="hidden md:table-cell h-12 text-[10px] font-black uppercase tracking-widest text-slate-900 dark:text-white">Class Section</TableHead>
                 <TableHead className="h-12 text-[10px] font-black uppercase tracking-widest text-slate-900 dark:text-white text-center">Laboratory</TableHead>
                 <TableHead className="h-12 text-[10px] font-black uppercase tracking-widest text-slate-900 dark:text-white text-center">Time In</TableHead>
                 <TableHead className="h-12 text-[10px] font-black uppercase tracking-widest text-slate-900 dark:text-white text-center">Time Out</TableHead>
@@ -488,6 +494,16 @@ export default function AdminDashboard() {
                         {log.professorName || userNameMap[log.professorId] || log.professorId}
                       </span>
                     </div>
+                  </TableCell>
+                  <TableCell className="hidden md:table-cell">
+                    <span className="text-[11px] font-bold text-slate-600 dark:text-slate-400">
+                      {log.subject || "—"}
+                    </span>
+                  </TableCell>
+                  <TableCell className="hidden md:table-cell">
+                    <span className="text-[11px] font-bold text-slate-600 dark:text-slate-400">
+                      {log.classSection || "—"}
+                    </span>
                   </TableCell>
                   <TableCell className="text-center">
                     <Badge variant="outline" className="rounded-full bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 px-3 py-0.5 text-[9px] font-black uppercase">
@@ -517,7 +533,7 @@ export default function AdminDashboard() {
               ))}
               {filteredLogs.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={6} className="h-32 text-center text-slate-300 font-bold italic">
+                  <TableCell colSpan={8} className="h-32 text-center text-slate-300 font-bold italic">
                     No activity logs found for this criteria.
                   </TableCell>
                 </TableRow>

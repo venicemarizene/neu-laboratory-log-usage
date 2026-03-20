@@ -58,7 +58,8 @@ export function useCollection<T = any>(
   type StateDataType = ResultItemType[] | null;
 
   const [data, setData] = useState<StateDataType>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  // CRITICAL: Start as true to prevent race conditions in authorization logic
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<FirestoreError | Error | null>(null);
 
   useEffect(() => {
@@ -78,9 +79,12 @@ export function useCollection<T = any>(
         ? (memoizedTargetRefOrQuery as CollectionReference).path
         : (memoizedTargetRefOrQuery as unknown as InternalQuery)._query?.path?.canonicalString() || 'unknown path';
     
+    const filters = (memoizedTargetRefOrQuery as any)?._query?.filters || [];
+    
     console.log(`[Firestore DEBUG] useCollection initiating request: ${path}`, {
       query: memoizedTargetRefOrQuery,
-      constraints: (memoizedTargetRefOrQuery as any)?._query?.filters || []
+      constraintsCount: filters.length,
+      constraints: filters
     });
 
     // Directly use memoizedTargetRefOrQuery as it's assumed to be the final query
@@ -96,12 +100,6 @@ export function useCollection<T = any>(
         setIsLoading(false);
       },
       (error: FirestoreError) => {
-        // This logic extracts the path from either a ref or a query
-        const path: string =
-          memoizedTargetRefOrQuery.type === 'collection'
-            ? (memoizedTargetRefOrQuery as CollectionReference).path
-            : (memoizedTargetRefOrQuery as unknown as InternalQuery)._query.path.canonicalString()
-
         const contextualError = new FirestorePermissionError({
           operation: 'list',
           path,
@@ -119,6 +117,5 @@ export function useCollection<T = any>(
     return () => unsubscribe();
   }, [memoizedTargetRefOrQuery]); // Re-run if the target query/reference changes.
   
-  // Note: Relaxed memoization check to handle frozen Firestore SDK objects in different environments
   return { data, isLoading, error };
 }

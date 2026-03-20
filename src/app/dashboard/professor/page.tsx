@@ -233,6 +233,7 @@ export default function ProfessorDashboard() {
   // QUERY: Personal History - FILTERED BY professorId
   const personalLogsQuery = useMemoFirebase(() => {
     if (!user?.uid || !db) return null;
+    // CRITICAL: Must have professorId filter as the first constraint to satisfy security rules
     return query(
       collection(db, 'room_logs'),
       where('professorId', '==', user.uid),

@@ -257,10 +257,7 @@ export default function ProfessorDashboard() {
       </header>
 
       <main className="flex-1 flex flex-col items-center justify-start p-6 pt-16">
-        {/* Unified Centered Container */}
         <div className="w-full max-w-md flex flex-col items-center gap-8">
-          
-          {/* Greeting Section */}
           <div className="w-full flex flex-col items-center gap-6">
             {activeSession && (
               <div className="w-full bg-[var(--color-status-active-bg)] border border-transparent text-[var(--color-status-active-text)] px-4 py-3 rounded-xl flex items-center gap-3 animate-in slide-in-from-top-4 shadow-sm">
@@ -279,7 +276,6 @@ export default function ProfessorDashboard() {
             </div>
           </div>
 
-          {/* Cards Group (Main Logic + Profile Info) */}
           <div className="w-full flex flex-col items-center gap-4">
             {!activeSession ? (
               <Card className="w-full max-w-[360px] border-none shadow-2xl rounded-[32px] overflow-hidden bg-[var(--color-card-bg)]">
@@ -305,7 +301,7 @@ export default function ProfessorDashboard() {
                   <div className="space-y-3">
                     <Button 
                       onClick={() => setIsScannerOpen(true)}
-                      className="w-full h-12 rounded-2xl bg-[#5C7CFA] dark:bg-[#4C6EF5] hover:opacity-90 text-white font-black text-base flex items-center justify-center gap-3 shadow-lg transition-all active:scale-[0.98]"
+                      className="w-full h-12 rounded-2xl bg-[#5C7CFA] dark:bg-[#4C6EF5] hover:opacity-90 text-white font-black text-base flex items-center justify-center gap-3 shadow-lg transition-all active:scale-[0.98] border-none"
                     >
                       <QrCode className="h-4 w-4" />
                       Auto-Log via QR
@@ -314,7 +310,7 @@ export default function ProfessorDashboard() {
                     <Button 
                       onClick={() => handleLogEntry(selectedRoom)}
                       disabled={isLogging}
-                      className="w-full h-12 rounded-2xl bg-[#3D5C99] dark:bg-[#3D6DB5] hover:bg-[#3D5C99]/90 dark:hover:bg-[#2F5A9E] text-white font-black text-base flex items-center justify-center gap-3 shadow-lg transition-all active:scale-[0.98] disabled:opacity-70"
+                      className="w-full h-12 rounded-2xl bg-[#3D5C99] dark:bg-[#3D6DB5] hover:bg-[#3D5C99]/90 dark:hover:bg-[#2F5A9E] text-white font-black text-base flex items-center justify-center gap-3 shadow-lg transition-all active:scale-[0.98] disabled:opacity-70 border-none"
                     >
                       <ArrowRight className="h-4 w-4" />
                       {isLogging ? 'Logging...' : `Log Entry ${selectedRoom}`}
@@ -345,7 +341,6 @@ export default function ProfessorDashboard() {
               </Card>
             )}
 
-            {/* Professor Info Card (Now directly below the main card) */}
             <div className="w-full max-w-[360px] bg-[var(--color-card-bg)] rounded-3xl p-4 shadow-sm flex items-center justify-between border border-[var(--color-border)] transition-colors">
               <div className="flex items-center gap-3">
                 <Avatar className="h-10 w-10 bg-primary/10 rounded-2xl border-none">

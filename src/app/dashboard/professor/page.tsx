@@ -531,7 +531,7 @@ export default function ProfessorDashboard() {
 
                     <Button 
                       onClick={handleEndSession}
-                      className="w-full h-16 rounded-[2rem] bg-[var(--color-status-blocked-bg)] text-[var(--color-status-blocked-text)] hover:opacity-90 font-black text-lg flex items-center justify-center gap-4 shadow-lg transition-all active:scale-[0.98]"
+                      className="w-full h-16 rounded-[2rem] bg-[var(--color-status-blocked-bg)] text-[var(--color-status-blocked-text)] dark:text-white hover:opacity-90 dark:hover:bg-[#4A6BAD]/20 font-black text-lg flex items-center justify-center gap-4 shadow-lg transition-all active:scale-[0.98]"
                     >
                       <LogOut className="h-6 w-6" />
                       End Session

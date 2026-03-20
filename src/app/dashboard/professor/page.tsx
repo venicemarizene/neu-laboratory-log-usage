@@ -237,7 +237,7 @@ export default function ProfessorDashboard() {
     return query(
       collection(db, 'room_logs'),
       where('professorId', '==', user.uid),
-      orderBy('timeIn', 'desc'),
+      orderBy('startTime', 'desc'),
       limit(100)
     );
   }, [user?.uid, db]);
@@ -276,14 +276,14 @@ export default function ProfessorDashboard() {
     const currentMonth = now.getMonth();
     const currentYear = now.getFullYear();
     const monthLogs = personalLogs.filter(log => {
-      const logDate = new Date(log.timeIn);
+      const logDate = new Date(log.startTime);
       return logDate.getMonth() === currentMonth && logDate.getFullYear() === currentYear;
     });
     const count = monthLogs.length;
     let ms = 0;
     const rooms: Record<string, number> = {};
     monthLogs.forEach(log => {
-      if (log.timeIn && log.timeOut) ms += (new Date(log.timeOut).getTime() - new Date(log.timeIn).getTime());
+      if (log.startTime && log.endTime) ms += (new Date(log.endTime).getTime() - new Date(log.startTime).getTime());
       if (log.roomId) rooms[log.roomId] = (rooms[log.roomId] || 0) + 1;
     });
     let topRoom = '—';
@@ -307,7 +307,7 @@ export default function ProfessorDashboard() {
       const logRef = doc(db, 'room_logs', activeSession.id);
       updateDocumentNonBlocking(logRef, {
         status: 'Completed',
-        timeOut: new Date().toISOString(),
+        endTime: new Date().toISOString(),
         updatedAt: new Date().toISOString()
       });
     }
@@ -349,7 +349,7 @@ export default function ProfessorDashboard() {
       roomId: roomId,
       subject: subject.trim(),
       classSection: classSection.trim(),
-      timeIn: now,
+      startTime: now,
       status: 'Active',
       createdAt: now,
       updatedAt: now,
@@ -370,7 +370,7 @@ export default function ProfessorDashboard() {
     const logRef = doc(db, 'room_logs', activeSession.id);
     updateDocumentNonBlocking(logRef, {
       status: 'Completed',
-      timeOut: new Date().toISOString(),
+      endTime: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     });
     setActiveSession(null);

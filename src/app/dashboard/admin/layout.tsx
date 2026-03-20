@@ -1,16 +1,26 @@
+
 "use client"
 
 import { ReactNode, useEffect } from 'react';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { AdminSidebar } from '@/components/layout/AdminSidebar';
-import { useUser } from '@/firebase';
+import { useUser, useFirestore, useMemoFirebase, useDoc } from '@/firebase';
 import { useRouter } from 'next/navigation';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import { doc } from 'firebase/firestore';
 
 export default function AdminDashboardLayout({ children }: { children: ReactNode }) {
   const { user, isUserLoading } = useUser();
+  const db = useFirestore();
   const router = useRouter();
+
+  // Fetch the user's profile to verify their role
+  const profileRef = useMemoFirebase(() => {
+    if (!user || !db) return null;
+    return doc(db, 'user_profiles', user.uid);
+  }, [user, db]);
+  const { data: profile, isLoading: isProfileLoading } = useDoc(profileRef);
 
   useEffect(() => {
     if (!isUserLoading && !user) {
@@ -18,7 +28,14 @@ export default function AdminDashboardLayout({ children }: { children: ReactNode
     }
   }, [user, isUserLoading, router]);
 
-  if (isUserLoading) {
+  // Role-based protection: redirect non-admins back to the professor dashboard
+  useEffect(() => {
+    if (!isUserLoading && !isProfileLoading && profile && profile.role !== 'Admin') {
+      router.push('/dashboard/professor');
+    }
+  }, [profile, isProfileLoading, isUserLoading, router]);
+
+  if (isUserLoading || isProfileLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="animate-pulse flex flex-col items-center gap-4">
@@ -29,7 +46,7 @@ export default function AdminDashboardLayout({ children }: { children: ReactNode
     );
   }
 
-  if (!user) {
+  if (!user || !profile || profile.role !== 'Admin') {
     return null;
   }
 

@@ -436,10 +436,6 @@ export default function ProfessorDashboard() {
             </div>
           )}
 
-          <div className="hidden md:block">
-            <GreetingContent />
-          </div>
-
           <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start relative">
             <div className={cn(
               "md:col-span-4 flex flex-col gap-4 w-full md:border-r md:border-[var(--color-border)] md:pr-10",
@@ -474,6 +470,11 @@ export default function ProfessorDashboard() {
               "md:col-span-8 w-full flex flex-col gap-8",
               activeSession ? "order-1 md:order-2" : "order-3 md:order-2"
             )}>
+              {/* Standalone Greeting Section for Desktop Alignment */}
+              <div className="hidden md:block">
+                <GreetingContent />
+              </div>
+
               {activeSession && (
                 <div className="md:hidden w-full space-y-4">
                   <GreetingContent />
@@ -593,14 +594,11 @@ export default function ProfessorDashboard() {
         <DialogContent 
           className={cn(
             "p-0 overflow-hidden border-none bg-[var(--color-card-bg)] flex flex-col",
-            // Desktop specific layout
             "sm:max-w-[420px] sm:rounded-[14px] sm:p-8 sm:h-auto sm:max-h-[85vh]",
-            // Mobile full-screen layout
-            "max-sm:fixed max-sm:inset-0 max-sm:h-[100dvh] max-sm:w-[100vw] max-sm:max-w-none max-sm:rounded-none max-sm:translate-x-0 max-sm:translate-y-0 max-sm:justify-between"
+            "max-sm:fixed max-sm:inset-0 max-sm:h-[100dvh] max-sm:w-[100vw] max-sm:max-w-none max-sm:rounded-none max-sm:translate-x-0 max-sm:translate-y-0"
           )}
         >
-          {/* Header & Inputs Area */}
-          <div className="flex flex-col flex-1 max-sm:p-4 max-sm:pt-0">
+          <div className="flex flex-col flex-1 max-sm:p-6 max-sm:pt-0 overflow-y-auto">
             {/* Drag handle pill at the very top for mobile */}
             <div className="md:hidden w-12 h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full mx-auto mt-4 mb-6" />
             
@@ -649,11 +647,21 @@ export default function ProfessorDashboard() {
                 {errors.classSection && <p className="text-red-500 text-[12px] font-bold ml-4 mt-1">{errors.classSection}</p>}
                 {activeInput === 'classSection' && <SuggestionBox items={filteredSuggestions} onSelect={(val) => { setClassSection(val); setActiveInput(null); }} />}
               </div>
+
+              {/* Mobile Button - Normal Flow directly after Class Section with 16px gap via mt-4 */}
+              <div className="sm:hidden mt-4">
+                <Button 
+                  onClick={() => handleLogEntry(scannedRoomId)} 
+                  className="w-full h-16 rounded-[2rem] bg-primary text-white font-black text-lg flex items-center justify-center gap-4 shadow-lg transition-all active:scale-[0.98] border-none"
+                >
+                  <Check className="h-6 w-6" /> Confirm Session
+                </Button>
+              </div>
             </div>
           </div>
 
-          {/* Footer Area with Pinned Button */}
-          <div className="p-4 sm:p-0 sm:mt-8">
+          {/* Desktop Footer Only */}
+          <div className="hidden sm:block sm:mt-8">
             <Button 
               onClick={() => handleLogEntry(scannedRoomId)} 
               className="w-full h-16 rounded-[2rem] bg-primary text-white font-black text-lg flex items-center justify-center gap-4 shadow-lg transition-all active:scale-[0.98] border-none"

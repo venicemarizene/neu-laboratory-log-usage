@@ -50,10 +50,10 @@ export default function AdminDashboardLayout({ children }: { children: ReactNode
 
   return (
     <SidebarProvider>
-      <div className="flex min-h-screen w-full bg-[#F8FAFC] dark:bg-[var(--color-page-bg)] transition-colors">
+      <div className="flex min-h-screen w-full bg-[#F8FAFC] dark:bg-[#2A3245] transition-colors">
         <AdminSidebar />
         <div className="flex-1 flex flex-col relative overflow-hidden">
-          <main className="flex-1 overflow-auto bg-slate-50/50 dark:bg-[var(--color-page-bg)]/50">
+          <main className="flex-1 overflow-auto bg-transparent">
             {children}
           </main>
         </div>

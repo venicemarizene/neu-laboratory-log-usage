@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useState, useEffect, useMemo } from 'react';
@@ -43,7 +44,6 @@ export default function UserManagementPage() {
   const [mounted, setMounted] = useState(false);
   const db = useFirestore();
 
-  // Guard: Verify user role
   const adminRoleRef = useMemoFirebase(() => {
     if (!user?.uid || !db) return null;
     return doc(db, 'admin_roles', user.uid);
@@ -98,11 +98,10 @@ export default function UserManagementPage() {
 
   if (!isAuthorizedAdmin) return null;
 
-  const cardStyle = "border border-[#C5D3E8] shadow-[0_2px_8px_rgba(45,58,107,0.08)] hover:shadow-[0_4px_16px_rgba(45,58,107,0.14)] hover:-translate-y-[1px] transition-all duration-200 bg-[#F4F7FC] dark:bg-[#3D4966] rounded-[32px] overflow-hidden";
+  const cardStyle = "border border-[#C5D3E8] dark:border-[#424F6A] shadow-[0_2px_8px_rgba(45,58,107,0.08)] hover:shadow-[0_4px_16px_rgba(45,58,107,0.14)] hover:-translate-y-[1px] transition-all duration-200 bg-[#F4F7FC] dark:bg-[#3D4966] rounded-[32px] overflow-hidden";
 
   return (
     <div className="px-8 pt-6 pb-8 space-y-8 max-w-[1400px] mx-auto">
-      {/* Header Row */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <SidebarTrigger className="h-9 w-9 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-colors" />
@@ -117,13 +116,13 @@ export default function UserManagementPage() {
       </div>
 
       <Card className={cardStyle}>
-        <CardHeader className="p-8 border-b border-[#C5D3E8] dark:border-slate-800">
+        <CardHeader className="p-8 border-b border-[#C5D3E8] dark:border-[#424F6A]">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="relative w-full">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-300" />
               <Input 
                 placeholder="Search faculty by name or email..." 
-                className="pl-10 h-11 rounded-xl bg-background border-[#C5D3E8] dark:border-slate-700 text-sm font-bold placeholder:text-slate-300 shadow-sm focus-visible:ring-primary w-full"
+                className="pl-10 h-11 rounded-xl bg-background border-[#C5D3E8] dark:border-[#424F6A] text-sm font-bold placeholder:text-slate-300 shadow-sm focus-visible:ring-primary w-full"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -133,7 +132,7 @@ export default function UserManagementPage() {
         <CardContent className="p-0">
           <Table>
             <TableHeader className="bg-slate-50/50 dark:bg-slate-900/50">
-              <TableRow className="border-b border-[#C5D3E8] dark:border-slate-800 hover:bg-transparent">
+              <TableRow className="border-b border-[#C5D3E8] dark:border-[#424F6A] hover:bg-transparent">
                 <TableHead className="px-8 h-12 text-[10px] font-black uppercase tracking-widest text-slate-900 dark:text-white">Professor</TableHead>
                 <TableHead className="h-12 text-[10px] font-black uppercase tracking-widest text-slate-900 dark:text-white text-center">Role</TableHead>
                 <TableHead className="h-12 text-[10px] font-black uppercase tracking-widest text-slate-900 dark:text-white text-center">Status</TableHead>
@@ -142,7 +141,7 @@ export default function UserManagementPage() {
             </TableHeader>
             <TableBody>
               {filteredUsers.map((user) => (
-                <TableRow key={user.id} className="border-b border-[#C5D3E8] dark:border-slate-800 hover:bg-slate-50/30 dark:hover:bg-slate-800/30 transition-colors h-20">
+                <TableRow key={user.id} className="border-b border-[#C5D3E8] dark:border-[#424F6A] hover:bg-slate-50/30 dark:hover:bg-slate-800/30 transition-colors h-20">
                   <TableCell className="px-8 text-left">
                     <div className="flex flex-col items-start">
                       <span className="font-bold text-slate-800 dark:text-slate-200">{user.name}</span>
@@ -172,7 +171,7 @@ export default function UserManagementPage() {
                           <MoreVertical className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="w-56 p-2 rounded-2xl border border-[#C5D3E8] shadow-2xl">
+                      <DropdownMenuContent align="end" className="w-56 p-2 rounded-2xl border border-[#C5D3E8] dark:border-[#424F6A] shadow-2xl">
                         <DropdownMenuItem 
                           onClick={() => toggleBlockStatus(user.id, user.isBlocked)}
                           className="rounded-xl h-10 font-bold text-sm cursor-pointer"

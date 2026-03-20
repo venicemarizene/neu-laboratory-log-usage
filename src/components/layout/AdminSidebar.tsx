@@ -45,12 +45,12 @@ export function AdminSidebar() {
     <Sidebar className="border-none bg-primary dark:bg-slate-900 text-white">
       <SidebarHeader className="p-6">
         <div className="flex items-center gap-3">
-          <div className="bg-white rounded-full p-1 shadow-sm border border-slate-100 flex items-center justify-center shrink-0 overflow-hidden w-[52px] h-[52px]">
+          <div className="bg-white rounded-full p-0.5 shadow-sm border border-slate-100 flex items-center justify-center shrink-0 overflow-hidden w-[44px] h-[44px]">
             <img
               src="/NEU_LOGO.png"
               alt="New Era University Logo"
               className="rounded-full"
-              style={{ width: '44px', height: '44px', objectFit: 'contain' }}
+              style={{ width: '40px', height: '40px', objectFit: 'contain' }}
             />
           </div>
           <span className="font-black text-xl tracking-tight text-white leading-tight">New Era University</span>
@@ -85,7 +85,6 @@ export function AdminSidebar() {
       </SidebarContent>
 
       <SidebarFooter className="p-6 space-y-4 mt-auto">
-        {/* Administrator Profile Information */}
         {user && (
           <div className="px-4 py-2 border-b border-white/10 mb-2">
             <p className="text-sm font-black text-white leading-none truncate">

@@ -32,21 +32,18 @@ export default function RoomManagementPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [filter, setFilter] = useState<FilterType>('All');
 
-  // Verify authorization
   const adminRoleRef = useMemoFirebase(() => {
     if (!user?.uid || !db) return null;
     return doc(db, 'admin_roles', user.uid);
   }, [user?.uid, db]);
   const { isLoading: isAdminRoleLoading } = useDoc(adminRoleRef);
 
-  // Real-time listener for active sessions
   const activeLogsQuery = useMemoFirebase(() => {
     if (!db) return null;
     return query(collection(db, 'room_logs'), where('status', '==', 'Active'));
   }, [db]);
   const { data: activeLogs, isLoading: isLogsLoading } = useCollection(activeLogsQuery as any);
 
-  // Mapping room occupancy
   const roomOccupancy = useMemo(() => {
     const map: Record<string, { occupied: boolean; professorName?: string }> = {};
     LAB_ROOMS.forEach(roomId => {
@@ -95,11 +92,10 @@ export default function RoomManagementPage() {
     );
   }
 
-  const cardBaseStyle = "border border-[#C5D3E8] shadow-[0_2px_8px_rgba(45,58,107,0.08)] hover:shadow-[0_4px_16px_rgba(45,58,107,0.14)] hover:-translate-y-[1px] transition-all duration-200 bg-[#F4F7FC] dark:bg-[#3D4966] rounded-[32px] overflow-hidden relative";
+  const cardBaseStyle = "border border-[#C5D3E8] dark:border-[#424F6A] shadow-[0_2px_8px_rgba(45,58,107,0.08)] hover:shadow-[0_4px_16px_rgba(45,58,107,0.14)] hover:-translate-y-[1px] transition-all duration-200 bg-[#F4F7FC] dark:bg-[#3D4966] rounded-[32px] overflow-hidden relative";
 
   return (
     <div className="px-8 pt-6 pb-8 space-y-8 max-w-[1400px] mx-auto">
-      {/* Header Row */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <SidebarTrigger className="h-9 w-9 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-colors" />
@@ -113,7 +109,6 @@ export default function RoomManagementPage() {
         <ThemeToggle />
       </div>
 
-      {/* Stat Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card className={cardBaseStyle}>
           <CardContent className="p-8 flex items-center gap-6">
@@ -152,9 +147,8 @@ export default function RoomManagementPage() {
         </Card>
       </div>
 
-      {/* Filters Row */}
       <div className="flex justify-end">
-        <div className="flex bg-slate-100 dark:bg-slate-900 p-1 rounded-xl w-full md:w-auto border border-[#C5D3E8] dark:border-slate-800">
+        <div className="flex bg-slate-100 dark:bg-slate-900 p-1 rounded-xl w-full md:w-auto border border-[#C5D3E8] dark:border-[#424F6A]">
           {(['All', 'Occupied', 'Vacant'] as FilterType[]).map((f) => (
             <Button
               key={f}
@@ -172,15 +166,13 @@ export default function RoomManagementPage() {
         </div>
       </div>
 
-      {/* Main Two-Column Layout */}
       <div className="grid grid-cols-1 md:grid-cols-12 gap-8 h-[600px]">
-        {/* Left Column: List + Search Unified Card */}
-        <Card className="md:col-span-5 flex flex-col bg-[#F4F7FC] dark:bg-[#3D4966] border border-[#C5D3E8] dark:border-slate-800 rounded-[12px] overflow-hidden p-4 shadow-[0_2px_8px_rgba(45,58,107,0.08)] transition-all">
+        <Card className="md:col-span-5 flex flex-col bg-[#F4F7FC] dark:bg-[#3D4966] border border-[#C5D3E8] dark:border-[#424F6A] rounded-[12px] overflow-hidden p-4 shadow-[0_2px_8px_rgba(45,58,107,0.08)] transition-all">
           <div className="relative mb-4">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
             <Input 
               placeholder="Search room or faculty..." 
-              className="pl-10 h-11 rounded-xl bg-background border-[#C5D3E8] dark:border-slate-700 text-xs font-bold shadow-sm focus-visible:ring-primary"
+              className="pl-10 h-11 rounded-xl bg-background border-[#C5D3E8] dark:border-[#424F6A] text-xs font-bold shadow-sm focus-visible:ring-primary"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -235,17 +227,10 @@ export default function RoomManagementPage() {
                   </button>
                 );
               })}
-              {filteredRooms.length === 0 && (
-                <div className="flex flex-col items-center justify-center py-20 text-center space-y-2">
-                  <AlertCircle className="h-8 w-8 text-slate-200 dark:text-slate-700" />
-                  <p className="text-xs font-bold text-slate-400 italic">No matching laboratories found</p>
-                </div>
-              )}
             </div>
           </ScrollArea>
         </Card>
 
-        {/* Right Column: Detail Panel */}
         <Card className={cn(cardBaseStyle, "md:col-span-7 flex items-center justify-center p-12 hover:translate-y-0")}>
           <div className="w-full max-w-md flex flex-col items-center gap-10">
             <div className="text-center space-y-2">
@@ -285,7 +270,7 @@ export default function RoomManagementPage() {
               </div>
 
               {selectedRoomData.occupied && (
-                <Card className="border border-[#C5D3E8] shadow-sm bg-white dark:bg-slate-800 rounded-3xl overflow-hidden animate-in fade-in slide-in-from-bottom-2 duration-300">
+                <Card className="border border-[#C5D3E8] dark:border-[#424F6A] shadow-sm bg-white dark:bg-slate-800 rounded-3xl overflow-hidden animate-in fade-in slide-in-from-bottom-2 duration-300">
                   <CardContent className="p-6 flex items-center gap-4">
                     <div className="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
                       <Users size={20} />

@@ -43,7 +43,7 @@ import {
   SelectValue 
 } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { startOfDay, endOfDay, subWeeks, subMonths, isBefore } from 'date-fns';
+import { startOfDay, endOfDay, subWeeks, subMonths, isBefore, format } from 'date-fns';
 
 const MONTHS = [
   "January", "February", "March", "April", "May", "June",
@@ -186,11 +186,9 @@ export default function AdminDashboard() {
 
   const formatTime = (dateString: string | null) => {
     if (!dateString) return "—";
-    return new Date(dateString).toLocaleTimeString('en-US', {
-      hour: 'numeric',
-      minute: '2-digit',
-      hour12: true
-    });
+    const date = new Date(dateString);
+    // Standardized institutional format: "Mar 20 · 11:03 PM"
+    return format(date, "MMM d '·' h:mm a");
   };
 
   const calculateDuration = (start: string, end: string | null) => {
@@ -199,10 +197,10 @@ export default function AdminDashboard() {
     const endTime = new Date(end).getTime();
     const diffMs = endTime - startTime;
     
-    // Fixed: Handle negative values or zero (clock drift or error)
+    // Defensive check: Handle negative values or zero (clock drift or error)
     if (diffMs <= 0) return "—";
 
-    // Fixed: Show seconds if less than a minute
+    // Show seconds if less than a minute
     if (diffMs < 60000) {
       const seconds = Math.floor(diffMs / 1000);
       return `${seconds}s`;

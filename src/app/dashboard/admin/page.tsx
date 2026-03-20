@@ -54,6 +54,11 @@ const MONTHS = [
 const DAYS = Array.from({ length: 31 }, (_, i) => (i + 1).toString());
 const YEARS = Array.from({ length: 5 }, (_, i) => (new Date().getFullYear() - 2 + i).toString());
 
+const BOOTSTRAP_ADMINS = [
+  'venicemarizene.linga@neu.edu.ph',
+  'jcesperanza@neu.edu.ph'
+];
+
 interface CustomDate {
   month: string;
   day: string;
@@ -81,21 +86,34 @@ export default function AdminDashboard() {
 
   const db = useFirestore();
 
-  // Guard: Verify user role before executing administrative queries
+  // Guard: Verify user role using both profile and admin_roles collection to match Security Rules
+  const adminRoleRef = useMemoFirebase(() => {
+    if (!user?.uid || !db) return null;
+    return doc(db, 'admin_roles', user.uid);
+  }, [user?.uid, db]);
+  const { data: adminRole, isLoading: isAdminRoleLoading } = useDoc(adminRoleRef);
+
   const profileRef = useMemoFirebase(() => {
-    if (!user || !db) return null;
+    if (!user?.uid || !db) return null;
     return doc(db, 'user_profiles', user.uid);
-  }, [user, db]);
-  const { data: profile } = useDoc(profileRef);
-  const isAdmin = profile?.role === 'Admin';
+  }, [user?.uid, db]);
+  const { data: profile, isLoading: isProfileLoading } = useDoc(profileRef);
+
+  const isAuthorizedAdmin = useMemo(() => {
+    if (isAdminRoleLoading || isProfileLoading) return false;
+    return (
+      !!adminRole || 
+      profile?.role === 'Admin' || 
+      BOOTSTRAP_ADMINS.includes(user?.email || '')
+    );
+  }, [adminRole, profile, user, isAdminRoleLoading, isProfileLoading]);
 
   const usersQuery = useMemoFirebase(() => {
-    if (!db || !user || !isAdmin) return null;
+    if (!db || !user || !isAuthorizedAdmin) return null;
     return collection(db, 'user_profiles');
-  }, [db, user, isAdmin]);
+  }, [db, user, isAuthorizedAdmin]);
   const { data: users } = useCollection(usersQuery as any);
 
-  // Create a lookup map for names to handle legacy logs or missing fields
   const userNameMap = useMemo(() => {
     const map: Record<string, string> = {};
     users?.forEach(u => {
@@ -105,7 +123,7 @@ export default function AdminDashboard() {
   }, [users]);
 
   const logsQuery = useMemoFirebase(() => {
-    if (!db || !user || !isAdmin) return null;
+    if (!db || !user || !isAuthorizedAdmin) return null;
     let q = query(collection(db, 'room_logs'), orderBy('createdAt', 'desc'));
 
     const today = new Date();
@@ -128,7 +146,7 @@ export default function AdminDashboard() {
     }
 
     return query(q, limit(100));
-  }, [db, user, filterLabel, customFrom, customTo, isAdmin]);
+  }, [db, user, filterLabel, customFrom, customTo, isAuthorizedAdmin]);
   
   const { data: logs } = useCollection(logsQuery as any);
 
@@ -136,7 +154,18 @@ export default function AdminDashboard() {
     setMounted(true);
   }, []);
 
-  if (!mounted || !user || !isAdmin) return null;
+  if (!mounted || !user || isAdminRoleLoading || isProfileLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="animate-pulse flex flex-col items-center gap-4">
+          <div className="h-12 w-12 bg-primary/20 rounded-full" />
+          <div className="h-4 w-24 bg-muted rounded" />
+        </div>
+      </div>
+    );
+  }
+
+  if (!isAuthorizedAdmin) return null;
 
   const activeLogsCount = logs?.filter(l => l.status === 'Active').length || 0;
   const uniqueFacultyCount = new Set(logs?.map(l => l.professorId)).size || 0;

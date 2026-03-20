@@ -7,9 +7,7 @@ service cloud.firestore {
      * NEU LabTrack Security Rules
      * 
      * CORE PHILOSOPHY:
-     * This ruleset implements a hybrid security model designed for a university computer laboratory 
-     * tracking system. It prioritizes Authorization Independence by using a dedicated collection 
-     * for administrative roles.
+     * Standardized security model that enforces ownership and explicit role-based access.
      */
 
     // --- Helper Functions ---
@@ -48,33 +46,32 @@ service cloud.firestore {
     // --- Collection Rules ---
 
     /**
-     * @description Rules for user profile data. Users manage their own; admins manage all.
+     * @description Rules for user profile data.
      */
     match /user_profiles/{userId} {
-      allow get, list: if isOwner(userId) || isAdmin();
+      // Use standard read rules; Firestore will enforce ownership as a filter for list queries
+      allow read: if isOwner(userId) || isAdmin();
       allow create: if isOwner(userId) && request.resource.data.id == userId;
       allow update: if (isOwner(userId) || isAdmin()) && resource != null && request.resource.data.id == resource.data.id;
       allow delete: if isAdmin();
     }
 
     /**
-     * @description Lab room definitions. Read-only for most; writable by admins.
+     * @description Lab room definitions.
      */
     match /rooms/{roomId} {
-      allow read: if true;
+      allow read: if isSignedIn();
       allow write: if isAdmin();
     }
 
     /**
      * @description Usage logs for laboratory sessions.
-     * Prioritize ownership check to allow professors to query their own sessions.
      */
     match /room_logs/{logId} {
-      // Use 'read' to cover both 'get' and 'list' with a consistent ownership check
+      // Standard read rule; requires a filter matching professorId for non-admins
       allow read: if isSignedIn() && (
         isAdmin() || 
-        (resource != null && resource.data.professorId == request.auth.uid) ||
-        (resource == null && request.query.limit <= 100) // Allow list query initiation
+        (resource != null && resource.data.professorId == request.auth.uid)
       );
       allow create: if isSignedIn() && request.resource.data.professorId == request.auth.uid;
       allow update: if isSignedIn() && (

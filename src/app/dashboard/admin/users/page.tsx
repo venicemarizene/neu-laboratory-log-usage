@@ -1,6 +1,7 @@
+
 "use client"
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -19,7 +20,7 @@ import {
   ShieldCheck, 
   MoreVertical
 } from 'lucide-react';
-import { useCollection, useFirestore, useMemoFirebase, useUser } from '@/firebase';
+import { useCollection, useFirestore, useMemoFirebase, useUser, useDoc } from '@/firebase';
 import { collection, doc } from 'firebase/firestore';
 import { updateDocumentNonBlocking } from '@/firebase/non-blocking-updates';
 import {
@@ -29,16 +30,43 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
+const BOOTSTRAP_ADMINS = [
+  'venicemarizene.linga@neu.edu.ph',
+  'jcesperanza@neu.edu.ph'
+];
+
 export default function UserManagementPage() {
   const { user } = useUser();
   const [searchTerm, setSearchTerm] = useState('');
   const [mounted, setMounted] = useState(false);
   const db = useFirestore();
 
+  // Guard: Verify user role before executing administrative queries
+  const adminRoleRef = useMemoFirebase(() => {
+    if (!user?.uid || !db) return null;
+    return doc(db, 'admin_roles', user.uid);
+  }, [user?.uid, db]);
+  const { data: adminRole, isLoading: isAdminRoleLoading } = useDoc(adminRoleRef);
+
+  const profileRef = useMemoFirebase(() => {
+    if (!user?.uid || !db) return null;
+    return doc(db, 'user_profiles', user.uid);
+  }, [user?.uid, db]);
+  const { data: profile, isLoading: isProfileLoading } = useDoc(profileRef);
+
+  const isAuthorizedAdmin = useMemo(() => {
+    if (isAdminRoleLoading || isProfileLoading) return false;
+    return (
+      !!adminRole || 
+      profile?.role === 'Admin' || 
+      BOOTSTRAP_ADMINS.includes(user?.email || '')
+    );
+  }, [adminRole, profile, user, isAdminRoleLoading, isProfileLoading]);
+
   const usersQuery = useMemoFirebase(() => {
-    if (!db || !user) return null;
+    if (!db || !user || !isAuthorizedAdmin) return null;
     return collection(db, 'user_profiles');
-  }, [db, user]);
+  }, [db, user, isAuthorizedAdmin]);
   const { data: users, isLoading } = useCollection(usersQuery as any);
 
   useEffect(() => {
@@ -55,7 +83,18 @@ export default function UserManagementPage() {
     updateDocumentNonBlocking(userRef, { isBlocked: !currentStatus });
   };
 
-  if (!mounted || !user) return null;
+  if (!mounted || !user || isAdminRoleLoading || isProfileLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="animate-pulse flex flex-col items-center gap-4">
+          <div className="h-12 w-12 bg-primary/20 rounded-full" />
+          <div className="h-4 w-24 bg-muted rounded" />
+        </div>
+      </div>
+    );
+  }
+
+  if (!isAuthorizedAdmin) return null;
 
   return (
     <div className="p-8 space-y-8 max-w-[1400px] mx-auto">

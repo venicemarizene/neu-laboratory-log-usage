@@ -601,7 +601,7 @@ export default function ProfessorDashboard() {
           className={cn(
             "p-0 overflow-hidden border-none bg-[var(--color-card-bg)]",
             "sm:max-w-[420px] sm:rounded-[14px] sm:p-8", // Desktop styling
-            "max-sm:fixed max-sm:bottom-0 max-sm:left-0 max-sm:right-0 max-sm:max-w-none max-sm:translate-x-0 max-sm:translate-y-0 max-sm:h-[65vh] max-sm:rounded-t-[32px] max-sm:flex max-sm:flex-col" // Mobile bottom sheet styling
+            "max-sm:fixed max-sm:bottom-0 max-sm:left-0 max-sm:right-0 max-sm:max-w-none max-sm:translate-x-0 max-sm:translate-y-0 max-sm:h-[80vh] max-sm:rounded-t-[32px] max-sm:flex max-sm:flex-col" // Mobile bottom sheet styling
           )}
         >
           {/* Mobile Drag Handle */}
@@ -611,6 +611,7 @@ export default function ProfessorDashboard() {
             <DialogTitle className="text-xl font-black text-[var(--color-text-primary)] tracking-tight">Confirm Laboratory Session</DialogTitle>
           </DialogHeader>
 
+          {/* Scrollable Content Area */}
           <div className="flex-1 overflow-y-auto p-6 sm:p-0 space-y-8 pb-32 sm:pb-0">
             <div className="flex items-center gap-3 bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 p-4 rounded-2xl">
               <CheckCircle2 className="h-6 w-6" />
@@ -658,7 +659,8 @@ export default function ProfessorDashboard() {
             </div>
           </div>
 
-          <div className="max-sm:fixed max-sm:bottom-0 max-sm:left-0 max-sm:right-0 max-sm:p-6 max-sm:bg-[var(--color-card-bg)] max-sm:border-t max-sm:border-[var(--color-border)]">
+          {/* Pinned Action Bar for Mobile */}
+          <div className="max-sm:fixed max-sm:bottom-0 max-sm:left-0 max-sm:right-0 max-sm:p-6 max-sm:bg-[var(--color-card-bg)] max-sm:border-t max-sm:border-[var(--color-border)] z-10">
             <Button 
               onClick={() => handleLogEntry(scannedRoomId)} 
               className="w-full h-16 rounded-[2rem] bg-primary text-white font-black text-lg flex items-center justify-center gap-4 shadow-lg transition-all active:scale-[0.98] border-none"
@@ -671,4 +673,3 @@ export default function ProfessorDashboard() {
     </div>
   );
 }
-

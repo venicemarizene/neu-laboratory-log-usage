@@ -47,7 +47,7 @@
   --color-page-bg: #2A3245;
   --color-card-bg: #3D4966;
   --color-sidebar-bg: #232D42;
-  --color-primary: #86A7E0;
+  --color-primary: #94B4EB;
   --color-accent-bg: #2A3A5A;
   --color-accent-border: #3A5080;
   --color-text-primary: #E2E8F4;
@@ -62,11 +62,11 @@
   /* shadcn/ui variables mapping for dim mode */
   --background: 222 24% 22%;
   --foreground: 210 40% 96%;
-  --card: 222 25% 32%;
+  --card: 222 25% 40%;
   --card-foreground: 210 40% 96%;
   --popover: 222 26% 27%;
   --popover-foreground: 210 40% 96%;
-  --primary: 218 55% 70%;
+  --primary: 218 65% 75%;
   --primary-foreground: 210 40% 98%;
   --secondary: 222 24% 31%;
   --secondary-foreground: 210 40% 98%;
@@ -78,7 +78,7 @@
   --destructive-foreground: 210 40% 98%;
   --border: 220 23% 34%;
   --input: 220 23% 34%;
-  --ring: 218 55% 70%;
+  --ring: 218 65% 75%;
 }
 
 @layer base {
@@ -89,7 +89,7 @@
     @apply bg-[var(--color-page-bg)] text-[var(--color-text-primary)] font-body;
   }
   header, footer, .top-bar, .bottom-bar {
-    @apply bg-[#E8EDF5] dark:bg-[#2E3A52] border-[#CDD5E4] dark:border-[#424F6A];
+    @apply bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 transition-colors;
   }
   h1, h2, h3, h4, h5, h6 {
     @apply text-[var(--color-text-primary)];
@@ -104,7 +104,7 @@
 
 @layer components {
   .login-card {
-    @apply bg-[#F0F4FA] dark:bg-[#3D4966] border-[#CDD5E4] dark:border-[#424F6A] shadow-[0_2px_8px_rgba(30,40,80,0.08)];
+    @apply bg-white dark:bg-[#3D4966] border-[#CDD5E4] dark:border-[#424F6A] shadow-[0_2px_8px_rgba(30,40,80,0.08)];
   }
   .portal-tab-container {
     @apply bg-slate-200/50 dark:bg-[#2A3245] border-transparent dark:border-[#424F6A];

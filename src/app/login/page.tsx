@@ -96,10 +96,10 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex flex-col transition-colors">
-      {/* Top Navigation Bar */}
-      <header className="h-16 border-b flex items-center justify-between px-6 sm:px-12 sticky top-0 z-50 shadow-sm bg-white dark:bg-[#2A3245]">
+      {/* Top Navigation Bar synchronized with bottom bar */}
+      <header className="h-16 border-b flex items-center justify-between px-6 sm:px-12 sticky top-0 z-50 shadow-sm bg-slate-50 dark:bg-slate-900 transition-colors">
         <div className="flex items-center gap-3">
-          <div className="bg-white rounded-full p-0.5 shadow-sm border border-slate-100">
+          <div className="bg-white rounded-full p-0.5 shadow-sm border border-slate-100 flex items-center justify-center">
             <img
               src="/NEU_LOGO.png"
               alt="New Era University Logo"
@@ -116,7 +116,7 @@ export default function LoginPage() {
         <Card className="w-full max-w-[420px] bg-white dark:bg-[#3D4966] border-none shadow-2xl rounded-[40px] overflow-hidden">
           <CardContent className="p-10 flex flex-col items-center gap-6 text-center">
             {/* Institution Logo Wrapper */}
-            <div className="bg-white p-0.5 rounded-full shadow-sm">
+            <div className="bg-white p-0.5 rounded-full shadow-sm flex items-center justify-center">
               <img
                 src="/NEU_LOGO.png"
                 alt="New Era University Logo"
@@ -163,7 +163,7 @@ export default function LoginPage() {
               </div>
 
               <div className="space-y-6">
-                {/* Google Login Button */}
+                {/* Google Login Button - Lighter in Dim Mode */}
                 <Button 
                   onClick={handleSignIn}
                   disabled={isLoading}

@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useState, useEffect, useRef } from 'react';
@@ -246,14 +245,14 @@ export default function ProfessorDashboard() {
 
   return (
     <div className="min-h-screen bg-[var(--color-page-bg)] flex flex-col font-body antialiased transition-colors">
-      {/* Top Navigation Bar */}
-      <header className="h-16 border-b flex items-center justify-between px-6 sm:px-12 sticky top-0 z-50 shadow-sm bg-[var(--color-card-bg)] transition-colors">
+      {/* Top Navigation Bar synchronized with bottom bar */}
+      <header className="h-16 border-b flex items-center justify-between px-6 sm:px-12 sticky top-0 z-50 shadow-sm bg-slate-50 dark:bg-slate-900 transition-colors">
         <div className="flex items-center gap-3">
-          <div className="bg-white rounded-full p-0.5 shadow-sm border border-slate-100">
+          <div className="bg-white rounded-full p-0.5 shadow-sm border border-slate-100 flex items-center justify-center">
             <img
               src="/NEU_LOGO.png"
               alt="New Era University Logo"
-              style={{ width: '40px', height: '40px', objectFit: 'contain' }}
+              style={{ width: '34px', height: '34px', objectFit: 'contain' }}
             />
           </div>
           <span className="font-black text-lg tracking-tight text-primary">New Era University</span>

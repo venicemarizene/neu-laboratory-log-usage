@@ -1,4 +1,3 @@
-
 "use client"
 
 import { ReactNode, useEffect } from 'react';
@@ -42,14 +41,14 @@ export default function AdminDashboardLayout({ children }: { children: ReactNode
       <div className="flex min-h-screen w-full bg-[#F8FAFC] dark:bg-slate-950 transition-colors">
         <AdminSidebar />
         <div className="flex-1 flex flex-col">
-          {/* Top Header */}
-          <header className="h-16 border-b bg-white dark:bg-slate-900 flex items-center justify-between px-8 sticky top-0 z-40 transition-colors">
+          {/* Top Header synchronized with bottom bar */}
+          <header className="h-16 border-b bg-slate-50 dark:bg-slate-900 flex items-center justify-between px-8 sticky top-0 z-40 transition-colors">
             <div className="flex items-center gap-3">
-              <div className="bg-white rounded-full p-0.5 shadow-sm border border-slate-100">
+              <div className="bg-white rounded-full p-0.5 shadow-sm border border-slate-100 flex items-center justify-center">
                 <img
                   src="/NEU_LOGO.png"
                   alt="New Era University Logo"
-                  style={{ width: '40px', height: '40px', objectFit: 'contain' }}
+                  style={{ width: '34px', height: '34px', objectFit: 'contain' }}
                 />
               </div>
               <span className="text-sm font-black text-primary uppercase tracking-widest">New Era University</span>

@@ -134,10 +134,8 @@ export default function ProfessorDashboard() {
     let hideTimer: NodeJS.Timeout;
 
     if (showSuccess) {
-      // Show for 4 seconds, then start fade
       fadeTimer = setTimeout(() => {
         setIsFading(true);
-        // Fade for 0.5 seconds, then remove from DOM
         hideTimer = setTimeout(() => {
           setShowSuccess(false);
           setIsFading(false);
@@ -156,7 +154,6 @@ export default function ProfessorDashboard() {
       router.push('/login');
     }
     
-    // Time-aware greeting logic
     const hours = new Date().getHours();
     if (hours < 12) setGreeting("Good morning");
     else if (hours < 18) setGreeting("Good afternoon");
@@ -186,7 +183,6 @@ export default function ProfessorDashboard() {
 
   const { data: personalLogs } = useCollection(personalLogsQuery);
 
-  // Calculate Personal Stats from personalLogs
   const { sessionsThisMonth, totalHours, mostUsedRoom } = useMemo(() => {
     if (!personalLogs) return { sessionsThisMonth: 0, totalHours: '0.0', mostUsedRoom: '—' };
     
@@ -336,8 +332,8 @@ export default function ProfessorDashboard() {
 
   if (!user) return null;
 
-  const GreetingContent = () => (
-    <div className="text-left space-y-2 mb-8">
+  const GreetingContent = ({ className }: { className?: string }) => (
+    <div className={cn("text-left space-y-2", className)}>
       <h1 className="text-2xl md:text-3xl font-black text-primary tracking-tight">
         {greeting}, {firstName}!
       </h1>
@@ -393,7 +389,7 @@ export default function ProfessorDashboard() {
         <div className="w-full max-w-6xl flex flex-col gap-8 md:gap-10">
           
           {/* Mobile-only Greeting at the very top */}
-          <div className="md:hidden w-full">
+          <div className="md:hidden w-full mb-8">
             <GreetingContent />
           </div>
 
@@ -453,9 +449,9 @@ export default function ProfessorDashboard() {
                 <Card className="w-full border-none shadow-2xl rounded-[40px] overflow-hidden bg-[var(--color-card-bg)]">
                   <CardContent className="p-8 md:p-12 space-y-8">
                     {/* Greeting integrated into action card for desktop, hidden on mobile */}
-                    <div className="hidden md:block">
+                    <div className="hidden md:block mb-8">
                       <GreetingContent />
-                      <Separator className="bg-[var(--color-border)] opacity-50 -mt-2 mb-8" />
+                      <Separator className="bg-[var(--color-border)] opacity-50 -mt-2" />
                     </div>
 
                     <Button 
@@ -505,9 +501,8 @@ export default function ProfessorDashboard() {
                 <Card className="w-full border-none shadow-2xl rounded-[40px] overflow-hidden bg-[var(--color-card-bg)]">
                   <CardContent className="p-8 md:p-16 space-y-10 text-center">
                     {/* Desktop Greeting Header */}
-                    <div className="hidden md:block">
+                    <div className="hidden md:block mb-10">
                       <GreetingContent />
-                      <Separator className="bg-[var(--color-border)] opacity-50 -mt-2 mb-10" />
                     </div>
 
                     <div className="space-y-4">
@@ -529,7 +524,6 @@ export default function ProfessorDashboard() {
                         <span className="text-[11px] font-black uppercase tracking-widest">Active Usage</span>
                       </div>
                       <h2 className="text-6xl md:text-8xl font-black text-[var(--color-text-primary)] tracking-tighter">{activeSession.roomId}</h2>
-                      <p className="text-sm font-bold text-[var(--color-text-secondary)]">Institutional Session Registered</p>
                     </div>
 
                     <Button 

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -23,7 +23,7 @@ import {
 import { useUser, useAuth, useFirestore, useCollection, useMemoFirebase } from '@/firebase';
 import { useRouter } from 'next/navigation';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { doc, query, where, collection, limit } from 'firebase/firestore';
+import { doc, query, where, collection, limit, orderBy } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Html5Qrcode } from 'html5-qrcode';
@@ -121,6 +121,7 @@ export default function ProfessorDashboard() {
   const [isLogging, setIsLogging] = useState(false);
   const [activeSession, setActiveSession] = useState<{id: string, roomId: string} | null>(null);
   const [isScannerOpen, setIsScannerOpen] = useState(false);
+  const [greeting, setGreeting] = useState("Welcome back");
 
   function userHook() {
       return useUser();
@@ -130,6 +131,12 @@ export default function ProfessorDashboard() {
     if (!isUserLoading && !user) {
       router.push('/login');
     }
+    
+    // Time-aware greeting logic
+    const hours = new Date().getHours();
+    if (hours < 12) setGreeting("Good morning");
+    else if (hours < 18) setGreeting("Good afternoon");
+    else setGreeting("Good evening");
   }, [user, isUserLoading, router]);
 
   const activeSessionQuery = useMemoFirebase(() => {
@@ -143,6 +150,55 @@ export default function ProfessorDashboard() {
   }, [user, db]);
 
   const { data: activeSessions } = useCollection(activeSessionQuery);
+
+  // Month logs for stats
+  const monthLogsQuery = useMemoFirebase(() => {
+    if (!user || !db) return null;
+    const startOfMonth = new Date();
+    startOfMonth.setDate(1);
+    startOfMonth.setHours(0, 0, 0, 0);
+    return query(
+      collection(db, 'room_logs'),
+      where('professorId', '==', user.uid),
+      where('createdAt', '>=', startOfMonth.toISOString()),
+      orderBy('createdAt', 'desc')
+    );
+  }, [user, db]);
+
+  const { data: monthLogs } = useCollection(monthLogsQuery);
+
+  // Calculate Personal Stats
+  const { sessionsThisMonth, totalHours, mostUsedRoom } = useMemo(() => {
+    if (!monthLogs) return { sessionsThisMonth: 0, totalHours: '0.0', mostUsedRoom: '—' };
+    
+    const count = monthLogs.length;
+    let ms = 0;
+    const rooms: Record<string, number> = {};
+
+    monthLogs.forEach(log => {
+      if (log.startTime && log.endTime) {
+        ms += (new Date(log.endTime).getTime() - new Date(log.startTime).getTime());
+      }
+      if (log.roomId) {
+        rooms[log.roomId] = (rooms[log.roomId] || 0) + 1;
+      }
+    });
+
+    let topRoom = '—';
+    let max = 0;
+    Object.entries(rooms).forEach(([room, freq]) => {
+      if (freq > max) {
+        max = freq;
+        topRoom = room;
+      }
+    });
+
+    return {
+      sessionsThisMonth: count,
+      totalHours: (ms / 3600000).toFixed(1),
+      mostUsedRoom: topRoom
+    };
+  }, [monthLogs]);
 
   useEffect(() => {
     if (activeSessions && activeSessions.length > 0) {
@@ -277,11 +333,27 @@ export default function ProfessorDashboard() {
               </div>
             )}
 
-            <div className="text-center space-y-2">
-              <h1 className="text-3xl font-black text-primary tracking-tight">Welcome back, {firstName}!</h1>
+            <div className="text-center space-y-2 w-full">
+              <h1 className="text-3xl font-black text-primary tracking-tight">{greeting}, {firstName}!</h1>
               <p className="text-base text-[var(--color-text-secondary)] font-bold">
                 {activeSession ? "Current lab session in progress." : "Which room are you using today?"}
               </p>
+
+              {/* Personal Stat Chips Row */}
+              <div className="grid grid-cols-3 gap-2 w-full pt-4">
+                <div className="bg-slate-50 dark:bg-slate-900/40 p-3 rounded-2xl border border-slate-200/50 dark:border-slate-800 flex flex-col items-center justify-center text-center shadow-sm">
+                  <span className="text-[8px] font-black uppercase tracking-tighter text-slate-400 dark:text-slate-500 mb-1 leading-none">Sessions This Month</span>
+                  <span className="text-xs font-black text-primary dark:text-white leading-none mt-1">{sessionsThisMonth}</span>
+                </div>
+                <div className="bg-slate-50 dark:bg-slate-900/40 p-3 rounded-2xl border border-slate-200/50 dark:border-slate-800 flex flex-col items-center justify-center text-center shadow-sm">
+                  <span className="text-[8px] font-black uppercase tracking-tighter text-slate-400 dark:text-slate-500 mb-1 leading-none">Hours Used</span>
+                  <span className="text-xs font-black text-primary dark:text-white leading-none mt-1">{totalHours}h</span>
+                </div>
+                <div className="bg-slate-50 dark:bg-slate-900/40 p-3 rounded-2xl border border-slate-200/50 dark:border-slate-800 flex flex-col items-center justify-center text-center shadow-sm">
+                  <span className="text-[8px] font-black uppercase tracking-tighter text-slate-400 dark:text-slate-500 mb-1 leading-none">Most Used Room</span>
+                  <span className="text-xs font-black text-primary dark:text-white leading-none mt-1">{mostUsedRoom}</span>
+                </div>
+              </div>
             </div>
           </div>
 

@@ -167,7 +167,7 @@ export default function LoginPage() {
                 <Button 
                   onClick={handleSignIn}
                   disabled={isLoading}
-                  className="w-full h-14 rounded-2xl bg-[#3D5C99] dark:bg-[#3D6DB5] hover:bg-[#3D5C99]/90 dark:hover:bg-[#2F5A9E] text-white font-black text-lg gap-3 transition-all active:scale-[0.98] shadow-lg shadow-[#3D5C99]/10 border-none"
+                  className="w-full h-14 rounded-2xl bg-[#3D5C99] dark:bg-[#1E40AF] hover:bg-[#3D5C99]/90 dark:hover:bg-[#1E40AF]/90 text-white font-black text-lg gap-3 transition-all active:scale-[0.98] shadow-lg shadow-[#3D5C99]/10 border-none"
                 >
                   <svg className="w-5 h-5" viewBox="0 0 24 24">
                     <path

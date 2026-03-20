@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useState, useEffect, useRef } from 'react';
@@ -117,7 +118,7 @@ export default function ProfessorDashboard() {
   const router = useRouter();
   const { toast } = useToast();
   
-  const [selectedRoom, setSelectedRoom] = useState<string>("M103");
+  const [selectedRoom, setSelectedRoom] = useState<string>("");
   const [isLogging, setIsLogging] = useState(false);
   const [activeSession, setActiveSession] = useState<{id: string, roomId: string} | null>(null);
   const [isScannerOpen, setIsScannerOpen] = useState(false);
@@ -167,7 +168,7 @@ export default function ProfessorDashboard() {
   };
 
   const handleLogEntry = (roomId: string) => {
-    if (!user || !db || isLogging) return;
+    if (!user || !db || isLogging || !roomId) return;
 
     if (activeSession) {
       toast({
@@ -294,7 +295,7 @@ export default function ProfessorDashboard() {
                     </label>
                     <Select value={selectedRoom} onValueChange={setSelectedRoom}>
                       <SelectTrigger className="h-12 rounded-2xl bg-[var(--color-accent-bg)] border-none text-base font-black text-[var(--color-text-primary)] px-6 shadow-inner focus:ring-0 transition-colors">
-                        <SelectValue placeholder="Select a room" />
+                        <SelectValue placeholder="Select Room" />
                       </SelectTrigger>
                       <SelectContent className="rounded-2xl border-none shadow-xl bg-[var(--color-card-bg)]">
                         {LAB_ROOMS.map(room => (
@@ -313,7 +314,7 @@ export default function ProfessorDashboard() {
                     className="w-full h-12 rounded-2xl border-2 border-[#475569] dark:border-[#4A6BAD] bg-transparent text-[#475569] dark:text-white hover:bg-[#1E3A8A] hover:text-white hover:border-[#1E3A8A] dark:hover:bg-[#4A6BAD] dark:hover:text-white dark:hover:border-[#4A6BAD] font-black text-base flex items-center justify-center gap-3 transition-all duration-200 active:scale-[0.98] disabled:opacity-70"
                   >
                     <ArrowRight className="h-4 w-4" />
-                    {isLogging ? 'Logging...' : `Log Entry ${selectedRoom}`}
+                    {isLogging ? 'Logging...' : selectedRoom ? `Log Entry ${selectedRoom}` : 'Log Entry'}
                   </Button>
                 </CardContent>
               </Card>

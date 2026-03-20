@@ -45,12 +45,12 @@ export function AdminSidebar() {
     <Sidebar className="border-none bg-primary dark:bg-slate-900 text-white">
       <SidebarHeader className="p-6">
         <div className="flex items-center gap-3">
-          <div className="bg-white rounded-full p-1 shadow-sm border border-slate-100 flex items-center justify-center shrink-0 overflow-hidden">
+          <div className="bg-white rounded-full p-1 shadow-sm border border-slate-100 flex items-center justify-center shrink-0 overflow-hidden w-[52px] h-[52px]">
             <img
               src="/NEU_LOGO.png"
               alt="New Era University Logo"
               className="rounded-full"
-              style={{ width: '56px', height: '56px', objectFit: 'contain' }}
+              style={{ width: '44px', height: '44px', objectFit: 'contain' }}
             />
           </div>
           <span className="font-black text-xl tracking-tight text-white leading-tight">New Era University</span>
@@ -69,7 +69,7 @@ export function AdminSidebar() {
                   className={cn(
                     "h-12 rounded-lg font-bold transition-all px-6 border-l-[5px]",
                     isActive 
-                      ? "bg-white/20 text-white border-white shadow-sm" 
+                      ? "bg-white/15 text-white border-white shadow-sm" 
                       : "text-white/60 hover:bg-white/10 hover:text-white border-transparent"
                   )}
                 >

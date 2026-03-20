@@ -119,3 +119,18 @@
     @apply bg-primary dark:bg-[#4A6BAD] text-white hover:bg-primary/90 dark:hover:bg-[#4A6BAD]/90;
   }
 }
+
+@keyframes custom-pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.7;
+  }
+}
+
+.animate-custom-pulse {
+  animation: custom-pulse 1.5s ease-in-out infinite;
+}

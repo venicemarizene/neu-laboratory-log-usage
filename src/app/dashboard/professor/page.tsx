@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useState, useEffect, useRef, useMemo } from 'react';
@@ -185,13 +184,20 @@ export default function ProfessorDashboard() {
   const [subject, setSubject] = useState<string>("");
   const [classSection, setClassSection] = useState<string>("");
   const [isLogging, setIsLogging] = useState(false);
-  const [activeSession, setActiveSession] = useState<{id: string, roomId: string} | null>(null);
+  const [activeSession, setActiveSession] = useState<{
+    id: string; 
+    roomId: string; 
+    subject?: string; 
+    classSection?: string; 
+    startTime?: string;
+  } | null>(null);
   const [isScannerOpen, setIsScannerOpen] = useState(false);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [scannedRoomId, setScannedRoomId] = useState<string>("");
   const [greeting, setGreeting] = useState("Welcome back");
   const [showSuccess, setShowSuccess] = useState(false);
   const [isFading, setIsFading] = useState(false);
+  const [elapsedTime, setElapsedTime] = useState("00:00:00");
   
   const [errors, setErrors] = useState<{subject?: string, classSection?: string, room?: string}>({});
   const [activeInput, setActiveInput] = useState<'subject' | 'classSection' | null>(null);
@@ -248,6 +254,28 @@ export default function ProfessorDashboard() {
 
   const { data: personalLogs } = useCollection(personalLogsQuery);
 
+  useEffect(() => {
+    let interval: any;
+    if (activeSession?.startTime) {
+      const updateTimer = () => {
+        const start = new Date(activeSession.startTime!).getTime();
+        const now = Date.now();
+        const diff = Math.max(0, now - start);
+        const h = Math.floor(diff / 3600000);
+        const m = Math.floor((diff % 3600000) / 60000);
+        const s = Math.floor((diff % 60000) / 1000);
+        setElapsedTime(
+          `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`
+        );
+      };
+      updateTimer();
+      interval = setInterval(updateTimer, 1000);
+    } else {
+      setElapsedTime("00:00:00");
+    }
+    return () => clearInterval(interval);
+  }, [activeSession?.startTime]);
+
   const suggestions = useMemo(() => {
     if (!personalLogs) return { subjects: [], classSections: [] };
     const subjectsSet = new Set<string>();
@@ -299,7 +327,14 @@ export default function ProfessorDashboard() {
 
   useEffect(() => {
     if (activeSessions && activeSessions.length > 0) {
-      setActiveSession({ id: activeSessions[0].id, roomId: activeSessions[0].roomId });
+      const sess = activeSessions[0];
+      setActiveSession({ 
+        id: sess.id, 
+        roomId: sess.roomId,
+        subject: sess.subject,
+        classSection: sess.classSection,
+        startTime: sess.startTime
+      });
     } else {
       setActiveSession(null);
     }
@@ -349,7 +384,13 @@ export default function ProfessorDashboard() {
       updatedAt: now,
     }, { merge: true });
     
-    setActiveSession({ id: logId, roomId: roomId });
+    setActiveSession({ 
+      id: logId, 
+      roomId: roomId,
+      subject: subject.trim(),
+      classSection: classSection.trim(),
+      startTime: now
+    });
     setShowSuccess(true);
     setIsFading(false);
     setIsLogging(false);
@@ -542,10 +583,20 @@ export default function ProfessorDashboard() {
                     )}
                     <div className="flex flex-col items-center gap-6">
                       <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-5 py-2 rounded-full">
+                        <div className="h-2 w-2 rounded-full bg-green-500 animate-custom-pulse" />
                         <Clock className="h-4 w-4" />
                         <span className="text-[11px] font-black uppercase tracking-widest">Active Usage</span>
                       </div>
-                      <h2 className="text-6xl md:text-8xl font-black text-[var(--color-text-primary)] tracking-tighter">{activeSession.roomId}</h2>
+                      <div className="flex flex-col items-center gap-2">
+                        <h2 className="text-6xl md:text-8xl font-black text-[var(--color-text-primary)] tracking-tighter">{activeSession.roomId}</h2>
+                        <div className="flex flex-col">
+                          <p className="text-[14px] font-medium text-[var(--color-text-secondary)]">{activeSession.subject || '—'}</p>
+                          <p className="text-[14px] font-medium text-[var(--color-text-secondary)]">{activeSession.classSection || '—'}</p>
+                        </div>
+                      </div>
+                      <div className="text-[22px] font-semibold text-primary">
+                        {elapsedTime}
+                      </div>
                     </div>
                     <Button onClick={handleEndSession} className={cn("w-full h-16 rounded-[2rem] font-black text-lg flex items-center justify-center gap-4 shadow-lg transition-all active:scale-[0.98] border-none", "bg-[#FEE2E2] text-[#991B1B] hover:bg-[#DC2626] hover:text-white", "dark:bg-red-950/40 dark:text-white dark:hover:bg-[#3D5C99]/30 dark:hover:text-white")}>
                       <LogOut className="h-6 w-6" /> End Session

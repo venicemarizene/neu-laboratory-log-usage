@@ -133,7 +133,7 @@ export default function LoginPage() {
 
             <div className="w-full flex flex-col gap-8">
               <div className="flex flex-col gap-4">
-                <p className="text-sm font-bold text-slate-500 dark:text-slate-400">
+                <p className="text-sm font-bold text-slate-500 dark:text-slate-400 mb-2">
                   Sign in with your university credentials
                 </p>
                 
@@ -163,11 +163,11 @@ export default function LoginPage() {
               </div>
 
               <div className="space-y-6">
-                {/* Google Login Button - Adjusted with a slightly darker blue for dim mode */}
+                {/* Google Login Button - Custom colors for light and dim mode */}
                 <Button 
                   onClick={handleSignIn}
                   disabled={isLoading}
-                  className="w-full h-14 rounded-2xl bg-[#3D5C99] dark:bg-[#3D5C99] hover:bg-[#3D5C99]/90 dark:hover:bg-[#3D5C99]/90 text-white font-black text-lg gap-3 transition-all active:scale-[0.98] shadow-lg shadow-[#3D5C99]/10 border-none"
+                  className="w-full h-14 rounded-2xl bg-[#3D5C99] dark:bg-[#3D6DB5] hover:bg-[#3D5C99]/90 dark:hover:bg-[#2F5A9E] text-white font-black text-lg gap-3 transition-all active:scale-[0.98] shadow-lg shadow-[#3D5C99]/10 border-none"
                 >
                   <svg className="w-5 h-5" viewBox="0 0 24 24">
                     <path

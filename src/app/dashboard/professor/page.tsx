@@ -307,12 +307,12 @@ export default function ProfessorDashboard() {
                     </Select>
                   </div>
 
-                  {/* Secondary action: Outlined Slate Blue style */}
+                  {/* Secondary action: Outlined style with enhanced dim mode visibility */}
                   <Button 
                     onClick={() => handleLogEntry(selectedRoom)}
                     disabled={isLogging}
                     variant="outline"
-                    className="w-full h-12 rounded-2xl border-2 border-[#475569] dark:border-[#4A6BAD] bg-transparent text-[#475569] dark:text-[#4A6BAD] hover:bg-[#475569]/5 dark:hover:bg-[#4A6BAD]/5 font-black text-base flex items-center justify-center gap-3 transition-all active:scale-[0.98] disabled:opacity-70"
+                    className="w-full h-12 rounded-2xl border-2 border-[#475569] dark:border-[#4A6BAD] bg-transparent text-[#475569] dark:text-white hover:bg-[#475569]/5 dark:hover:bg-[#4A6BAD]/5 font-black text-base flex items-center justify-center gap-3 transition-all active:scale-[0.98] disabled:opacity-70"
                   >
                     <ArrowRight className="h-4 w-4" />
                     {isLogging ? 'Logging...' : `Log Entry ${selectedRoom}`}

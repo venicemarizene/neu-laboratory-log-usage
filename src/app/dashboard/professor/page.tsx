@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useState, useEffect, useRef } from 'react';
@@ -168,7 +167,16 @@ export default function ProfessorDashboard() {
   };
 
   const handleLogEntry = (roomId: string) => {
-    if (!user || !db || isLogging || !roomId) return;
+    if (!user || !db || isLogging || !roomId) {
+      if (!roomId) {
+        toast({
+          variant: 'destructive',
+          title: 'Room Required',
+          description: 'Please select a laboratory room before logging an entry.',
+        });
+      }
+      return;
+    }
 
     if (activeSession) {
       toast({
@@ -289,6 +297,13 @@ export default function ProfessorDashboard() {
                     Auto-Log via QR
                   </Button>
 
+                  {/* Divider */}
+                  <div className="relative flex items-center gap-4 py-2">
+                    <div className="flex-1 h-px bg-[var(--color-border)] opacity-50"></div>
+                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[var(--color-text-tertiary)]">or</span>
+                    <div className="flex-1 h-px bg-[var(--color-border)] opacity-50"></div>
+                  </div>
+
                   <div className="space-y-3">
                     <label className="text-[10px] font-black uppercase tracking-[0.2em] text-[var(--color-text-tertiary)] ml-1">
                       Laboratory Room
@@ -311,7 +326,7 @@ export default function ProfessorDashboard() {
                     onClick={() => handleLogEntry(selectedRoom)}
                     disabled={isLogging}
                     variant="outline"
-                    className="w-full h-12 rounded-2xl border-2 border-[#475569] dark:border-[#4A6BAD] bg-transparent text-[#475569] dark:text-white hover:bg-[#1E3A8A]/10 hover:text-[#1E3A8A] hover:border-[#1E3A8A] dark:hover:bg-[#4A6BAD]/20 dark:hover:text-white dark:hover:border-[#4A6BAD] font-black text-base flex items-center justify-center gap-3 transition-all duration-200 active:scale-[0.98] disabled:opacity-70"
+                    className="w-full h-12 rounded-2xl border-2 border-[#1E3A8A] dark:border-[#4A6BAD] bg-transparent text-[#1E3A8A] dark:text-white hover:bg-[#1E3A8A]/10 dark:hover:bg-[#4A6BAD]/20 font-black text-base flex items-center justify-center gap-3 transition-all duration-200 active:scale-[0.98] disabled:opacity-70"
                   >
                     <ArrowRight className="h-4 w-4" />
                     {isLogging ? 'Logging...' : selectedRoom ? `Log Entry ${selectedRoom}` : 'Log Entry'}

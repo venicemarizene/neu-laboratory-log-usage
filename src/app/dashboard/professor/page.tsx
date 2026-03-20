@@ -24,10 +24,18 @@ import {
   SelectTrigger, 
   SelectValue 
 } from '@/components/ui/select';
-import { useUser, useAuth, useFirestore, useCollection, useMemoFirebase } from '@/firebase';
+import { 
+  useUser, 
+  useAuth, 
+  useFirestore, 
+  useCollection, 
+  useMemoFirebase,
+  errorEmitter,
+  FirestorePermissionError 
+} from '@/firebase';
 import { useRouter } from 'next/navigation';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { doc, query, where, collection, limit, orderBy } from 'firebase/firestore';
+import { doc, query, where, collection, limit, orderBy, updateDoc } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Html5Qrcode } from 'html5-qrcode';
@@ -368,13 +376,26 @@ export default function ProfessorDashboard() {
   const handleEndSession = async () => {
     if (!activeSession || !db) return;
     const logRef = doc(db, 'room_logs', activeSession.id);
-    updateDocumentNonBlocking(logRef, {
-      status: 'Completed',
-      endTime: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    });
-    setActiveSession(null);
-    setShowSuccess(false); 
+    
+    try {
+      // First write to the active session document and await confirmation
+      await updateDoc(logRef, {
+        status: 'Completed',
+        endTime: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      });
+      
+      // Then immediately sign out and redirect to login
+      await auth.signOut();
+      router.push('/login');
+    } catch (e: any) {
+      // Emit permission error if update fails using the institutional pattern
+      errorEmitter.emit('permission-error', new FirestorePermissionError({
+        path: logRef.path,
+        operation: 'update',
+        requestResourceData: { status: 'Completed' }
+      }));
+    }
   };
 
   const fullName = user?.displayName || 'Professor';

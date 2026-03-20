@@ -42,7 +42,7 @@ export function AdminSidebar() {
   ];
 
   return (
-    <Sidebar className="border-none bg-primary text-white">
+    <Sidebar className="border-none bg-primary dark:bg-slate-900 text-white">
       <SidebarHeader className="p-6">
         <div className="flex items-center gap-3">
           <div className="bg-white rounded-full p-1 shadow-sm border border-slate-100 flex items-center justify-center shrink-0 overflow-hidden">
@@ -50,7 +50,7 @@ export function AdminSidebar() {
               src="/NEU_LOGO.png"
               alt="New Era University Logo"
               className="rounded-full"
-              style={{ width: '48px', height: '48px', objectFit: 'contain' }}
+              style={{ width: '56px', height: '56px', objectFit: 'contain' }}
             />
           </div>
           <span className="font-black text-xl tracking-tight text-white leading-tight">New Era University</span>

@@ -47,7 +47,7 @@
   --color-page-bg: #2A3245;
   --color-card-bg: #3D4966;
   --color-sidebar-bg: #232D42;
-  --color-primary: #7AA0E0;
+  --color-primary: #4F86F7;
   --color-accent-bg: #2A3A5A;
   --color-accent-border: #3A5080;
   --color-text-primary: #E2E8F4;
@@ -59,14 +59,14 @@
   --color-status-blocked-bg: #3A2228;
   --color-status-blocked-text: #C49090;
 
-  /* shadcn/ui variables mapping for dim mode - adjusted primary to a slightly darker navy blue */
+  /* shadcn/ui variables mapping for dim mode - primary blue updated to be more vivid and saturated */
   --background: 222 24% 22%;
   --foreground: 210 40% 96%;
   --card: 222 25% 40%;
   --card-foreground: 210 40% 96%;
   --popover: 222 26% 27%;
   --popover-foreground: 210 40% 96%;
-  --primary: 221 43% 48%;
+  --primary: 221 83% 62%;
   --primary-foreground: 210 40% 98%;
   --secondary: 222 24% 31%;
   --secondary-foreground: 210 40% 98%;

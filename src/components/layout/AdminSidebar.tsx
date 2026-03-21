@@ -51,7 +51,7 @@ export function AdminSidebar() {
               className="w-full h-full object-contain"
             />
           </div>
-          <span className="font-black text-xl tracking-tight text-white leading-tight">New Era University</span>
+          <span className="font-black text-xl tracking-tight leading-tight text-white dark:text-[#4A90D9]">New Era University</span>
         </div>
       </SidebarHeader>
 

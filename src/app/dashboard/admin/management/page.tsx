@@ -110,7 +110,7 @@ export default function RoomManagementPage() {
               <Monitor size={24} />
             </div>
             <div>
-              <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-[#4A90D9] mb-1">Total Rooms</p>
+              <p className="text-[10px] font-black uppercase tracking-widest text-[#3D5C99] dark:text-[#4A90D9] mb-1">Total Rooms</p>
               <h3 className="text-3xl font-black text-slate-900 dark:text-white leading-none">{stats.total}</h3>
             </div>
           </CardContent>
@@ -122,7 +122,7 @@ export default function RoomManagementPage() {
               <Activity size={24} />
             </div>
             <div>
-              <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-[#4A90D9] mb-1">Occupied</p>
+              <p className="text-[10px] font-black uppercase tracking-widest text-[#3D5C99] dark:text-[#4A90D9] mb-1">Occupied</p>
               <h3 className="text-3xl font-black text-red-500 leading-none">{stats.occupied}</h3>
             </div>
           </CardContent>
@@ -134,7 +134,7 @@ export default function RoomManagementPage() {
               <CheckCircle2 size={24} />
             </div>
             <div>
-              <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-[#4A90D9] mb-1">Vacant</p>
+              <p className="text-[10px] font-black uppercase tracking-widest text-[#3D5C99] dark:text-[#4A90D9] mb-1">Vacant</p>
               <h3 className="text-3xl font-black text-green-500 leading-none">{stats.vacant}</h3>
             </div>
           </CardContent>
@@ -151,7 +151,7 @@ export default function RoomManagementPage() {
               onClick={() => setFilter(f)}
               className={cn(
                 "flex-1 md:flex-none h-9 px-6 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all",
-                filter === f ? "bg-white dark:bg-slate-800 text-primary shadow-sm" : "text-slate-400"
+                filter === f ? "bg-white dark:bg-slate-800 text-primary shadow-sm" : "text-slate-500"
               )}
             >
               {f}
@@ -161,8 +161,8 @@ export default function RoomManagementPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-12 gap-8 h-[600px]">
-        <Card className="md:col-span-5 flex flex-col bg-[#F4F7FC] dark:bg-[#3D4966] border border-[#B0BED6] dark:border-[#4A5878] rounded-[12px] overflow-hidden p-4 shadow-[0_2px_8px_rgba(30,40,80,0.10)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.25)] transition-all">
-          <div className="relative mb-4">
+        <Card className="md:col-span-5 flex flex-col bg-white dark:bg-[#3D4966] border border-[#B0BED6] dark:border-[#4A5878] rounded-[24px] overflow-hidden p-6 shadow-[0_2px_8px_rgba(30,40,80,0.10)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.25)] transition-all">
+          <div className="relative mb-6">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
             <Input 
               placeholder="Search room or faculty..." 
@@ -185,13 +185,13 @@ export default function RoomManagementPage() {
                       "w-full flex items-center justify-between p-4 rounded-2xl transition-all duration-200 group",
                       isActive 
                         ? "bg-primary text-white shadow-lg shadow-primary/20" 
-                        : "text-slate-600 dark:text-slate-300 hover:bg-white/50 dark:hover:bg-slate-800/50"
+                        : "text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/50"
                     )}
                   >
                     <div className="flex items-center gap-4">
                       <div className={cn(
                         "h-10 w-10 rounded-xl flex items-center justify-center transition-colors",
-                        isActive ? "bg-white/20" : "bg-slate-100 dark:bg-slate-800"
+                        isActive ? "bg-white/20" : "bg-slate-50 dark:bg-slate-900"
                       )}>
                         <Monitor className={cn("h-4 w-4", isActive ? "text-white" : "text-slate-400")} />
                       </div>
@@ -238,7 +238,7 @@ export default function RoomManagementPage() {
 
             <div className="w-full space-y-6">
               <div className={cn(
-                "p-8 rounded-[40px] flex flex-col items-center justify-center text-center gap-4 border-2 transition-all duration-500",
+                "p-8 rounded-[40px] flex flex-col items-center justify-center text-center gap-4 border transition-all duration-500",
                 selectedRoomData.occupied 
                   ? "bg-red-50/50 dark:bg-red-950/10 border-red-100 dark:border-red-900/30" 
                   : "bg-green-50/50 dark:bg-green-950/10 border-green-100 dark:border-green-900/30"

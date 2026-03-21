@@ -127,10 +127,10 @@ export default function UserManagementPage() {
           <Table>
             <TableHeader className="bg-slate-50/50 dark:bg-slate-900/50">
               <TableRow className="border-b border-[#B0BED6] dark:border-[#4A5878] hover:bg-transparent">
-                <TableHead className="px-8 h-12 text-[10px] font-black uppercase tracking-widest text-slate-900 dark:text-white">Professor</TableHead>
-                <TableHead className="h-12 text-[10px] font-black uppercase tracking-widest text-slate-900 dark:text-white text-center">Role</TableHead>
-                <TableHead className="h-12 text-[10px] font-black uppercase tracking-widest text-slate-900 dark:text-white text-center">Status</TableHead>
-                <TableHead className="px-8 h-12 text-[10px] font-black uppercase tracking-widest text-slate-900 dark:text-white text-right">Actions</TableHead>
+                <TableHead className="px-8 h-12 text-[10px] font-black uppercase tracking-widest text-[#3D5C99] dark:text-[#4A90D9]">Professor</TableHead>
+                <TableHead className="h-12 text-[10px] font-black uppercase tracking-widest text-[#3D5C99] dark:text-[#4A90D9] text-center">Role</TableHead>
+                <TableHead className="h-12 text-[10px] font-black uppercase tracking-widest text-[#3D5C99] dark:text-[#4A90D9] text-center">Status</TableHead>
+                <TableHead className="px-8 h-12 text-[10px] font-black uppercase tracking-widest text-[#3D5C99] dark:text-[#4A90D9] text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>

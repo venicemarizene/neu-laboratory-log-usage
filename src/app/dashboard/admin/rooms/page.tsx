@@ -7,13 +7,13 @@ import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { LAB_ROOMS } from '@/lib/constants';
 import { QRCodeSVG } from 'qrcode.react';
-import { Download, Monitor, Search, Maximize2, ChevronRight } from 'lucide-react';
+import { Download, Monitor, Search, Maximize2, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { ThemeToggle } from '@/components/ThemeToggle';
 
-export default function RoomQrGeneratorPage() {
-  const [selectedRoom, setSelectedRoom] = useState<string>(LAB_ROOMS[0]);
+export default function RoomQrRegistryPage() {
+  const [selectedRoom, setSelectedRoom] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
 
   const filteredRooms = useMemo(() => {
@@ -57,11 +57,12 @@ export default function RoomQrGeneratorPage() {
     window.open(`https://api.qrserver.com/v1/create-qr-code/?size=1000x1000&data=${encodeURIComponent(qrValue)}`, '_blank');
   };
 
-  const cardStyle = "border border-[#B0BED6] dark:border-[#4A5878] shadow-[0_2px_8px_rgba(30,40,80,0.10)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.25)] hover:shadow-[0_4px_16px_rgba(45,58,107,0.14)] hover:-translate-y-[1px] transition-all duration-200 bg-[#F4F7FC] dark:bg-[#3D4966] rounded-[32px] overflow-hidden";
+  const cardStyle = "border border-[#B0BED6] dark:border-[#4A5878] shadow-[0_2px_8px_rgba(30,40,80,0.10)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.25)] hover:shadow-[0_4px_16px_rgba(45,58,107,0.14)] hover:-translate-y-[1px] transition-all duration-200 bg-[#F4F7FC] dark:bg-[#3D4966] rounded-[24px] overflow-hidden";
+  const roomCardStyle = "border border-[#B0BED6] dark:border-[#4A5878] shadow-[0_2px_8px_rgba(30,40,80,0.10)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.25)] hover:shadow-[0_4px_16px_rgba(45,58,107,0.14)] transition-all duration-200 bg-white dark:bg-[#3D4966] rounded-[20px] p-6 flex flex-col items-center gap-4 group cursor-pointer active:scale-95";
 
   return (
-    <div className="px-8 pt-6 pb-8 space-y-8 max-w-[1400px] mx-auto">
-      <div className="flex items-center justify-between">
+    <div className="px-8 pt-6 pb-8 space-y-8 max-w-[1400px] mx-auto flex flex-col h-screen overflow-hidden">
+      <div className="flex items-center justify-between shrink-0">
         <div className="flex items-center gap-4">
           <SidebarTrigger className="h-9 w-9 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-colors" />
           <h1 className="text-2xl font-black text-[#3D5C99] dark:text-[#4A90D9] tracking-tight leading-none">Lab QR Registry</h1>
@@ -69,92 +70,98 @@ export default function RoomQrGeneratorPage() {
         <ThemeToggle />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-8 h-[600px]">
-        <div className="md:col-span-4 flex flex-col bg-white dark:bg-slate-900 border border-[#B0BED6] dark:border-[#4A5878] rounded-[32px] overflow-hidden">
-          <div className="p-6 border-b border-[#B0BED6] dark:border-[#4A5878]">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-              <Input 
-                placeholder="Filter rooms..." 
-                className="pl-10 h-10 rounded-xl bg-slate-50 dark:bg-slate-800 border-[#B0BED6] dark:border-[#4A5878] text-xs font-bold focus-visible:ring-primary"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
+      <div className="flex-1 flex gap-8 overflow-hidden">
+        <div className="flex-1 flex flex-col gap-6 overflow-hidden">
+          <div className="relative shrink-0">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+            <Input 
+              placeholder="Search rooms..." 
+              className="pl-10 h-12 rounded-2xl bg-white dark:bg-[#3D4966] border-[#B0BED6] dark:border-[#4A5878] text-sm font-bold shadow-sm"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
           </div>
+
           <ScrollArea className="flex-1">
-            <div className="p-3 space-y-1">
+            <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 pr-4">
               {filteredRooms.map((room) => (
-                <button
+                <div
                   key={room}
                   onClick={() => setSelectedRoom(room)}
                   className={cn(
-                    "w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-200 group",
-                    selectedRoom === room 
-                      ? "bg-primary text-white shadow-lg shadow-primary/20" 
-                      : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
+                    roomCardStyle,
+                    selectedRoom === room && "ring-2 ring-primary ring-offset-2 dark:ring-offset-slate-900"
                   )}
                 >
-                  <div className="flex items-center gap-3">
-                    <Monitor className={cn("h-4 w-4", selectedRoom === room ? "text-white" : "text-slate-400")} />
-                    <span className="font-bold text-sm tracking-tight">{room}</span>
+                  <div className="h-12 w-12 rounded-xl bg-slate-50 dark:bg-slate-900 flex items-center justify-center text-slate-400 group-hover:text-primary transition-colors">
+                    <Monitor size={24} />
                   </div>
-                  <ChevronRight className={cn("h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity", selectedRoom === room && "opacity-100")} />
-                </button>
+                  <span className="font-black text-lg tracking-tight text-slate-900 dark:text-white">{room}</span>
+                </div>
               ))}
             </div>
           </ScrollArea>
         </div>
 
-        <div className="md:col-span-8 flex items-center justify-center">
-          <Card className={cn(cardStyle, "max-w-md w-full max-h-[540px] flex flex-col")}>
-            <CardContent className="p-8 flex flex-col items-center gap-6 flex-1 overflow-hidden">
-              <div className="text-center space-y-1">
-                <h3 className="text-3xl font-black text-slate-900 dark:text-[#4A90D9] tracking-tighter">
-                  {selectedRoom}
-                </h3>
-                <p className="text-[9px] font-black uppercase tracking-[0.2em] text-primary">
-                  Institutional Laboratory Unit
-                </p>
-              </div>
+        {selectedRoom && (
+          <div className="w-[380px] shrink-0 animate-in slide-in-from-right duration-300">
+            <Card className={cn(cardStyle, "h-full flex flex-col border-none shadow-2xl relative")}>
+              <button 
+                onClick={() => setSelectedRoom(null)}
+                className="absolute top-4 right-4 h-8 w-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 hover:text-primary transition-colors z-10"
+              >
+                <X size={16} />
+              </button>
 
-              <div className="bg-white p-4 rounded-[32px] border-4 border-slate-50 dark:border-slate-800 shadow-inner relative group flex items-center justify-center">
-                <div className="hidden group-hover:flex absolute inset-0 bg-white/60 backdrop-blur-[1px] rounded-[28px] items-center justify-center transition-all animate-in fade-in cursor-pointer" onClick={() => openView(selectedRoom)}>
-                   <Maximize2 className="h-10 w-10 text-primary" />
+              <div className="p-8 flex flex-col items-center gap-8 flex-1">
+                <div className="text-center space-y-1">
+                  <h3 className="text-3xl font-black text-[#3D5C99] dark:text-[#4A90D9] tracking-tighter">
+                    {selectedRoom}
+                  </h3>
+                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
+                    Institutional Laboratory Unit
+                  </p>
                 </div>
-                <QRCodeSVG
-                  id={`qr-${selectedRoom}`}
-                  value={`https://neu-laboratory-log-usage.vercel.app/login?room=${selectedRoom}`}
-                  size={220}
-                  level="H"
-                  includeMargin={true}
-                  bgColor="#FFFFFF"
-                  fgColor="#000000"
-                />
-              </div>
 
-              <div className="w-full flex flex-col gap-3 mt-auto">
-                <div className="flex gap-3">
+                <div className="w-full space-y-4">
+                  <div className="bg-white p-6 rounded-[32px] border border-[#B0BED6] dark:border-[#4A5878] shadow-inner flex items-center justify-center">
+                    <QRCodeSVG
+                      id={`qr-${selectedRoom}`}
+                      value={`https://neu-laboratory-log-usage.vercel.app/login?room=${selectedRoom}`}
+                      size={200}
+                      level="H"
+                      includeMargin={true}
+                    />
+                  </div>
+                  
+                  <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-[#B0BED6] dark:border-[#4A5878]">
+                    <p className="text-[9px] font-bold text-slate-400 break-all leading-tight">
+                      {`https://neu-laboratory-log-usage.vercel.app/login?room=${selectedRoom}`}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="w-full flex flex-col gap-3 mt-auto">
                   <Button 
-                    onClick={() => openView(selectedRoom)}
+                    onClick={() => openView(selectedRoom!)}
                     variant="outline"
-                    className="flex-1 h-11 rounded-xl font-black text-xs gap-2 border-2 border-[#B0BED6] dark:border-[#4A5878] hover:bg-slate-50 dark:hover:bg-slate-800 transition-all active:scale-95"
+                    className="h-12 rounded-xl font-black text-xs gap-2 border-[#B0BED6] dark:border-[#4A5878] shadow-sm"
                   >
-                    <Maximize2 className="h-4 w-4" />
+                    <Maximize2 size={16} />
                     View Full
                   </Button>
                   <Button 
-                    onClick={() => downloadQR(selectedRoom)}
-                    className="flex-1 h-11 rounded-xl bg-primary hover:bg-primary/90 text-white font-black text-xs gap-2 shadow-lg shadow-primary/20 transition-all active:scale-95"
+                    onClick={() => downloadQR(selectedRoom!)}
+                    className="h-12 rounded-xl bg-primary hover:bg-primary/90 text-white font-black text-xs gap-2 shadow-lg shadow-primary/20"
                   >
-                    <Download className="h-4 w-4" />
+                    <Download size={16} />
                     Download PNG
                   </Button>
                 </div>
               </div>
-            </CardContent>
-          </Card>
-        </div>
+            </Card>
+          </div>
+        )}
       </div>
     </div>
   );

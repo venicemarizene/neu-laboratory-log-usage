@@ -253,7 +253,7 @@ export default function AdminDashboard() {
     setIsFilterOpen(false);
   };
 
-  const cardBaseStyle = "border border-[#C5D3E8] dark:border-[#424F6A] shadow-[0_2px_8px_rgba(45,58,107,0.08)] hover:shadow-[0_4px_16px_rgba(45,58,107,0.14)] hover:-translate-y-[1px] transition-all duration-200 bg-[#F4F7FC] dark:bg-[#3D4966] rounded-[32px] overflow-hidden relative";
+  const cardBaseStyle = "border border-[#B0BED6] dark:border-[#4A5878] shadow-[0_2px_8px_rgba(30,40,80,0.10)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.25)] hover:shadow-[0_4px_16px_rgba(45,58,107,0.14)] hover:-translate-y-[1px] transition-all duration-200 bg-[#F4F7FC] dark:bg-[#3D4966] rounded-[32px] overflow-hidden relative";
 
   return (
     <div className="px-8 pt-6 pb-8 space-y-8 max-w-[1400px] mx-auto">
@@ -261,7 +261,7 @@ export default function AdminDashboard() {
         <div className="flex items-center gap-4">
           <SidebarTrigger className="h-9 w-9 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-colors" />
           <div className="flex flex-col">
-            <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight leading-none">Laboratory Analytics</h1>
+            <h1 className="text-2xl font-black text-[#3D5C99] dark:text-[#4A90D9] tracking-tight leading-none">Laboratory Analytics</h1>
             <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mt-1">
               NEU COMPUTER LABORATORY MANAGEMENT
             </p>
@@ -276,7 +276,7 @@ export default function AdminDashboard() {
             <Waves size={32} />
           </div>
           <CardHeader className="pb-2">
-            <CardTitle className="text-xs font-black uppercase tracking-widest text-slate-400">
+            <CardTitle className="text-xs font-black uppercase tracking-widest text-slate-400 dark:text-[#4A90D9]">
               Active Logs Filtered
             </CardTitle>
           </CardHeader>
@@ -291,7 +291,7 @@ export default function AdminDashboard() {
             <Users size={24} />
           </div>
           <CardHeader className="pb-2">
-            <CardTitle className="text-xs font-black uppercase tracking-widest text-slate-400">
+            <CardTitle className="text-xs font-black uppercase tracking-widest text-slate-400 dark:text-[#4A90D9]">
               Unique Faculty
             </CardTitle>
           </CardHeader>
@@ -306,7 +306,7 @@ export default function AdminDashboard() {
             <Waves size={24} />
           </div>
           <CardHeader className="pb-2">
-            <CardTitle className="text-xs font-black uppercase tracking-widest text-slate-400">
+            <CardTitle className="text-xs font-black uppercase tracking-widest text-slate-400 dark:text-[#4A90D9]">
               Blocked Accounts
             </CardTitle>
           </CardHeader>
@@ -320,14 +320,14 @@ export default function AdminDashboard() {
       <Card className={cn(cardBaseStyle, "p-8")}>
         <div className="mb-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div>
-            <h2 className="text-lg font-black text-slate-900 dark:text-white">Computer Laboratory Distribution</h2>
+            <h2 className="text-lg font-black text-[#3D5C99] dark:text-[#4A90D9]">Computer Laboratory Distribution</h2>
             <p className="text-xs font-bold text-slate-400">Visual frequency of usage across M101-M111</p>
           </div>
           <Button 
             variant="outline" 
             size="sm" 
             onClick={downloadChart}
-            className="rounded-xl font-bold gap-2 text-xs border-[#C5D3E8] dark:border-[#424F6A]"
+            className="rounded-xl font-bold gap-2 text-xs border-[#B0BED6] dark:border-[#4A5878]"
           >
             <Download className="h-3.5 w-3.5" />
             Download Chart
@@ -363,9 +363,9 @@ export default function AdminDashboard() {
       </Card>
 
       <Card className={cn(cardBaseStyle, "overflow-hidden")}>
-        <CardHeader className="p-8 border-b border-[#C5D3E8] dark:border-[#424F6A] flex flex-col md:flex-row items-center justify-between gap-4">
+        <CardHeader className="p-8 border-b border-[#B0BED6] dark:border-[#4A5878] flex flex-col md:flex-row items-center justify-between gap-4">
           <div>
-            <h2 className="text-lg font-black text-slate-900 dark:text-white">Activity Logs</h2>
+            <h2 className="text-lg font-black text-[#3D5C99] dark:text-[#4A90D9]">Activity Logs</h2>
             <p className="text-xs font-bold text-slate-400">Search and filter institutional usage</p>
           </div>
           <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
@@ -373,7 +373,7 @@ export default function AdminDashboard() {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
               <Input 
                 placeholder="Search faculty, lab, or subject..." 
-                className="pl-9 h-11 w-full md:w-64 rounded-xl bg-background border-[#C5D3E8] dark:border-[#424F6A] text-xs font-bold shadow-sm focus-visible:ring-primary"
+                className="pl-9 h-11 w-full md:w-64 rounded-xl bg-background border-[#B0BED6] dark:border-[#4A5878] text-xs font-bold shadow-sm focus-visible:ring-primary"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -381,7 +381,7 @@ export default function AdminDashboard() {
             
             <Popover open={isFilterOpen} onOpenChange={setIsFilterOpen}>
               <PopoverTrigger asChild>
-                <div className="bg-background border border-[#C5D3E8] dark:border-[#424F6A] text-slate-900 dark:text-white h-11 px-4 rounded-xl flex items-center gap-2 font-bold cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors shadow-sm">
+                <div className="bg-background border border-[#B0BED6] dark:border-[#4A5878] text-slate-900 dark:text-white h-11 px-4 rounded-xl flex items-center gap-2 font-bold cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors shadow-sm">
                   <CalendarIcon size={14} className="text-slate-400" />
                   <span className="text-xs">
                     {filterLabel === 'Custom Range' 
@@ -391,9 +391,9 @@ export default function AdminDashboard() {
                   <ChevronDown size={14} className="text-slate-400 ml-1" />
                 </div>
               </PopoverTrigger>
-              <PopoverContent align="end" className="w-[320px] sm:w-[500px] p-0 border border-[#C5D3E8] dark:border-[#424F6A] shadow-2xl rounded-2xl overflow-hidden flex flex-col bg-card">
+              <PopoverContent align="end" className="w-[320px] sm:w-[500px] p-0 border border-[#B0BED6] dark:border-[#4A5878] shadow-2xl rounded-2xl overflow-hidden flex flex-col bg-card dark:bg-[#3D4966]">
                 <div className="flex flex-col md:flex-row">
-                  <div className="p-3 border-r border-[#C5D3E8] dark:border-[#424F6A] min-w-[160px] bg-slate-50/30 dark:bg-slate-900/30">
+                  <div className="p-3 border-r border-[#B0BED6] dark:border-[#4A5878] min-w-[160px] bg-slate-50/30 dark:bg-slate-900/30">
                     <div className="space-y-1">
                       {['Daily Logs', 'Weekly Logs', 'Monthly Logs', 'All Logs'].map((option) => (
                         <Button
@@ -432,7 +432,7 @@ export default function AdminDashboard() {
                         <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Start Date</label>
                         <div className="grid grid-cols-3 gap-2">
                           <Select value={customFrom.month} onValueChange={(v) => setCustomFrom(prev => ({...prev, month: v}))}>
-                            <SelectTrigger className="h-9 rounded-lg text-[10px] font-bold border-[#C5D3E8] dark:border-[#424F6A]">
+                            <SelectTrigger className="h-9 rounded-lg text-[10px] font-bold border-[#B0BED6] dark:border-[#4A5878]">
                               <SelectValue placeholder="Month" />
                             </SelectTrigger>
                             <SelectContent>
@@ -440,7 +440,7 @@ export default function AdminDashboard() {
                             </SelectContent>
                           </Select>
                           <Select value={customFrom.day} onValueChange={(v) => setCustomFrom(prev => ({...prev, day: v}))}>
-                            <SelectTrigger className="h-9 rounded-lg text-[10px] font-bold border-[#C5D3E8] dark:border-[#424F6A]">
+                            <SelectTrigger className="h-9 rounded-lg text-[10px] font-bold border-[#B0BED6] dark:border-[#4A5878]">
                               <SelectValue placeholder="Day" />
                             </SelectTrigger>
                             <SelectContent>
@@ -448,7 +448,7 @@ export default function AdminDashboard() {
                             </SelectContent>
                           </Select>
                           <Select value={customFrom.year} onValueChange={(v) => setCustomFrom(prev => ({...prev, year: v}))}>
-                            <SelectTrigger className="h-9 rounded-lg text-[10px] font-bold border-[#C5D3E8] dark:border-[#424F6A]">
+                            <SelectTrigger className="h-9 rounded-lg text-[10px] font-bold border-[#B0BED6] dark:border-[#4A5878]">
                               <SelectValue placeholder="Year" />
                             </SelectTrigger>
                             <SelectContent>
@@ -462,7 +462,7 @@ export default function AdminDashboard() {
                         <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">End Date</label>
                         <div className="grid grid-cols-3 gap-2">
                           <Select value={customTo.month} onValueChange={(v) => setCustomTo(prev => ({...prev, month: v}))}>
-                            <SelectTrigger className="h-9 rounded-lg text-[10px] font-bold border-[#C5D3E8] dark:border-[#424F6A]">
+                            <SelectTrigger className="h-9 rounded-lg text-[10px] font-bold border-[#B0BED6] dark:border-[#4A5878]">
                               <SelectValue placeholder="Month" />
                             </SelectTrigger>
                             <SelectContent>
@@ -470,7 +470,7 @@ export default function AdminDashboard() {
                             </SelectContent>
                           </Select>
                           <Select value={customTo.day} onValueChange={(v) => setCustomTo(prev => ({...prev, day: v}))}>
-                            <SelectTrigger className="h-9 rounded-lg text-[10px] font-bold border-[#C5D3E8] dark:border-[#424F6A]">
+                            <SelectTrigger className="h-9 rounded-lg text-[10px] font-bold border-[#B0BED6] dark:border-[#4A5878]">
                               <SelectValue placeholder="Day" />
                             </SelectTrigger>
                             <SelectContent>
@@ -478,7 +478,7 @@ export default function AdminDashboard() {
                             </SelectContent>
                           </Select>
                           <Select value={customTo.year} onValueChange={(v) => setCustomTo(prev => ({...prev, year: v}))}>
-                            <SelectTrigger className="h-9 rounded-lg text-[10px] font-bold border-[#C5D3E8] dark:border-[#424F6A]">
+                            <SelectTrigger className="h-9 rounded-lg text-[10px] font-bold border-[#B0BED6] dark:border-[#4A5878]">
                               <SelectValue placeholder="Year" />
                             </SelectTrigger>
                             <SelectContent>
@@ -515,7 +515,7 @@ export default function AdminDashboard() {
         <CardContent className="p-0">
           <Table>
             <TableHeader className="bg-slate-50/50 dark:bg-slate-900/50">
-              <TableRow className="border-b border-[#C5D3E8] dark:border-[#424F6A] hover:bg-transparent">
+              <TableRow className="border-b border-[#B0BED6] dark:border-[#4A5878] hover:bg-transparent">
                 <TableHead className="px-8 h-12 text-[10px] font-black uppercase tracking-widest text-slate-900 dark:text-white">Professor</TableHead>
                 <TableHead className="hidden md:table-cell h-12 text-[10px] font-black uppercase tracking-widest text-slate-900 dark:text-white">Subject</TableHead>
                 <TableHead className="hidden md:table-cell h-12 text-[10px] font-black uppercase tracking-widest text-slate-900 dark:text-white">Class Section</TableHead>
@@ -528,7 +528,7 @@ export default function AdminDashboard() {
             </TableHeader>
             <TableBody>
               {filteredLogs.map((log) => (
-                <TableRow key={log.id} className="border-b border-[#C5D3E8] dark:border-[#424F6A] hover:bg-slate-50/30 dark:hover:bg-slate-800/30 transition-colors h-16">
+                <TableRow key={log.id} className="border-b border-[#B0BED6] dark:border-[#4A5878] hover:bg-slate-50/30 dark:hover:bg-slate-800/30 transition-colors h-16">
                   <TableCell className="px-8">
                     <div className="flex flex-col">
                       <span className="font-bold text-sm text-slate-800 dark:text-slate-200">
@@ -547,7 +547,7 @@ export default function AdminDashboard() {
                     </span>
                   </TableCell>
                   <TableCell className="text-center">
-                    <Badge variant="outline" className="rounded-full bg-slate-50 dark:bg-slate-900 border-[#C5D3E8] dark:border-[#424F6A] text-slate-600 dark:text-slate-400 px-3 py-0.5 text-[9px] font-black uppercase">
+                    <Badge variant="outline" className="rounded-full bg-slate-50 dark:bg-slate-900 border-[#B0BED6] dark:border-[#4A5878] text-slate-600 dark:text-slate-400 px-3 py-0.5 text-[9px] font-black uppercase">
                       {log.roomId}
                     </Badge>
                   </TableCell>

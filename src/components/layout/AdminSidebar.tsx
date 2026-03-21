@@ -42,7 +42,7 @@ export function AdminSidebar() {
   ];
 
   return (
-    <Sidebar className="border-none bg-primary dark:bg-slate-900 text-white">
+    <Sidebar className="border-none bg-[#2B3D6B] dark:bg-[#0F172A] text-white">
       <SidebarHeader className="p-6">
         <div className="flex items-center gap-3">
           <div className="bg-white rounded-full p-0.5 shadow-sm border border-slate-100 flex items-center justify-center shrink-0 overflow-hidden w-[44px] h-[44px]">
@@ -53,7 +53,7 @@ export function AdminSidebar() {
               style={{ width: '40px', height: '40px', objectFit: 'contain' }}
             />
           </div>
-          <span className="font-black text-xl tracking-tight text-white leading-tight">New Era University</span>
+          <span className="font-black text-xl tracking-tight text-white dark:text-[#4A90D9] leading-tight transition-colors">New Era University</span>
         </div>
       </SidebarHeader>
 

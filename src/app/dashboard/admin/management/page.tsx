@@ -92,7 +92,7 @@ export default function RoomManagementPage() {
     );
   }
 
-  const cardBaseStyle = "border border-[#C5D3E8] dark:border-[#424F6A] shadow-[0_2px_8px_rgba(45,58,107,0.08)] hover:shadow-[0_4px_16px_rgba(45,58,107,0.14)] hover:-translate-y-[1px] transition-all duration-200 bg-[#F4F7FC] dark:bg-[#3D4966] rounded-[32px] overflow-hidden relative";
+  const cardBaseStyle = "border border-[#B0BED6] dark:border-[#4A5878] shadow-[0_2px_8px_rgba(30,40,80,0.10)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.25)] hover:shadow-[0_4px_16px_rgba(45,58,107,0.14)] hover:-translate-y-[1px] transition-all duration-200 bg-[#F4F7FC] dark:bg-[#3D4966] rounded-[32px] overflow-hidden relative";
 
   return (
     <div className="px-8 pt-6 pb-8 space-y-8 max-w-[1400px] mx-auto">
@@ -100,7 +100,7 @@ export default function RoomManagementPage() {
         <div className="flex items-center gap-4">
           <SidebarTrigger className="h-9 w-9 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-colors" />
           <div className="flex flex-col">
-            <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight leading-none">Room Management</h1>
+            <h1 className="text-2xl font-black text-[#3D5C99] dark:text-[#4A90D9] tracking-tight leading-none">Room Management</h1>
             <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mt-1">
               Real-time laboratory occupancy and session monitoring
             </p>
@@ -116,7 +116,7 @@ export default function RoomManagementPage() {
               <Monitor size={24} />
             </div>
             <div>
-              <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Total Rooms</p>
+              <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-[#4A90D9] mb-1">Total Rooms</p>
               <h3 className="text-3xl font-black text-slate-900 dark:text-white leading-none">{stats.total}</h3>
             </div>
           </CardContent>
@@ -128,7 +128,7 @@ export default function RoomManagementPage() {
               <Activity size={24} />
             </div>
             <div>
-              <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Occupied</p>
+              <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-[#4A90D9] mb-1">Occupied</p>
               <h3 className="text-3xl font-black text-red-500 leading-none">{stats.occupied}</h3>
             </div>
           </CardContent>
@@ -140,7 +140,7 @@ export default function RoomManagementPage() {
               <CheckCircle2 size={24} />
             </div>
             <div>
-              <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Vacant</p>
+              <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-[#4A90D9] mb-1">Vacant</p>
               <h3 className="text-3xl font-black text-green-500 leading-none">{stats.vacant}</h3>
             </div>
           </CardContent>
@@ -148,7 +148,7 @@ export default function RoomManagementPage() {
       </div>
 
       <div className="flex justify-end">
-        <div className="flex bg-slate-100 dark:bg-slate-900 p-1 rounded-xl w-full md:w-auto border border-[#C5D3E8] dark:border-[#424F6A]">
+        <div className="flex bg-slate-100 dark:bg-slate-900 p-1 rounded-xl w-full md:w-auto border border-[#B0BED6] dark:border-[#4A5878]">
           {(['All', 'Occupied', 'Vacant'] as FilterType[]).map((f) => (
             <Button
               key={f}
@@ -167,12 +167,12 @@ export default function RoomManagementPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-12 gap-8 h-[600px]">
-        <Card className="md:col-span-5 flex flex-col bg-[#F4F7FC] dark:bg-[#3D4966] border border-[#C5D3E8] dark:border-[#424F6A] rounded-[12px] overflow-hidden p-4 shadow-[0_2px_8px_rgba(45,58,107,0.08)] transition-all">
+        <Card className="md:col-span-5 flex flex-col bg-[#F4F7FC] dark:bg-[#3D4966] border border-[#B0BED6] dark:border-[#4A5878] rounded-[12px] overflow-hidden p-4 shadow-[0_2px_8px_rgba(30,40,80,0.10)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.25)] transition-all">
           <div className="relative mb-4">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
             <Input 
               placeholder="Search room or faculty..." 
-              className="pl-10 h-11 rounded-xl bg-background border-[#C5D3E8] dark:border-[#424F6A] text-xs font-bold shadow-sm focus-visible:ring-primary"
+              className="pl-10 h-11 rounded-xl bg-background border-[#B0BED6] dark:border-[#4A5878] text-xs font-bold shadow-sm focus-visible:ring-primary"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -234,7 +234,7 @@ export default function RoomManagementPage() {
         <Card className={cn(cardBaseStyle, "md:col-span-7 flex items-center justify-center p-12 hover:translate-y-0")}>
           <div className="w-full max-w-md flex flex-col items-center gap-10">
             <div className="text-center space-y-2">
-              <h3 className="text-6xl font-black text-slate-900 dark:text-white tracking-tighter">
+              <h3 className="text-6xl font-black text-slate-900 dark:text-[#4A90D9] tracking-tighter">
                 {selectedRoomId}
               </h3>
               <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary">
@@ -270,13 +270,13 @@ export default function RoomManagementPage() {
               </div>
 
               {selectedRoomData.occupied && (
-                <Card className="border border-[#C5D3E8] dark:border-[#424F6A] shadow-sm bg-white dark:bg-slate-800 rounded-3xl overflow-hidden animate-in fade-in slide-in-from-bottom-2 duration-300">
+                <Card className="border border-[#B0BED6] dark:border-[#4A5878] shadow-sm bg-white dark:bg-slate-800 rounded-3xl overflow-hidden animate-in fade-in slide-in-from-bottom-2 duration-300">
                   <CardContent className="p-6 flex items-center gap-4">
                     <div className="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
                       <Users size={20} />
                     </div>
                     <div>
-                      <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Current Faculty</p>
+                      <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-[#4A90D9] mb-1">Current Faculty</p>
                       <p className="text-base font-black text-slate-900 dark:text-white leading-tight">
                         {selectedRoomData.professorName}
                       </p>

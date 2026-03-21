@@ -242,7 +242,7 @@ export default function RoomManagementPage() {
                   <div className={cn(
                     "h-12 w-12 rounded-xl flex items-center justify-center transition-colors",
                     isActive 
-                      ? (window.document.documentElement.classList.contains('dark') ? "bg-slate-900 text-[#1E2235]" : "bg-white text-[#F4F7FC]")
+                      ? "bg-white/20 text-white"
                       : "bg-slate-50 dark:bg-slate-900 text-slate-400 group-hover:text-primary"
                   )}>
                     <Monitor size={24} />
@@ -264,7 +264,7 @@ export default function RoomManagementPage() {
         </div>
 
         {selectedRoomId && selectedRoomData && (
-          <div className="w-[380px] shrink-0 animate-in slide-in-from-right duration-300 sticky top-6 h-fit z-10">
+          <div className="w-[380px] shrink-0 animate-in slide-in-from-right duration-300 sticky top-6 h-fit z-10" onClick={(e) => e.stopPropagation()}>
             <Card className={cn(cardBaseStyle, "flex flex-col shadow-2xl transition-none hover:translate-y-0")}>
               <div className="p-0 flex flex-col">
                 <div className="p-6 flex items-center justify-between border-b border-[#B0BED6] dark:border-[#4A5878]">
@@ -353,12 +353,6 @@ export default function RoomManagementPage() {
                         level="H"
                         includeMargin={true}
                       />
-                    </div>
-                    
-                    <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-[#B0BED6] dark:border-[#4A5878]">
-                      <p className="text-[9px] font-bold text-slate-400 break-all leading-tight line-clamp-2 text-center">
-                        {`https://neu-laboratory-log-usage.vercel.app/login?room=${selectedRoomId}`}
-                      </p>
                     </div>
 
                     <div className="grid grid-cols-2 gap-3">

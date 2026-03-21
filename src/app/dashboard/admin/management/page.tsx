@@ -183,14 +183,14 @@ export default function RoomManagementPage() {
 
       <div className="flex-1 flex gap-8 overflow-hidden relative">
         <div 
-          className="flex-1 flex flex-col gap-8 overflow-hidden"
+          className="flex-1 flex flex-col gap-12 overflow-hidden"
           onClick={() => { if (selectedRoomId) setSelectedRoomId(null); }}
         >
           <div className="flex flex-col md:flex-row items-center gap-4 shrink-0" onClick={(e) => e.stopPropagation()}>
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
               <Input 
-                placeholder="Search room or faculty..." 
+                placeholder="Search laboratory room..." 
                 className="pl-10 h-12 rounded-2xl bg-white dark:bg-[#3D4966] border-[#B0BED6] dark:border-[#4A5878] text-sm font-bold shadow-sm"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -215,7 +215,7 @@ export default function RoomManagementPage() {
           </div>
 
           <ScrollArea className="flex-1">
-            <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 pr-4 pb-12">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pr-4 pb-12">
               {filteredRooms.map((roomId) => {
                 const occupancy = roomOccupancy[roomId];
                 const isActive = selectedRoomId === roomId;
@@ -227,26 +227,34 @@ export default function RoomManagementPage() {
                       setSelectedRoomId(roomId);
                     }}
                     className={cn(
-                      "border border-[#B0BED6] dark:border-[#4A5878] shadow-[0_2px_8px_rgba(30,40,80,0.10)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.25)] hover:shadow-[0_4px_16px_rgba(45,58,107,0.14)] transition-all duration-200 bg-white dark:bg-[#3D4966] rounded-[20px] p-6 flex flex-col items-center gap-4 group cursor-pointer active:scale-95 relative",
-                      isActive && "ring-2 ring-primary ring-offset-2 dark:ring-offset-slate-900"
+                      "border border-[#B0BED6] dark:border-[#4A5878] shadow-[0_2px_8px_rgba(30,40,80,0.10)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.25)] hover:shadow-[0_4px_16px_rgba(45,58,107,0.14)] transition-all duration-200 bg-white dark:bg-[#3D4966] rounded-[24px] p-6 flex flex-col items-center gap-4 group cursor-pointer active:scale-95 relative",
+                      isActive && "ring-2 ring-primary ring-offset-2 dark:ring-offset-slate-900",
+                      isActive && (window.document.documentElement.classList.contains('dark') ? "bg-[#5B9FE0]" : "bg-[#4A6BAD]")
                     )}
                   >
-                    <div className="absolute left-4 top-1/2 -translate-y-1/2">
+                    <div className="absolute left-6 top-1/2 -translate-y-1/2">
                       <div className={cn(
-                        "h-2.5 w-2.5 rounded-full animate-custom-pulse",
+                        "h-3 w-3 rounded-full animate-custom-pulse",
                         occupancy.occupied ? "bg-[#E24B4A]" : "bg-[#22C55E]"
                       )} />
                     </div>
-                    <div className="h-12 w-12 rounded-xl bg-slate-50 dark:bg-slate-900 flex items-center justify-center text-slate-400 group-hover:text-primary transition-colors">
+                    <div className={cn(
+                      "h-12 w-12 rounded-xl flex items-center justify-center transition-colors",
+                      isActive 
+                        ? (window.document.documentElement.classList.contains('dark') ? "bg-slate-900 text-[#1E2235]" : "bg-white text-[#F4F7FC]")
+                        : "bg-slate-50 dark:bg-slate-900 text-slate-400 group-hover:text-primary"
+                    )}>
                       <Monitor size={24} />
                     </div>
                     <div className="text-center">
-                      <span className="font-black text-lg tracking-tight text-slate-900 dark:text-white">{roomId}</span>
-                      {occupancy.occupied && (
-                        <p className="text-[9px] font-bold text-slate-400 truncate max-w-[120px] mt-1">
-                          {occupancy.professorName}
-                        </p>
-                      )}
+                      <span className={cn(
+                        "font-black text-xl tracking-tight",
+                        isActive 
+                          ? (window.document.documentElement.classList.contains('dark') ? "text-[#1E2235]" : "text-[#F4F7FC]")
+                          : "text-slate-900 dark:text-white"
+                      )}>
+                        {roomId}
+                      </span>
                     </div>
                   </div>
                 );
@@ -256,7 +264,7 @@ export default function RoomManagementPage() {
         </div>
 
         {selectedRoomId && selectedRoomData && (
-          <div className="w-[360px] shrink-0 animate-in slide-in-from-right duration-300 relative z-10">
+          <div className="w-[380px] shrink-0 animate-in slide-in-from-right duration-300 relative z-10">
             <Card className={cn(cardBaseStyle, "h-fit flex flex-col border border-[#B0BED6] dark:border-[#4A5878] shadow-2xl bg-[#F4F7FC] dark:bg-[#3D4966] transition-none hover:translate-y-0")}>
               <div className="p-6 flex flex-col items-center gap-8">
                 <div className="w-full flex items-center justify-between">
@@ -295,10 +303,10 @@ export default function RoomManagementPage() {
                         "rounded-full px-4 py-1 text-[11px] font-black uppercase tracking-[0.1em] border-none mb-2",
                         selectedRoomData.occupied ? "bg-red-500 text-white" : "bg-green-500 text-white"
                       )}>
-                        {selectedRoomData.occupied ? 'Active Session' : 'Ready for Usage'}
+                        {selectedRoomData.occupied ? 'Occupied' : 'Vacant'}
                       </Badge>
                       <p className="text-sm font-bold text-slate-500 dark:text-slate-400">
-                        Status: {selectedRoomData.occupied ? 'Laboratory currently in use' : 'Laboratory is vacant'}
+                        Status: {selectedRoomData.occupied ? 'In Use' : 'Available'}
                       </p>
                     </div>
                   </div>
@@ -336,7 +344,7 @@ export default function RoomManagementPage() {
                         className="h-10 rounded-xl font-black text-[10px] gap-2 border-[#B0BED6] dark:border-[#4A5878] shadow-sm uppercase tracking-wider"
                       >
                         <Maximize2 size={14} />
-                        View Full
+                        View
                       </Button>
                       <Button 
                         onClick={() => downloadQR(selectedRoomId!)}

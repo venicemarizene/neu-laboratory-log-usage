@@ -254,65 +254,61 @@ export default function AdminDashboard() {
   };
 
   const cardBaseStyle = "border border-[#B0BED6] dark:border-[#4A5878] shadow-[0_2px_8px_rgba(30,40,80,0.10)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.25)] hover:shadow-[0_4px_16px_rgba(45,58,107,0.14)] hover:-translate-y-[1px] transition-all duration-200 bg-[#F4F7FC] dark:bg-[#3D4966] rounded-[32px] overflow-hidden relative";
+  const statCardStyle = "border border-[#B0BED6] dark:border-[#4A5878] shadow-[0_2px_8px_rgba(30,40,80,0.10)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.25)] hover:shadow-[0_4px_16px_rgba(45,58,107,0.14)] hover:-translate-y-[1px] transition-all duration-200 bg-[#D4DFF2] dark:bg-[#3D4966] rounded-[32px] overflow-hidden relative";
 
   return (
     <div className="px-8 pt-6 pb-8 space-y-8 max-w-[1400px] mx-auto">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <SidebarTrigger className="h-9 w-9 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-colors" />
-          <div className="flex flex-col">
-            <h1 className="text-2xl font-black text-[#3D5C99] dark:text-[#4A90D9] tracking-tight leading-none">Laboratory Analytics</h1>
-            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mt-1">
-              NEU COMPUTER LABORATORY MANAGEMENT
-            </p>
-          </div>
+          <h1 className="text-2xl font-black text-[#3D5C99] dark:text-[#4A90D9] tracking-tight leading-none">Laboratory Analytics</h1>
         </div>
         <ThemeToggle />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className={cardBaseStyle}>
+        <Card className={statCardStyle}>
           <div className="absolute top-6 right-6 opacity-20 text-primary">
             <Waves size={32} />
           </div>
           <CardHeader className="pb-2">
-            <CardTitle className="text-xs font-black uppercase tracking-widest text-slate-400 dark:text-[#4A90D9]">
-              Active Logs Filtered
+            <CardTitle className="text-xs font-black uppercase tracking-widest text-slate-600 dark:text-[#4A90D9]">
+              Active Logs
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-4xl font-black text-slate-900 dark:text-white mb-1">{activeLogsCount}</div>
-            <p className="text-[10px] font-bold text-slate-300">Current viewing window</p>
+            <p className="text-[10px] font-bold text-slate-400 dark:text-slate-300">Current viewing window</p>
           </CardContent>
         </Card>
 
-        <Card className={cardBaseStyle}>
+        <Card className={statCardStyle}>
           <div className="absolute top-6 right-6 opacity-10 text-primary">
             <Users size={24} />
           </div>
           <CardHeader className="pb-2">
-            <CardTitle className="text-xs font-black uppercase tracking-widest text-slate-400 dark:text-[#4A90D9]">
+            <CardTitle className="text-xs font-black uppercase tracking-widest text-slate-600 dark:text-[#4A90D9]">
               Unique Faculty
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-4xl font-black text-slate-900 dark:text-white mb-1">{uniqueFacultyCount}</div>
-            <p className="text-[10px] font-bold text-slate-300">Active teaching staff</p>
+            <p className="text-[10px] font-bold text-slate-400 dark:text-slate-300">Active teaching staff</p>
           </CardContent>
         </Card>
 
-        <Card className={cardBaseStyle}>
+        <Card className={statCardStyle}>
           <div className="absolute top-6 right-6 opacity-20 text-destructive">
             <Waves size={24} />
           </div>
           <CardHeader className="pb-2">
-            <CardTitle className="text-xs font-black uppercase tracking-widest text-slate-400 dark:text-[#4A90D9]">
+            <CardTitle className="text-xs font-black uppercase tracking-widest text-slate-600 dark:text-[#4A90D9]">
               Blocked Accounts
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-4xl font-black text-destructive mb-1">{blockedCount}</div>
-            <p className="text-[10px] font-bold text-slate-300">Restricted system access</p>
+            <p className="text-[10px] font-bold text-slate-400 dark:text-slate-300">Restricted system access</p>
           </CardContent>
         </Card>
       </div>

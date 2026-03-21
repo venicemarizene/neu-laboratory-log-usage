@@ -105,12 +105,7 @@ export default function UserManagementPage() {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <SidebarTrigger className="h-9 w-9 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-colors" />
-          <div className="flex flex-col">
-            <h1 className="text-2xl font-black text-[#3D5C99] dark:text-[#4A90D9] tracking-tight leading-none">Professor Directory</h1>
-            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mt-1">
-              Institutional account management and laboratory access control
-            </p>
-          </div>
+          <h1 className="text-2xl font-black text-[#3D5C99] dark:text-[#4A90D9] tracking-tight leading-none">Professor Directory</h1>
         </div>
         <ThemeToggle />
       </div>

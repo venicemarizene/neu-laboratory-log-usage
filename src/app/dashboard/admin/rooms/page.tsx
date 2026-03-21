@@ -65,12 +65,7 @@ export default function RoomQrGeneratorPage() {
       <div className="max-w-[1400px] w-full mx-auto flex items-center justify-between px-8 pt-6 pb-6 bg-transparent">
         <div className="flex items-center gap-4">
           <SidebarTrigger className="h-9 w-9 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-colors" />
-          <div className="flex flex-col">
-            <h1 className="text-2xl font-black text-[#3D5C99] dark:text-[#4A90D9] tracking-tight leading-none">Laboratory QR Registry</h1>
-            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mt-1">
-              Generate and manage institutional QR identification
-            </p>
-          </div>
+          <h1 className="text-2xl font-black text-[#3D5C99] dark:text-[#4A90D9] tracking-tight leading-none">Lab QR Registry</h1>
         </div>
         <ThemeToggle />
       </div>

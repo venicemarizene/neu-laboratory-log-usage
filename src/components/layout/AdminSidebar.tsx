@@ -43,15 +43,15 @@ export function AdminSidebar() {
   return (
     <Sidebar className={cn("border-none text-white transition-colors duration-200 opacity-100 bg-opacity-100", "bg-[#2B3D6B] dark:bg-[#0F172A]")}>
       <SidebarHeader className="p-6">
-        <div className="flex items-center gap-3">
-          <div className="bg-white rounded-full p-0 flex items-center justify-center shrink-0 overflow-hidden w-[40px] h-[40px] border border-white/10">
+        <div className="flex items-center gap-4">
+          <div className="bg-white rounded-full p-0 flex items-center justify-center shrink-0 overflow-hidden w-[52px] h-[52px] border border-white/10">
             <img
               src="/NEU_LOGO.png"
               alt="New Era University Logo"
               className="w-full h-full object-contain"
             />
           </div>
-          <span className="font-black text-xl tracking-tight leading-tight text-white">New Era University</span>
+          <span className="font-black text-xl tracking-tight leading-tight text-white dark:text-[#4A90D9]">New Era University</span>
         </div>
       </SidebarHeader>
 
@@ -65,7 +65,7 @@ export function AdminSidebar() {
                   asChild 
                   isActive={isActive}
                   className={cn(
-                    "h-12 rounded-lg font-bold transition-all px-6 border-l-[3px] text-white",
+                    "h-12 rounded-lg font-bold transition-all px-6 border-l-[5px] text-white",
                     isActive 
                       ? "bg-[rgba(61,92,153,0.12)] dark:bg-[rgba(74,144,217,0.15)] border-white shadow-sm" 
                       : "hover:bg-white/10 border-transparent"

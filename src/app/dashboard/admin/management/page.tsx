@@ -231,7 +231,7 @@ export default function RoomManagementPage() {
                   className={cn(
                     "border border-[#B0BED6] dark:border-[#4A5878] shadow-[0_2px_8px_rgba(30,40,80,0.10)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.25)] hover:shadow-[0_4px_16px_rgba(45,58,107,0.14)] transition-all duration-200 bg-white dark:bg-[#3D4966] rounded-[24px] p-6 flex flex-col items-center gap-4 group cursor-pointer active:scale-95 relative",
                     isActive && "ring-2 ring-primary ring-offset-2 dark:ring-offset-slate-900",
-                    isActive && (window.document.documentElement.classList.contains('dark') ? "bg-[#5B9FE0]" : "bg-[#4A6BAD]")
+                    isActive && (window.document.documentElement.classList.contains('dark') ? "bg-[#5B9FE0]" : "bg-[#3D5C99]/90")
                   )}
                 >
                   <div className="absolute left-6 top-1/2 -translate-y-1/2">

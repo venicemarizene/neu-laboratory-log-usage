@@ -134,3 +134,9 @@
 .animate-custom-pulse {
   animation: custom-pulse 1.5s ease-in-out infinite;
 }
+
+html:not(.dark) [data-active="true"],
+html:not(.dark) [aria-current="page"],
+html:not(.dark) [data-state="active"] {
+  background-color: rgb(61 92 153 / 0.9) !important;
+}

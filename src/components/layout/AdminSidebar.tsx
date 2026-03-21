@@ -66,7 +66,7 @@ export function AdminSidebar() {
                   className={cn(
                     "h-12 rounded-lg font-bold transition-all px-6 border-l-[5px] text-white",
                     isActive 
-                      ? "bg-[rgba(255,255,255,0.18)] dark:bg-[rgba(74,144,217,0.15)] border-white shadow-sm" 
+                      ? "bg-[rgba(74,144,217,0.28)] dark:bg-[rgba(74,144,217,0.15)] border-white shadow-sm" 
                       : "hover:bg-white/10 border-transparent"
                   )}
                 >

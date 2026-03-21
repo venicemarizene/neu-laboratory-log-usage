@@ -1,6 +1,7 @@
+
 "use client"
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
@@ -183,13 +184,13 @@ export default function RoomManagementPage() {
         </Card>
       </div>
 
-      <div className="flex gap-8 relative">
+      <div className="flex flex-col md:flex-row gap-8 relative">
         <div 
           className="flex-1 flex flex-col gap-12"
           onClick={() => { if (selectedRoomId) setSelectedRoomId(null); }}
         >
           <div className="flex flex-col md:flex-row items-center gap-4 shrink-0" onClick={(e) => e.stopPropagation()}>
-            <div className="relative flex-1">
+            <div className="relative flex-1 w-full">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
               <Input 
                 placeholder="Search laboratory room..." 
@@ -198,7 +199,7 @@ export default function RoomManagementPage() {
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
-            <div className="flex bg-slate-100 dark:bg-slate-900 p-1 rounded-xl border border-[#B0BED6] dark:border-[#4A5878]">
+            <div className="flex bg-slate-100 dark:bg-slate-900 p-1 rounded-xl border border-[#B0BED6] dark:border-[#4A5878] w-full md:w-auto">
               {(['All', 'Occupied', 'Vacant'] as FilterType[]).map((f) => (
                 <Button
                   key={f}
@@ -206,7 +207,7 @@ export default function RoomManagementPage() {
                   size="sm"
                   onClick={() => setFilter(f)}
                   className={cn(
-                    "h-9 px-6 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all",
+                    "flex-1 md:flex-none h-9 px-6 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all",
                     filter === f ? "bg-white dark:bg-slate-800 text-[#3D5C99] dark:text-[#4A90D9] shadow-sm" : "text-slate-500"
                   )}
                 >
@@ -216,7 +217,7 @@ export default function RoomManagementPage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pb-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pb-20 md:pb-12">
             {filteredRooms.map((roomId) => {
               const occupancy = roomOccupancy[roomId];
               const isActive = selectedRoomId === roomId;
@@ -240,10 +241,8 @@ export default function RoomManagementPage() {
                     )} />
                   </div>
                   <div className={cn(
-                    "h-12 w-12 rounded-xl flex items-center justify-center transition-colors",
-                    isActive 
-                      ? "bg-white/20 text-white"
-                      : "bg-slate-50 dark:bg-slate-900 text-slate-400 group-hover:text-primary"
+                    "h-12 w-12 rounded-xl flex items-center justify-center transition-colors shadow-sm bg-slate-50 dark:bg-slate-900",
+                    isActive ? "text-white bg-white/20" : "text-slate-400 group-hover:text-primary"
                   )}>
                     <Monitor size={24} />
                   </div>
@@ -264,118 +263,132 @@ export default function RoomManagementPage() {
         </div>
 
         {selectedRoomId && selectedRoomData && (
-          <div className="w-[380px] shrink-0 animate-in slide-in-from-right duration-300 sticky top-6 h-fit z-10" onClick={(e) => e.stopPropagation()}>
-            <Card className={cn(cardBaseStyle, "flex flex-col shadow-2xl transition-none hover:translate-y-0")}>
-              <div className="p-0 flex flex-col">
-                <div className="p-6 flex items-center justify-between border-b border-[#B0BED6] dark:border-[#4A5878]">
-                  <div className="text-left">
-                    <h3 className="text-xl font-black text-[#3D5C99] dark:text-[#4A90D9] tracking-tighter">
-                      {selectedRoomId}
-                    </h3>
+          <div 
+            className={cn(
+              "fixed md:sticky md:top-6 inset-0 z-[100] md:z-10 flex items-center justify-center md:items-start md:justify-start bg-black/55 md:bg-transparent transition-all",
+              "md:w-[380px] md:shrink-0 md:h-fit"
+            )}
+            onClick={() => setSelectedRoomId(null)}
+          >
+            <div 
+              className={cn(
+                "w-[90%] max-w-[340px] md:w-full md:max-w-none animate-in slide-in-from-right md:slide-in-from-right duration-300",
+                "bg-transparent"
+              )}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <Card className={cn(cardBaseStyle, "flex flex-col shadow-2xl transition-none hover:translate-y-0 md:rounded-[32px] rounded-[16px]")}>
+                <div className="p-0 flex flex-col">
+                  <div className="p-6 flex items-center justify-between border-b border-[#B0BED6] dark:border-[#4A5878]">
+                    <div className="text-left">
+                      <h3 className="text-xl font-black text-[#3D5C99] dark:text-[#4A90D9] tracking-tighter">
+                        {selectedRoomId}
+                      </h3>
+                    </div>
+                    <button 
+                      onClick={() => setSelectedRoomId(null)}
+                      className="h-8 w-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 hover:text-primary transition-colors"
+                    >
+                      <X size={16} />
+                    </button>
                   </div>
-                  <button 
-                    onClick={() => setSelectedRoomId(null)}
-                    className="h-8 w-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 hover:text-primary transition-colors"
-                  >
-                    <X size={16} />
-                  </button>
-                </div>
 
-                <Tabs defaultValue="room" className="w-full">
-                  <div className="px-6 py-4">
-                    <TabsList className="grid grid-cols-2 w-full h-11 bg-slate-100/50 dark:bg-slate-900/50 p-1 rounded-xl">
-                      <TabsTrigger value="room" className="rounded-lg text-[10px] font-black uppercase tracking-wider flex items-center gap-2">
-                        <Info size={14} />
-                        Room
-                      </TabsTrigger>
-                      <TabsTrigger value="qr" className="rounded-lg text-[10px] font-black uppercase tracking-wider flex items-center gap-2">
-                        <QrCode size={14} />
-                        Room QR code
-                      </TabsTrigger>
-                    </TabsList>
-                  </div>
-
-                  <TabsContent value="room" className="px-6 pb-8 space-y-6 mt-0">
-                    <div className={cn(
-                      "p-8 rounded-[32px] flex flex-col items-center justify-center text-center gap-4 border transition-all duration-500",
-                      selectedRoomData.occupied 
-                        ? "bg-red-50/50 dark:bg-red-950/10 border-red-100 dark:border-red-900/30" 
-                        : "bg-green-50/50 dark:bg-green-950/10 border-green-100 dark:border-green-900/30"
-                    )}>
-                      <div className={cn(
-                        "h-14 w-14 rounded-2xl flex items-center justify-center shadow-sm",
-                        selectedRoomData.occupied ? "bg-red-500 text-white" : "bg-green-500 text-white"
-                      )}>
-                        {selectedRoomData.occupied ? <Users size={28} /> : <CheckCircle2 size={28} />}
-                      </div>
-                      
-                      <div className="space-y-1">
-                        <h4 className={cn(
-                          "text-lg font-black uppercase tracking-tight",
-                          selectedRoomData.occupied ? "text-red-500" : "text-green-500"
-                        )}>
-                          {selectedRoomData.occupied ? 'Occupied' : 'Available'}
-                        </h4>
-                        <p className="text-xs font-bold text-slate-500 dark:text-slate-400">
-                          {selectedRoomData.occupied 
-                            ? "This room is currently in use." 
-                            : "This laboratory room is currently vacant and ready for use."}
-                        </p>
-                      </div>
+                  <Tabs defaultValue="room" className="w-full">
+                    <div className="px-6 py-4">
+                      <TabsList className="grid grid-cols-2 w-full h-11 bg-slate-100/50 dark:bg-slate-900/50 p-1 rounded-xl">
+                        <TabsTrigger value="room" className="rounded-lg text-[10px] font-black uppercase tracking-wider flex items-center gap-2">
+                          <Info size={14} />
+                          Room
+                        </TabsTrigger>
+                        <TabsTrigger value="qr" className="rounded-lg text-[10px] font-black uppercase tracking-wider flex items-center gap-2">
+                          <QrCode size={14} />
+                          Room QR code
+                        </TabsTrigger>
+                      </TabsList>
                     </div>
 
-                    {selectedRoomData.occupied && (
-                      <div className="space-y-3">
-                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Current occupant</p>
-                        <div className="p-4 rounded-2xl border border-[#B0BED6] dark:border-[#4A5878] bg-white dark:bg-slate-800 flex items-center gap-4">
-                          <Avatar className="h-10 w-10 border-none bg-primary/10">
-                            <AvatarFallback className="text-primary font-black text-sm">
-                              {(selectedRoomData.professorName || 'P').charAt(0).toUpperCase()}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div className="flex flex-col">
-                            <p className="text-sm font-black text-slate-900 dark:text-white leading-tight">
-                              {selectedRoomData.professorName}
-                            </p>
-                            <p className="text-[10px] font-bold text-slate-400">Faculty Member</p>
-                          </div>
+                    <TabsContent value="room" className="px-6 pb-8 space-y-6 mt-0">
+                      <div className={cn(
+                        "p-8 rounded-[32px] flex flex-col items-center justify-center text-center gap-4 border transition-all duration-500",
+                        selectedRoomData.occupied 
+                          ? "bg-red-50/50 dark:bg-red-950/10 border-red-100 dark:border-red-900/30" 
+                          : "bg-green-50/50 dark:bg-green-950/10 border-green-100 dark:border-green-900/30"
+                      )}>
+                        <div className={cn(
+                          "h-14 w-14 rounded-2xl flex items-center justify-center shadow-sm",
+                          selectedRoomData.occupied ? "bg-red-500 text-white" : "bg-green-500 text-white"
+                        )}>
+                          {selectedRoomData.occupied ? <Users size={28} /> : <CheckCircle2 size={28} />}
+                        </div>
+                        
+                        <div className="space-y-1">
+                          <h4 className={cn(
+                            "text-lg font-black uppercase tracking-tight",
+                            selectedRoomData.occupied ? "text-red-500" : "text-green-500"
+                          )}>
+                            {selectedRoomData.occupied ? 'Occupied' : 'Available'}
+                          </h4>
+                          <p className="text-xs font-bold text-slate-500 dark:text-slate-400">
+                            {selectedRoomData.occupied 
+                              ? "This room is currently in use." 
+                              : "This laboratory room is currently vacant and ready for use."}
+                          </p>
                         </div>
                       </div>
-                    )}
-                  </TabsContent>
 
-                  <TabsContent value="qr" className="px-6 pb-8 space-y-6 mt-0">
-                    <div className="bg-white p-6 rounded-[28px] border border-[#B0BED6] dark:border-[#4A5878] shadow-inner flex items-center justify-center aspect-square max-w-[200px] mx-auto">
-                      <QRCodeSVG
-                        id={`qr-${selectedRoomId}`}
-                        value={`https://neu-laboratory-log-usage.vercel.app/login?room=${selectedRoomId}`}
-                        size={152}
-                        level="H"
-                        includeMargin={true}
-                      />
-                    </div>
+                      {selectedRoomData.occupied && (
+                        <div className="space-y-3">
+                          <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Current occupant</p>
+                          <div className="p-4 rounded-2xl border border-[#B0BED6] dark:border-[#4A5878] bg-white dark:bg-slate-800 flex items-center gap-4">
+                            <Avatar className="h-10 w-10 border-none bg-primary/10">
+                              <AvatarFallback className="text-primary font-black text-sm">
+                                {(selectedRoomData.professorName || 'P').charAt(0).toUpperCase()}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div className="flex flex-col">
+                              <p className="text-sm font-black text-slate-900 dark:text-white leading-tight">
+                                {selectedRoomData.professorName}
+                              </p>
+                              <p className="text-[10px] font-bold text-slate-400">Faculty Member</p>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </TabsContent>
 
-                    <div className="grid grid-cols-2 gap-3">
-                      <Button 
-                        onClick={() => openView(selectedRoomId!)}
-                        variant="outline"
-                        className="h-11 rounded-xl font-black text-[10px] gap-2 border-[#B0BED6] dark:border-[#4A5878] shadow-sm uppercase tracking-wider"
-                      >
-                        <Maximize2 size={14} />
-                        View Full
-                      </Button>
-                      <Button 
-                        onClick={() => downloadQR(selectedRoomId!)}
-                        className="h-11 rounded-xl bg-primary hover:bg-primary/90 text-white font-black text-[10px] gap-2 shadow-lg shadow-primary/20 uppercase tracking-wider"
-                      >
-                        <Download size={14} />
-                        Download PNG
-                      </Button>
-                    </div>
-                  </TabsContent>
-                </Tabs>
-              </div>
-            </Card>
+                    <TabsContent value="qr" className="px-6 pb-8 space-y-6 mt-0">
+                      <div className="bg-white p-6 rounded-[28px] border border-[#B0BED6] dark:border-[#4A5878] shadow-inner flex items-center justify-center aspect-square max-w-[200px] mx-auto">
+                        <QRCodeSVG
+                          id={`qr-${selectedRoomId}`}
+                          value={`https://neu-laboratory-log-usage.vercel.app/login?room=${selectedRoomId}`}
+                          size={152}
+                          level="H"
+                          includeMargin={true}
+                        />
+                      </div>
+
+                      <div className="flex flex-col md:flex-row gap-3 items-center justify-center">
+                        <Button 
+                          onClick={() => openView(selectedRoomId!)}
+                          variant="outline"
+                          className="w-[80%] md:w-auto md:flex-1 h-11 rounded-xl font-black text-[10px] gap-2 border-[#B0BED6] dark:border-[#4A5878] shadow-sm uppercase tracking-wider"
+                        >
+                          <Maximize2 size={14} />
+                          View Full
+                        </Button>
+                        <Button 
+                          onClick={() => downloadQR(selectedRoomId!)}
+                          className="w-[80%] md:w-auto md:flex-1 h-11 rounded-xl bg-primary hover:bg-primary/90 text-white font-black text-[10px] gap-2 shadow-lg shadow-primary/20 uppercase tracking-wider"
+                        >
+                          <Download size={14} />
+                          Download PNG
+                        </Button>
+                      </div>
+                    </TabsContent>
+                  </Tabs>
+                </div>
+              </Card>
+            </div>
           </div>
         )}
       </div>

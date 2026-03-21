@@ -1,14 +1,45 @@
 
 "use client"
 
-import { ReactNode, useEffect } from 'react';
-import { SidebarProvider } from '@/components/ui/sidebar';
+import { ReactNode, useEffect, useState } from 'react';
+import { SidebarProvider, useSidebar } from '@/components/ui/sidebar';
 import { AdminSidebar } from '@/components/layout/AdminSidebar';
 import { useUser, useFirestore, useMemoFirebase, useDoc } from '@/firebase';
 import { useRouter } from 'next/navigation';
 import { doc } from 'firebase/firestore';
+import { Button } from '@/components/ui/button';
+import { PanelLeft } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
-export default function AdminDashboardLayout({ children }: { children: ReactNode }) {
+function FloatingSidebarToggle() {
+  const { toggleSidebar } = useSidebar();
+  const [show, setShow] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setShow(window.scrollY > 10);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  return (
+    <Button
+      variant="ghost"
+      size="icon"
+      onClick={toggleSidebar}
+      className={cn(
+        "fixed top-4 left-4 z-[60] h-10 w-10 rounded-full md:hidden transition-opacity duration-200 shadow-lg border-none",
+        "bg-[#2B3D6B] dark:bg-[#0F172A] text-white hover:bg-[#2B3D6B]/90 dark:hover:bg-[#0F172A]/90",
+        show ? "opacity-100" : "opacity-0 pointer-events-none"
+      )}
+    >
+      <PanelLeft className="h-5 w-5" />
+    </Button>
+  );
+}
+
+function AdminDashboardLayoutContent({ children }: { children: ReactNode }) {
   const { user, isUserLoading } = useUser();
   const db = useFirestore();
   const router = useRouter();
@@ -49,15 +80,24 @@ export default function AdminDashboardLayout({ children }: { children: ReactNode
   }
 
   return (
-    <SidebarProvider>
-      <div className="flex min-h-screen w-full bg-[#F8FAFC] dark:bg-[#2A3245] transition-colors">
-        <AdminSidebar />
-        <div className="flex-1 flex flex-col relative overflow-hidden">
-          <main className="flex-1 overflow-auto bg-transparent">
-            {children}
-          </main>
-        </div>
+    <div className="flex min-h-screen w-full bg-[#F8FAFC] dark:bg-[#2A3245] transition-colors">
+      <FloatingSidebarToggle />
+      <AdminSidebar />
+      <div className="flex-1 flex flex-col relative overflow-hidden">
+        <main className="flex-1 overflow-auto bg-transparent">
+          {children}
+        </main>
       </div>
+    </div>
+  );
+}
+
+export default function AdminDashboardLayout({ children }: { children: ReactNode }) {
+  return (
+    <SidebarProvider>
+      <AdminDashboardLayoutContent>
+        {children}
+      </AdminDashboardLayoutContent>
     </SidebarProvider>
   );
 }

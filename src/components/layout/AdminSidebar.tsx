@@ -1,4 +1,3 @@
-
 "use client"
 
 import Link from 'next/link';
@@ -42,18 +41,17 @@ export function AdminSidebar() {
   ];
 
   return (
-    <Sidebar className="border-none bg-[#2B3D6B] dark:bg-[#0F172A] text-white">
+    <Sidebar className={cn("border-none text-white transition-colors duration-200", "bg-[#2B3D6B] dark:bg-[#0F172A]")}>
       <SidebarHeader className="p-6">
         <div className="flex items-center gap-3">
-          <div className="bg-white rounded-full p-0.5 shadow-sm border border-slate-100 flex items-center justify-center shrink-0 overflow-hidden w-[44px] h-[44px]">
+          <div className="bg-white rounded-full p-0 flex items-center justify-center shrink-0 overflow-hidden w-[40px] h-[40px] border border-white/10">
             <img
               src="/NEU_LOGO.png"
               alt="New Era University Logo"
-              className="rounded-full"
-              style={{ width: '40px', height: '40px', objectFit: 'contain' }}
+              className="w-full h-full object-contain"
             />
           </div>
-          <span className="font-black text-xl tracking-tight text-white dark:text-[#4A90D9] leading-tight transition-colors">New Era University</span>
+          <span className="font-black text-xl tracking-tight text-white leading-tight">New Era University</span>
         </div>
       </SidebarHeader>
 
@@ -67,15 +65,15 @@ export function AdminSidebar() {
                   asChild 
                   isActive={isActive}
                   className={cn(
-                    "h-12 rounded-lg font-bold transition-all px-6 border-l-[5px]",
+                    "h-12 rounded-lg font-bold transition-all px-6 border-l-[3px] text-white",
                     isActive 
-                      ? "bg-white/15 text-white border-white shadow-sm" 
-                      : "text-white/60 hover:bg-white/10 hover:text-white border-transparent"
+                      ? "bg-[rgba(61,92,153,0.12)] dark:bg-[rgba(74,144,217,0.15)] border-white shadow-sm" 
+                      : "hover:bg-white/10 border-transparent"
                   )}
                 >
                   <Link href={item.href}>
                     <item.icon className={cn("h-5 w-5 mr-3", isActive ? "text-white" : "text-white/60")} />
-                    {item.name}
+                    <span className="text-white">{item.name}</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -90,7 +88,7 @@ export function AdminSidebar() {
             <p className="text-sm font-black text-white leading-none truncate">
               {user.displayName || 'Administrator'}
             </p>
-            <p className="text-[10px] text-white/60 font-bold mt-1 truncate">
+            <p className="text-[10px] text-[#CBD5E1] font-bold mt-1 truncate">
               {user.email}
             </p>
           </div>

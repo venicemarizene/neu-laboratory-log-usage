@@ -7,7 +7,6 @@ import {
   Users, 
   LogOut, 
   ShieldCheck,
-  QrCode,
   LayoutList
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -36,7 +35,6 @@ export function AdminSidebar() {
   const navItems = [
     { name: 'Dashboard', href: '/dashboard/admin', icon: LayoutDashboard },
     { name: 'Professor Directory', href: '/dashboard/admin/users', icon: Users },
-    { name: 'Lab QR Registry', href: '/dashboard/admin/rooms', icon: QrCode },
     { name: 'Room Management', href: '/dashboard/admin/management', icon: LayoutList },
   ];
 

@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useState, useMemo } from 'react';
@@ -7,6 +6,8 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { 
   Monitor, 
   Search, 
@@ -15,7 +16,9 @@ import {
   CheckCircle2,
   X,
   Maximize2,
-  Download
+  Download,
+  Info,
+  QrCode
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useCollection, useFirestore, useMemoFirebase, useUser, useDoc } from '@/firebase';
@@ -130,7 +133,7 @@ export default function RoomManagementPage() {
     );
   }
 
-  const cardBaseStyle = "border border-[#B0BED6] dark:border-[#4A5878] shadow-[0_2px_8px_rgba(30,40,80,0.10)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.25)] hover:shadow-[0_4px_16px_rgba(45,58,107,0.14)] hover:-translate-y-[1px] transition-all duration-200 bg-[#F4F7FC] dark:bg-[#3D4966] rounded-[32px] overflow-hidden relative";
+  const cardBaseStyle = "border border-[#B0BED6] dark:border-[#4A5878] shadow-[0_2px_8px_rgba(30,40,80,0.10)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.25)] transition-all duration-200 bg-[#F4F7FC] dark:bg-[#3D4966] rounded-[32px] overflow-hidden relative";
   const statCardStyle = "border border-[#B0BED6] dark:border-[#4A5878] shadow-[0_2px_8px_rgba(30,40,80,0.10)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.25)] hover:shadow-[0_4px_16px_rgba(45,58,107,0.14)] hover:-translate-y-[1px] transition-all duration-200 bg-[#D4DFF2] dark:bg-[#3D4966] rounded-[32px] overflow-hidden relative";
 
   return (
@@ -265,16 +268,13 @@ export default function RoomManagementPage() {
 
         {selectedRoomId && selectedRoomData && (
           <div className="w-[380px] shrink-0 animate-in slide-in-from-right duration-300 relative z-10">
-            <Card className={cn(cardBaseStyle, "h-fit flex flex-col border border-[#B0BED6] dark:border-[#4A5878] shadow-2xl bg-[#F4F7FC] dark:bg-[#3D4966] transition-none hover:translate-y-0")}>
-              <div className="p-6 flex flex-col items-center gap-8">
-                <div className="w-full flex items-center justify-between">
+            <Card className={cn(cardBaseStyle, "h-fit flex flex-col shadow-2xl transition-none hover:translate-y-0")}>
+              <div className="p-0 flex flex-col">
+                <div className="p-6 flex items-center justify-between border-b border-[#B0BED6] dark:border-[#4A5878]">
                   <div className="text-left">
-                    <h3 className="text-2xl font-black text-[#3D5C99] dark:text-[#4A90D9] tracking-tighter">
+                    <h3 className="text-xl font-black text-[#3D5C99] dark:text-[#4A90D9] tracking-tighter">
                       {selectedRoomId}
                     </h3>
-                    <p className="text-[9px] font-black uppercase tracking-[0.15em] text-slate-400">
-                      Institutional Laboratory Room
-                    </p>
                   </div>
                   <button 
                     onClick={() => setSelectedRoomId(null)}
@@ -284,78 +284,105 @@ export default function RoomManagementPage() {
                   </button>
                 </div>
 
-                <div className="w-full space-y-6">
-                  <div className={cn(
-                    "p-8 rounded-[40px] flex flex-col items-center justify-center text-center gap-4 border transition-all duration-500",
-                    selectedRoomData.occupied 
-                      ? "bg-red-50/50 dark:bg-red-950/10 border-red-100 dark:border-red-900/30" 
-                      : "bg-green-50/50 dark:bg-green-950/10 border-green-100 dark:border-green-900/30"
-                  )}>
-                    <div className={cn(
-                      "h-16 w-16 rounded-3xl flex items-center justify-center shadow-sm",
-                      selectedRoomData.occupied ? "bg-red-500 text-white" : "bg-green-500 text-white"
-                    )}>
-                      {selectedRoomData.occupied ? <Activity size={32} /> : <CheckCircle2 size={32} />}
-                    </div>
-                    
-                    <div>
-                      <Badge className={cn(
-                        "rounded-full px-4 py-1 text-[11px] font-black uppercase tracking-[0.1em] border-none mb-2",
-                        selectedRoomData.occupied ? "bg-red-500 text-white" : "bg-green-500 text-white"
-                      )}>
-                        {selectedRoomData.occupied ? 'Occupied' : 'Vacant'}
-                      </Badge>
-                      <p className="text-sm font-bold text-slate-500 dark:text-slate-400">
-                        Status: {selectedRoomData.occupied ? 'In Use' : 'Available'}
-                      </p>
-                    </div>
+                <Tabs defaultValue="room" className="w-full">
+                  <div className="px-6 py-4">
+                    <TabsList className="grid grid-cols-2 w-full h-11 bg-slate-100/50 dark:bg-slate-900/50 p-1 rounded-xl">
+                      <TabsTrigger value="room" className="rounded-lg text-[10px] font-black uppercase tracking-wider flex items-center gap-2">
+                        <Info size={14} />
+                        Room
+                      </TabsTrigger>
+                      <TabsTrigger value="qr" className="rounded-lg text-[10px] font-black uppercase tracking-wider flex items-center gap-2">
+                        <QrCode size={14} />
+                        Room QR code
+                      </TabsTrigger>
+                    </TabsList>
                   </div>
 
-                  {selectedRoomData.occupied && (
-                    <Card className="border border-[#B0BED6] dark:border-[#4A5878] shadow-sm bg-white dark:bg-slate-800 rounded-3xl overflow-hidden">
-                      <CardContent className="p-6 flex items-center gap-4">
-                        <div className="h-12 w-12 rounded-2xl bg-[#3D5C99]/10 dark:bg-[#4A90D9]/10 flex items-center justify-center text-[#3D5C99] dark:text-[#4A90D9]">
-                          <Users size={20} />
-                        </div>
-                        <div>
-                          <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-[#4A90D9] mb-1">Current Faculty</p>
-                          <p className="text-base font-black text-slate-900 dark:text-white leading-tight">
-                            {selectedRoomData.professorName}
-                          </p>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  )}
+                  <TabsContent value="room" className="px-6 pb-8 space-y-6 mt-0">
+                    <div className={cn(
+                      "p-8 rounded-[32px] flex flex-col items-center justify-center text-center gap-4 border transition-all duration-500",
+                      selectedRoomData.occupied 
+                        ? "bg-red-50/50 dark:bg-red-950/10 border-red-100 dark:border-red-900/30" 
+                        : "bg-green-50/50 dark:bg-green-950/10 border-green-100 dark:border-green-900/30"
+                    )}>
+                      <div className={cn(
+                        "h-14 w-14 rounded-2xl flex items-center justify-center shadow-sm",
+                        selectedRoomData.occupied ? "bg-red-500 text-white" : "bg-green-500 text-white"
+                      )}>
+                        {selectedRoomData.occupied ? <Users size={28} /> : <CheckCircle2 size={28} />}
+                      </div>
+                      
+                      <div className="space-y-1">
+                        <h4 className={cn(
+                          "text-lg font-black uppercase tracking-tight",
+                          selectedRoomData.occupied ? "text-red-500" : "text-green-500"
+                        )}>
+                          {selectedRoomData.occupied ? 'Occupied' : 'Available'}
+                        </h4>
+                        <p className="text-xs font-bold text-slate-500 dark:text-slate-400">
+                          {selectedRoomData.occupied 
+                            ? "This room is currently in use." 
+                            : "This laboratory room is currently vacant and ready for use."}
+                        </p>
+                      </div>
+                    </div>
 
-                  <div className="w-full space-y-4">
-                    <div className="bg-white p-4 rounded-[24px] border border-[#B0BED6] dark:border-[#4A5878] shadow-inner flex items-center justify-center aspect-square max-w-[180px] mx-auto">
+                    {selectedRoomData.occupied && (
+                      <div className="space-y-3">
+                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Current occupant</p>
+                        <div className="p-4 rounded-2xl border border-[#B0BED6] dark:border-[#4A5878] bg-white dark:bg-slate-800 flex items-center gap-4">
+                          <Avatar className="h-10 w-10 border-none bg-primary/10">
+                            <AvatarFallback className="text-primary font-black text-sm">
+                              {(selectedRoomData.professorName || 'P').charAt(0).toUpperCase()}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="flex flex-col">
+                            <p className="text-sm font-black text-slate-900 dark:text-white leading-tight">
+                              {selectedRoomData.professorName}
+                            </p>
+                            <p className="text-[10px] font-bold text-slate-400">Faculty Member</p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </TabsContent>
+
+                  <TabsContent value="qr" className="px-6 pb-8 space-y-6 mt-0">
+                    <div className="bg-white p-6 rounded-[28px] border border-[#B0BED6] dark:border-[#4A5878] shadow-inner flex items-center justify-center aspect-square max-w-[200px] mx-auto">
                       <QRCodeSVG
                         id={`qr-${selectedRoomId}`}
                         value={`https://neu-laboratory-log-usage.vercel.app/login?room=${selectedRoomId}`}
-                        size={140}
+                        size={152}
                         level="H"
                         includeMargin={true}
                       />
                     </div>
-                    <div className="w-full grid grid-cols-2 gap-3">
+                    
+                    <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-[#B0BED6] dark:border-[#4A5878]">
+                      <p className="text-[9px] font-bold text-slate-400 break-all leading-tight line-clamp-2 text-center">
+                        {`https://neu-laboratory-log-usage.vercel.app/login?room=${selectedRoomId}`}
+                      </p>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3">
                       <Button 
                         onClick={() => openView(selectedRoomId!)}
                         variant="outline"
-                        className="h-10 rounded-xl font-black text-[10px] gap-2 border-[#B0BED6] dark:border-[#4A5878] shadow-sm uppercase tracking-wider"
+                        className="h-11 rounded-xl font-black text-[10px] gap-2 border-[#B0BED6] dark:border-[#4A5878] shadow-sm uppercase tracking-wider"
                       >
                         <Maximize2 size={14} />
-                        View
+                        View Full
                       </Button>
                       <Button 
                         onClick={() => downloadQR(selectedRoomId!)}
-                        className="h-10 rounded-xl bg-primary hover:bg-primary/90 text-white font-black text-[10px] gap-2 shadow-lg shadow-primary/20 uppercase tracking-wider"
+                        className="h-11 rounded-xl bg-primary hover:bg-primary/90 text-white font-black text-[10px] gap-2 shadow-lg shadow-primary/20 uppercase tracking-wider"
                       >
                         <Download size={14} />
-                        Download
+                        Download PNG
                       </Button>
                     </div>
-                  </div>
-                </div>
+                  </TabsContent>
+                </Tabs>
               </div>
             </Card>
           </div>

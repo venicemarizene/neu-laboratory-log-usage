@@ -104,7 +104,7 @@ export default function RoomManagementPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className={cardBaseStyle}>
+        <Card className={cn(cardBaseStyle, "bg-[#D4DFF2] dark:bg-[#3D4966]")}>
           <CardContent className="p-8 flex items-center gap-6">
             <div className="h-14 w-14 rounded-2xl bg-slate-50 dark:bg-slate-800 flex items-center justify-center text-slate-400">
               <Monitor size={24} />
@@ -116,7 +116,7 @@ export default function RoomManagementPage() {
           </CardContent>
         </Card>
 
-        <Card className={cardBaseStyle}>
+        <Card className={cn(cardBaseStyle, "bg-[#D4DFF2] dark:bg-[#3D4966]")}>
           <CardContent className="p-8 flex items-center gap-6">
             <div className="h-14 w-14 rounded-2xl bg-red-50 dark:bg-red-950/20 flex items-center justify-center text-red-500">
               <Activity size={24} />
@@ -128,7 +128,7 @@ export default function RoomManagementPage() {
           </CardContent>
         </Card>
 
-        <Card className={cardBaseStyle}>
+        <Card className={cn(cardBaseStyle, "bg-[#D4DFF2] dark:bg-[#3D4966]")}>
           <CardContent className="p-8 flex items-center gap-6">
             <div className="h-14 w-14 rounded-2xl bg-green-50 dark:bg-green-950/20 flex items-center justify-center text-green-500">
               <CheckCircle2 size={24} />
@@ -151,7 +151,7 @@ export default function RoomManagementPage() {
               onClick={() => setFilter(f)}
               className={cn(
                 "flex-1 md:flex-none h-9 px-6 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all",
-                filter === f ? "bg-white dark:bg-slate-800 text-primary shadow-sm" : "text-slate-500"
+                filter === f ? "bg-white dark:bg-slate-800 text-[#3D5C99] dark:text-[#4A90D9] shadow-sm" : "text-slate-500"
               )}
             >
               {f}
@@ -184,8 +184,8 @@ export default function RoomManagementPage() {
                     className={cn(
                       "w-full flex items-center justify-between p-4 rounded-2xl transition-all duration-200 group",
                       isActive 
-                        ? "bg-primary text-white shadow-lg shadow-primary/20" 
-                        : "text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/50"
+                        ? "bg-[#4A6BAD] text-[#F4F7FC] dark:bg-[#5B9FE0] dark:text-[#1E2235] shadow-lg shadow-[#4A6BAD]/20" 
+                        : "text-slate-600 dark:text-slate-300 hover:bg-[rgb(61_92_153/0.12)] dark:hover:bg-[rgb(74_144_217/0.15)]"
                     )}
                   >
                     <div className="flex items-center gap-4">
@@ -193,7 +193,7 @@ export default function RoomManagementPage() {
                         "h-10 w-10 rounded-xl flex items-center justify-center transition-colors",
                         isActive ? "bg-white/20" : "bg-slate-50 dark:bg-slate-900"
                       )}>
-                        <Monitor className={cn("h-4 w-4", isActive ? "text-white" : "text-slate-400")} />
+                        <Monitor className={cn("h-4 w-4", isActive ? "text-[#F4F7FC] dark:text-[#1E2235]" : "text-slate-400")} />
                       </div>
                       <div className="text-left">
                         <p className="font-black text-sm tracking-tight">{roomId}</p>
@@ -210,8 +210,8 @@ export default function RoomManagementPage() {
                         className={cn(
                           "rounded-full border-none px-3 py-0.5 text-[9px] font-black uppercase",
                           occupancy.occupied 
-                            ? (isActive ? "bg-white/20 text-white" : "bg-red-50 text-red-500 dark:bg-red-950/20")
-                            : (isActive ? "bg-white/20 text-white" : "bg-green-50 text-green-500 dark:bg-green-950/20")
+                            ? (isActive ? "bg-white/20 text-[#F4F7FC] dark:text-[#1E2235]" : "bg-red-50 text-red-500 dark:bg-red-950/20")
+                            : (isActive ? "bg-white/20 text-[#F4F7FC] dark:text-[#1E2235]" : "bg-green-50 text-green-500 dark:bg-green-950/20")
                         )}
                       >
                         {occupancy.occupied ? 'Occupied' : 'Vacant'}
@@ -231,7 +231,7 @@ export default function RoomManagementPage() {
               <h3 className="text-6xl font-black text-slate-900 dark:text-[#4A90D9] tracking-tighter">
                 {selectedRoomId}
               </h3>
-              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary">
+              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-[#3D5C99] dark:text-[#4A90D9]">
                 Institutional Laboratory Unit
               </p>
             </div>
@@ -266,7 +266,7 @@ export default function RoomManagementPage() {
               {selectedRoomData.occupied && (
                 <Card className="border border-[#B0BED6] dark:border-[#4A5878] shadow-sm bg-white dark:bg-slate-800 rounded-3xl overflow-hidden animate-in fade-in slide-in-from-bottom-2 duration-300">
                   <CardContent className="p-6 flex items-center gap-4">
-                    <div className="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
+                    <div className="h-12 w-12 rounded-2xl bg-[#3D5C99]/10 dark:bg-[#4A90D9]/10 flex items-center justify-center text-[#3D5C99] dark:text-[#4A90D9]">
                       <Users size={20} />
                     </div>
                     <div>

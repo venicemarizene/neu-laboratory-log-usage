@@ -5,7 +5,6 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { 
@@ -133,11 +132,11 @@ export default function RoomManagementPage() {
     );
   }
 
-  const cardBaseStyle = "border border-[#B0BED6] dark:border-[#4A5878] shadow-[0_2px_8px_rgba(30,40,80,0.10)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.25)] transition-all duration-200 bg-[#F4F7FC] dark:bg-[#3D4966] rounded-[32px] overflow-hidden relative";
   const statCardStyle = "border border-[#B0BED6] dark:border-[#4A5878] shadow-[0_2px_8px_rgba(30,40,80,0.10)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.25)] hover:shadow-[0_4px_16px_rgba(45,58,107,0.14)] hover:-translate-y-[1px] transition-all duration-200 bg-[#D4DFF2] dark:bg-[#3D4966] rounded-[32px] overflow-hidden relative";
+  const cardBaseStyle = "border border-[#B0BED6] dark:border-[#4A5878] shadow-[0_2px_8px_rgba(30,40,80,0.10)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.25)] transition-all duration-200 bg-[#F4F7FC] dark:bg-[#3D4966] rounded-[32px] overflow-hidden relative";
 
   return (
-    <div className="px-8 pt-6 pb-20 md:pb-8 space-y-8 max-w-[1400px] mx-auto flex flex-col h-screen overflow-hidden">
+    <div className="px-8 pt-6 pb-20 md:pb-8 space-y-8 max-w-[1400px] mx-auto min-h-screen">
       <div className="flex items-center justify-between shrink-0">
         <div className="flex items-center gap-4">
           <SidebarTrigger className="h-9 w-9 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-colors" />
@@ -184,9 +183,9 @@ export default function RoomManagementPage() {
         </Card>
       </div>
 
-      <div className="flex-1 flex gap-8 overflow-hidden relative">
+      <div className="flex gap-8 relative">
         <div 
-          className="flex-1 flex flex-col gap-12 overflow-hidden"
+          className="flex-1 flex flex-col gap-12"
           onClick={() => { if (selectedRoomId) setSelectedRoomId(null); }}
         >
           <div className="flex flex-col md:flex-row items-center gap-4 shrink-0" onClick={(e) => e.stopPropagation()}>
@@ -217,58 +216,56 @@ export default function RoomManagementPage() {
             </div>
           </div>
 
-          <ScrollArea className="flex-1">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pr-4 pb-12">
-              {filteredRooms.map((roomId) => {
-                const occupancy = roomOccupancy[roomId];
-                const isActive = selectedRoomId === roomId;
-                return (
-                  <div
-                    key={roomId}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setSelectedRoomId(roomId);
-                    }}
-                    className={cn(
-                      "border border-[#B0BED6] dark:border-[#4A5878] shadow-[0_2px_8px_rgba(30,40,80,0.10)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.25)] hover:shadow-[0_4px_16px_rgba(45,58,107,0.14)] transition-all duration-200 bg-white dark:bg-[#3D4966] rounded-[24px] p-6 flex flex-col items-center gap-4 group cursor-pointer active:scale-95 relative",
-                      isActive && "ring-2 ring-primary ring-offset-2 dark:ring-offset-slate-900",
-                      isActive && (window.document.documentElement.classList.contains('dark') ? "bg-[#5B9FE0]" : "bg-[#4A6BAD]")
-                    )}
-                  >
-                    <div className="absolute left-6 top-1/2 -translate-y-1/2">
-                      <div className={cn(
-                        "h-3 w-3 rounded-full animate-custom-pulse",
-                        occupancy.occupied ? "bg-[#E24B4A]" : "bg-[#22C55E]"
-                      )} />
-                    </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pb-12">
+            {filteredRooms.map((roomId) => {
+              const occupancy = roomOccupancy[roomId];
+              const isActive = selectedRoomId === roomId;
+              return (
+                <div
+                  key={roomId}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedRoomId(roomId);
+                  }}
+                  className={cn(
+                    "border border-[#B0BED6] dark:border-[#4A5878] shadow-[0_2px_8px_rgba(30,40,80,0.10)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.25)] hover:shadow-[0_4px_16px_rgba(45,58,107,0.14)] transition-all duration-200 bg-white dark:bg-[#3D4966] rounded-[24px] p-6 flex flex-col items-center gap-4 group cursor-pointer active:scale-95 relative",
+                    isActive && "ring-2 ring-primary ring-offset-2 dark:ring-offset-slate-900",
+                    isActive && (window.document.documentElement.classList.contains('dark') ? "bg-[#5B9FE0]" : "bg-[#4A6BAD]")
+                  )}
+                >
+                  <div className="absolute left-6 top-1/2 -translate-y-1/2">
                     <div className={cn(
-                      "h-12 w-12 rounded-xl flex items-center justify-center transition-colors",
-                      isActive 
-                        ? (window.document.documentElement.classList.contains('dark') ? "bg-slate-900 text-[#1E2235]" : "bg-white text-[#F4F7FC]")
-                        : "bg-slate-50 dark:bg-slate-900 text-slate-400 group-hover:text-primary"
-                    )}>
-                      <Monitor size={24} />
-                    </div>
-                    <div className="text-center">
-                      <span className={cn(
-                        "font-black text-xl tracking-tight",
-                        isActive 
-                          ? (window.document.documentElement.classList.contains('dark') ? "text-[#1E2235]" : "text-[#F4F7FC]")
-                          : "text-slate-900 dark:text-white"
-                      )}>
-                        {roomId}
-                      </span>
-                    </div>
+                      "h-3 w-3 rounded-full animate-custom-pulse",
+                      occupancy.occupied ? "bg-[#E24B4A]" : "bg-[#22C55E]"
+                    )} />
                   </div>
-                );
-              })}
-            </div>
-          </ScrollArea>
+                  <div className={cn(
+                    "h-12 w-12 rounded-xl flex items-center justify-center transition-colors",
+                    isActive 
+                      ? (window.document.documentElement.classList.contains('dark') ? "bg-slate-900 text-[#1E2235]" : "bg-white text-[#F4F7FC]")
+                      : "bg-slate-50 dark:bg-slate-900 text-slate-400 group-hover:text-primary"
+                  )}>
+                    <Monitor size={24} />
+                  </div>
+                  <div className="text-center">
+                    <span className={cn(
+                      "font-black text-xl tracking-tight",
+                      isActive 
+                        ? (window.document.documentElement.classList.contains('dark') ? "text-[#1E2235]" : "text-[#F4F7FC]")
+                        : "text-slate-900 dark:text-white"
+                    )}>
+                      {roomId}
+                    </span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
 
         {selectedRoomId && selectedRoomData && (
-          <div className="w-[380px] shrink-0 animate-in slide-in-from-right duration-300 relative z-10">
-            <Card className={cn(cardBaseStyle, "h-fit flex flex-col shadow-2xl transition-none hover:translate-y-0")}>
+          <div className="w-[380px] shrink-0 animate-in slide-in-from-right duration-300 sticky top-6 h-fit z-10">
+            <Card className={cn(cardBaseStyle, "flex flex-col shadow-2xl transition-none hover:translate-y-0")}>
               <div className="p-0 flex flex-col">
                 <div className="p-6 flex items-center justify-between border-b border-[#B0BED6] dark:border-[#4A5878]">
                   <div className="text-left">

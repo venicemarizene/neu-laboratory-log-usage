@@ -38,7 +38,6 @@ function LoginPageContent() {
     const provider = new GoogleAuthProvider();
     
     provider.setCustomParameters({
-      hd: 'neu.edu.ph',
       prompt: 'select_account'
     });
 

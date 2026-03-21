@@ -70,9 +70,12 @@ export default function RoomQrRegistryPage() {
         <ThemeToggle />
       </div>
 
-      <div className="flex-1 flex gap-8 overflow-hidden">
-        <div className="flex-1 flex flex-col gap-6 overflow-hidden">
-          <div className="relative shrink-0">
+      <div className="flex-1 flex gap-8 overflow-hidden relative">
+        <div 
+          className="flex-1 flex flex-col gap-8 overflow-hidden"
+          onClick={() => { if (selectedRoom) setSelectedRoom(null); }}
+        >
+          <div className="relative shrink-0" onClick={(e) => e.stopPropagation()}>
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
             <Input 
               placeholder="Search rooms..." 
@@ -87,7 +90,10 @@ export default function RoomQrRegistryPage() {
               {filteredRooms.map((room) => (
                 <div
                   key={room}
-                  onClick={() => setSelectedRoom(room)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedRoom(room);
+                  }}
                   className={cn(
                     roomCardStyle,
                     selectedRoom === room && "ring-2 ring-primary ring-offset-2 dark:ring-offset-slate-900"
@@ -104,57 +110,58 @@ export default function RoomQrRegistryPage() {
         </div>
 
         {selectedRoom && (
-          <div className="w-[380px] shrink-0 animate-in slide-in-from-right duration-300">
-            <Card className={cn(cardStyle, "h-full flex flex-col border-none shadow-2xl relative")}>
-              <button 
-                onClick={() => setSelectedRoom(null)}
-                className="absolute top-4 right-4 h-8 w-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 hover:text-primary transition-colors z-10"
-              >
-                <X size={16} />
-              </button>
-
-              <div className="p-8 flex flex-col items-center gap-8 flex-1">
-                <div className="text-center space-y-1">
-                  <h3 className="text-3xl font-black text-[#3D5C99] dark:text-[#4A90D9] tracking-tighter">
-                    {selectedRoom}
-                  </h3>
-                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
-                    Institutional Laboratory Unit
-                  </p>
+          <div className="w-[340px] shrink-0 animate-in slide-in-from-right duration-300 relative z-10">
+            <Card className={cn(cardStyle, "h-fit flex flex-col border border-[#B0BED6] dark:border-[#4A5878] shadow-2xl")}>
+              <div className="p-6 flex flex-col items-center gap-6">
+                <div className="w-full flex items-center justify-between">
+                  <div className="text-left">
+                    <h3 className="text-2xl font-black text-[#3D5C99] dark:text-[#4A90D9] tracking-tighter">
+                      {selectedRoom}
+                    </h3>
+                    <p className="text-[9px] font-black uppercase tracking-[0.15em] text-slate-400">
+                      Institutional Laboratory Room
+                    </p>
+                  </div>
+                  <button 
+                    onClick={() => setSelectedRoom(null)}
+                    className="h-8 w-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 hover:text-primary transition-colors"
+                  >
+                    <X size={16} />
+                  </button>
                 </div>
 
                 <div className="w-full space-y-4">
-                  <div className="bg-white p-6 rounded-[32px] border border-[#B0BED6] dark:border-[#4A5878] shadow-inner flex items-center justify-center">
+                  <div className="bg-white p-4 rounded-[24px] border border-[#B0BED6] dark:border-[#4A5878] shadow-inner flex items-center justify-center aspect-square">
                     <QRCodeSVG
                       id={`qr-${selectedRoom}`}
                       value={`https://neu-laboratory-log-usage.vercel.app/login?room=${selectedRoom}`}
-                      size={200}
+                      size={180}
                       level="H"
                       includeMargin={true}
                     />
                   </div>
                   
                   <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-[#B0BED6] dark:border-[#4A5878]">
-                    <p className="text-[9px] font-bold text-slate-400 break-all leading-tight">
+                    <p className="text-[9px] font-bold text-slate-400 break-all leading-tight line-clamp-2">
                       {`https://neu-laboratory-log-usage.vercel.app/login?room=${selectedRoom}`}
                     </p>
                   </div>
                 </div>
 
-                <div className="w-full flex flex-col gap-3 mt-auto">
+                <div className="w-full grid grid-cols-2 gap-3">
                   <Button 
                     onClick={() => openView(selectedRoom!)}
                     variant="outline"
-                    className="h-12 rounded-xl font-black text-xs gap-2 border-[#B0BED6] dark:border-[#4A5878] shadow-sm"
+                    className="h-10 rounded-xl font-black text-[10px] gap-2 border-[#B0BED6] dark:border-[#4A5878] shadow-sm uppercase tracking-wider"
                   >
-                    <Maximize2 size={16} />
+                    <Maximize2 size={14} />
                     View Full
                   </Button>
                   <Button 
                     onClick={() => downloadQR(selectedRoom!)}
-                    className="h-12 rounded-xl bg-primary hover:bg-primary/90 text-white font-black text-xs gap-2 shadow-lg shadow-primary/20"
+                    className="h-10 rounded-xl bg-primary hover:bg-primary/90 text-white font-black text-[10px] gap-2 shadow-lg shadow-primary/20 uppercase tracking-wider"
                   >
-                    <Download size={16} />
+                    <Download size={14} />
                     Download PNG
                   </Button>
                 </div>

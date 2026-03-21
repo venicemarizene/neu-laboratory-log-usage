@@ -41,7 +41,7 @@ export function AdminSidebar() {
   ];
 
   return (
-    <Sidebar className={cn("border-none text-white transition-colors duration-200", "bg-[#2B3D6B] dark:bg-[#0F172A]")}>
+    <Sidebar className={cn("border-none text-white transition-colors duration-200 opacity-100 bg-opacity-100", "bg-[#2B3D6B] dark:bg-[#0F172A]")}>
       <SidebarHeader className="p-6">
         <div className="flex items-center gap-3">
           <div className="bg-white rounded-full p-0 flex items-center justify-center shrink-0 overflow-hidden w-[40px] h-[40px] border border-white/10">
@@ -51,7 +51,7 @@ export function AdminSidebar() {
               className="w-full h-full object-contain"
             />
           </div>
-          <span className="font-black text-xl tracking-tight leading-tight text-white dark:text-[#4A90D9]">New Era University</span>
+          <span className="font-black text-xl tracking-tight leading-tight text-white">New Era University</span>
         </div>
       </SidebarHeader>
 

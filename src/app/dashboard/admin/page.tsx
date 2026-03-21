@@ -224,11 +224,13 @@ export default function AdminDashboard() {
     const endTime = new Date(end).getTime();
     const diffMs = endTime - startTime;
     if (diffMs <= 0) return "—";
-    const diffMins = Math.floor(diffMs / 60000);
-    if (diffMins < 60) return `${diffMins}m`;
-    const hours = Math.floor(diffMins / 60);
-    const remainingMins = diffMins % 60;
-    return `${hours}h ${remainingMins}m`;
+    const totalSeconds = Math.floor(diffMs / 1000);
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+    if (hours > 0) return `${hours}h ${minutes}m ${seconds}s`;
+    if (minutes > 0) return `${minutes}m ${seconds}s`;
+    return `${seconds}s`;
   };
 
   const handleApplyRange = () => {
